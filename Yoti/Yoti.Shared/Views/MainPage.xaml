@@ -7,7 +7,60 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-		<TextBlock Text="Hello, world!" Margin="20" FontSize="30" />
-    </Grid>
+	<ScrollViewer>
+		<StackPanel>
+			<StackPanel
+			MaxHeight="250">
+				<!--WELCOME TEXT-->
+				<TextBlock  
+					FontSize="30"
+					Padding="50">
+					<Run Text="Welcome to Yoti"/>
+				</TextBlock>
+				<TextBlock 
+					Padding="30">
+					<Run Text="You can sign in or create a new account by clicking"/> 
+					<Italic>Register</Italic>
+					<Run Text=" down below."/>
+				</TextBlock>
+			</StackPanel>
+			<StackPanel
+				MaxHeight="300">
+				<!--LOGIN:username-->
+				<TextBox
+					PlaceholderText="Enter your username" 
+					Header="Username"
+					Width="300"
+					Margin="30"/>
+				<!--LOGIN:password-->
+				<PasswordBox  
+					PlaceholderText="Enter your password"
+					Header="Password"
+					Width="300"
+					Margin="30"/>
+			</StackPanel>
+			<StackPanel 
+				Orientation="Horizontal"
+				HorizontalAlignment="Center"
+				FlowDirection="RightToLeft">
+
+				<!--login button-->
+				<Button
+						Margin="50"
+						Content="Login" 
+						Width = "100"
+						Height = "40"
+						VerticalAlignment="Center" 
+						HorizontalAlignment="Right"/>
+				<!--register button-->
+				<Button 
+						Margin="50"
+						Content="Register" 
+						Width = "100"
+						Height = "40"
+						VerticalAlignment="Center" 
+						HorizontalAlignment="Left"/>
+			</StackPanel>
+		</StackPanel>
+	</ScrollViewer>
 </Page>
