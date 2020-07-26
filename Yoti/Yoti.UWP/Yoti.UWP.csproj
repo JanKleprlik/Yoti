@@ -137,6 +137,9 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="..\Assets\Fonts\Sansation\Sansation_Regular.ttf">
+      <Link>Assets\Fonts\Sansation_Regular.ttf</Link>
+    </Content>
     <None Include="Yoti.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
