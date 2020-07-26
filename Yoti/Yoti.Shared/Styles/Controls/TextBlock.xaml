@@ -1,0 +1,14 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Yoti.Shared.Styles.Controls">
+
+	<Style x:Key="DefaultTextBlock" TargetType="TextBlock">
+		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
+		<Setter Property="TextWrapping" Value="Wrap"/>
+		<Setter Property="TextAlignment" Value="Center"/>
+	</Style>
+
+	<Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlock}"/>
+
+</ResourceDictionary>
