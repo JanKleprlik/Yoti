@@ -12,19 +12,30 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Yoti.Shared.ViewModels;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace Yoti.Shared.Views
 {
-	/// <summary>
-	/// An empty page that can be used on its own or navigated to within a Frame.
-	/// </summary>
-	public sealed partial class MainPage : Page
+	public sealed partial class LoginPage : Page
 	{
-		public MainPage()
+		public LoginPage()
 		{
 			this.InitializeComponent();
+			DataContext = new LoginPageVM();
+			NavigationCacheMode = NavigationCacheMode.Enabled;
 		}
+
+		private void OnRegister(object sender, RoutedEventArgs e)
+		{
+			this.Frame.Navigate(typeof(RegisterPage), username.Text);
+		}
+
+		private void OnLogin(object sender, RoutedEventArgs e)
+		{
+			this.Frame.Navigate(typeof(MainPage));
+		}
+
 	}
 }

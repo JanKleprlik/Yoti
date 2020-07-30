@@ -1,0 +1,67 @@
+﻿<Page
+    x:Class="Yoti.Shared.Views.RegisterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Yoti.Shared.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+	<ScrollViewer>
+		<StackPanel>
+			<StackPanel
+			MaxHeight="250">
+				<!--WELCOME TEXT-->
+				<TextBlock  
+					FontSize="30"
+					Padding="50"
+					Text="Hi newcomer"
+					HorizontalAlignment="Center"/>
+				<TextBlock 
+					Padding="30"
+					Text="Fill in registration form down below."
+					HorizontalAlignment="Center"/>
+			</StackPanel>
+			<StackPanel
+				MaxHeight="500">
+				<!--LOGIN:username-->
+				<TextBox
+					Name="username"
+					PlaceholderText="Enter your username" 
+					Header="Username"
+					Width="300"
+					Margin="30"/>
+				<!--LOGIN:password-->
+				<PasswordBox  
+					Name="password1"
+					PlaceholderText="Enter your password"
+					Header="Password"
+					Width="300"
+					Margin="30"/>
+				<PasswordBox  
+					PlaceholderText="Enter your password"
+					Header="Reenter password"
+					Width="300"
+					Margin="30"/>
+			</StackPanel>
+			<Grid 
+				HorizontalAlignment="Center"
+				MaxWidth="300"
+				>
+				<!--register button-->
+				<Button 
+					Margin="120,50,0,0"
+					Content="Register" 
+					Width = "180"
+					Height = "40"
+					VerticalAlignment="Top" Click="Button_Click"/>
+				<Button
+					Margin="0,50,0,0"
+					Content="Back"
+					Height="40"
+					Width="auto"
+					Click="GoBack"/>
+			</Grid>
+		</StackPanel>
+	</ScrollViewer>
+</Page>
