@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Yoti.Shared.Styles.Controls">
 
-	<Style x:Key="DefaultTextBlock" TargetType="TextBlock">
+	<Style x:Key="DefaultTextBlock" TargetType="TextBlock" BasedOn="{StaticResource BaseTextBlockStyle}">
 		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
 		<Setter Property="TextWrapping" Value="Wrap"/>
 		<Setter Property="TextAlignment" Value="Center"/>
