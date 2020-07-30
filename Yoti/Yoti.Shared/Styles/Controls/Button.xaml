@@ -5,14 +5,41 @@
 
 
 
-	<Style x:Key="DefaultButton" TargetType="Button">
-		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
-		<Setter Property="HorizontalContentAlignment" Value="Center"/>
-		<Setter Property="VerticalContentAlignment" Value="Center"/>
-		<Setter Property="CornerRadius" Value="5"/>
-	</Style>
+	<ControlTemplate x:Name="UserButton" TargetType="Button">
+		<Border BorderBrush="{TemplateBinding BorderBrush}"
+		        BorderThickness="{TemplateBinding BorderThickness}">
 
-	<Style TargetType="Button" BasedOn="{StaticResource DefaultButton}"/>
-
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualStateGroup.Transitions>
+						<VisualTransition GeneratedDuration="0:0:0" />
+						<VisualTransition GeneratedDuration="0" To="Pressed" />
+						<VisualTransition GeneratedDuration="0:0:0.5" To="MouseOver"/>
+					</VisualStateGroup.Transitions>
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="CircleButton.Fill" Value="{StaticResource SecondaryLightColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="CircleButton.Fill" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="CircleButton.Height" Value="35"/>
+							<Setter Target="CircleButton.Width" Value="35"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+			<Grid>
+				<Ellipse x:Name="CircleButton"
+				         Fill="{StaticResource SecondaryColor}"
+				         Height="40"
+				         Width="40"
+				/>
+				<SymbolIcon Symbol="Contact" Foreground="White" />
+			</Grid>
+		</Border>
+	</ControlTemplate>
 
 </ResourceDictionary>
