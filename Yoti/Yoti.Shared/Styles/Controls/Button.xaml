@@ -53,7 +53,57 @@
 		</Border>
 	</ControlTemplate>
 
+	<ControlTemplate x:Name="DefaultButton" TargetType="Button">
+		<Border>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="Scale.ScaleX" Value="1.05"/>
+							<Setter Target="Scale.ScaleY" Value="1.05"/>
+							<Setter Target="Text.Margin" Value="1,0,0,1"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="Scale.ScaleX" Value="0.9"/>
+							<Setter Target="Scale.ScaleY" Value="0.9"/>
+							<Setter Target="Text.Margin" Value="0,1,0,0"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
 
+			<Grid>
+				<Rectangle
+					x:Name="Button"
+					RadiusX="20"
+					RadiusY="20"
+					Width="{TemplateBinding Width}"
+					Height="{TemplateBinding Height}"
+					Fill="{StaticResource PrimaryColor}"
+					Stroke="{StaticResource SecondaryColor}"
+					StrokeThickness="2"
+					RenderTransformOrigin="0.5,0.5">
+					<Rectangle.RenderTransform>
+						<ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
+					</Rectangle.RenderTransform>
+				</Rectangle>
+				<TextBlock 
+					x:Name="Text"
+					Text="{TemplateBinding Content}"
+					TextWrapping="Wrap"
+					Foreground="White"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"/>
+			</Grid>
+		</Border>
+	</ControlTemplate>
 
 
 
