@@ -4,8 +4,12 @@
     xmlns:local="using:Yoti.Shared.Styles.Controls">
 
 
+	<Style TargetType="ContentControl">
+		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
+	</Style>
 
-	<ControlTemplate x:Name="IconButton" TargetType="Button">
+	<ControlTemplate x:Name="IconRoundButton" TargetType="Button">
+
 		<Border>
 			<VisualStateManager.VisualStateGroups>
 				<VisualStateGroup x:Name="CommonStates">
@@ -14,30 +18,42 @@
 						<VisualState.Setters>
 							<Setter Target="CircleButton.Fill" Value="{StaticResource PrimaryLightColor}"/>
 							<Setter Target="CircleButton.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="CircleScale.ScaleX" Value="1.05"/>
+							<Setter Target="CircleScale.ScaleY" Value="1.05"/>
+							<Setter Target="Icon.Margin" Value="1,0,0,0"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="Pressed">
 						<VisualState.Setters>
 							<Setter Target="CircleButton.Fill" Value="{StaticResource PrimaryLightColor}"/>
 							<Setter Target="CircleButton.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
-							<Setter Target="CircleButton.Height" Value="35"/>
-							<Setter Target="CircleButton.Width" Value="35"/>
+							<Setter Target="CircleScale.ScaleX" Value="0.9"/>
+							<Setter Target="CircleScale.ScaleY" Value="0.9"/>
+							<Setter Target="Icon.Margin" Value="0,1,0,0"/>
 						</VisualState.Setters>
 					</VisualState>
 				</VisualStateGroup>
 			</VisualStateManager.VisualStateGroups>
-
 			<Grid>
+
 				<Ellipse x:Name="CircleButton"
 				         Fill="{StaticResource PrimaryColor}"
 				         Height="40"
 				         Width="40"
 				         Stroke="{StaticResource SecondaryColor}"
-				         StrokeThickness="2"/>
+				         StrokeThickness="2"
+				         RenderTransformOrigin="0.5, 0.5"
+				>
+					<Ellipse.RenderTransform>
+						<ScaleTransform x:Name="CircleScale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
+					</Ellipse.RenderTransform>
+				</Ellipse>
 				<SymbolIcon x:Name="Icon" Symbol="{TemplateBinding Content}" Foreground="White"/>
 			</Grid>
 		</Border>
 	</ControlTemplate>
+
+
 
 
 
