@@ -9,10 +9,16 @@
 
 
 
-	<ScrollViewer>
-		<StackPanel>
+	<ScrollViewer Background="{StaticResource MainBackgroundColor}">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="auto"/>
+			</Grid.RowDefinitions>
 			<StackPanel
-				MaxHeight="250">
+				MaxHeight="250"
+				Grid.Row="0">
 				<!--WELCOME TEXT-->
 				<TextBlock  
 					FontSize="30"
@@ -21,6 +27,7 @@
 					HorizontalAlignment="Center"/>
 				<TextBlock 
 					Padding="30"
+					FontSize="16"
 					HorizontalAlignment="Center"
 					TextWrapping="Wrap"
 					HorizontalTextAlignment="Center">
@@ -30,7 +37,8 @@
 				</TextBlock>
 			</StackPanel>
 			<StackPanel
-				MaxHeight="300">
+				MaxHeight="300"
+				Grid.Row="1">
 				<!--LOGIN:username-->
 				<TextBox
 					x:Name="username"
@@ -39,7 +47,7 @@
 					Width="300"
 					Margin="30"/>
 				<!--LOGIN:password-->
-				<PasswordBox  
+				<PasswordBox 
 					PlaceholderText="Enter your password"
 					Header="Password"
 					Width="300"
@@ -48,7 +56,8 @@
 			<StackPanel 
 				Orientation="Horizontal"
 				HorizontalAlignment="Center"
-				FlowDirection="RightToLeft">
+				FlowDirection="RightToLeft"
+				Grid.Row="2">
 
 				<!--login button-->
 				<Button
@@ -69,6 +78,6 @@
 					HorizontalAlignment="Left"
 					Click="OnRegister"/>
 			</StackPanel>
-		</StackPanel>
+		</Grid>
 	</ScrollViewer>
 </Page>
