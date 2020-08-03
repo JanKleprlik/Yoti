@@ -7,10 +7,18 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-	<ScrollViewer>
-		<StackPanel>
+	<ScrollViewer
+		Background="{StaticResource MainBackgroundColor}">
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="auto"/>
+				<RowDefinition Height="*"/>
+				<RowDefinition Height="auto"/>
+			</Grid.RowDefinitions>
+
 			<StackPanel
-			MaxHeight="250">
+			MaxHeight="250"
+			Grid.Row="0">
 				<!--WELCOME TEXT-->
 				<TextBlock  
 					FontSize="30"
@@ -23,7 +31,8 @@
 					HorizontalAlignment="Center"/>
 			</StackPanel>
 			<StackPanel
-				MaxHeight="500">
+				MaxHeight="500"
+				Grid.Row="1">
 				<!--LOGIN:username-->
 				<TextBox
 					Name="username"
@@ -37,31 +46,32 @@
 					PlaceholderText="Enter your password"
 					Header="Password"
 					Width="300"
-					Margin="30"/>
+					Margin="0,60,0,20"/>
 				<PasswordBox  
-					PlaceholderText="Enter your password"
-					Header="Reenter password"
-					Width="300"
-					Margin="30"/>
+					PlaceholderText="Reenter your password"
+					Header="Password again"
+					Width="300"/>
 			</StackPanel>
-			<Grid 
+			<StackPanel 
+				Grid.Row="2"
 				HorizontalAlignment="Center"
-				MaxWidth="300"
+				Orientation="Horizontal"
+				FlowDirection="RightToLeft"
+				Spacing="70"
+				Padding="50"
 				>
 				<!--register button-->
 				<Button 
-					Margin="120,50,0,0"
 					Content="Register" 
 					Width = "180"
 					Height = "40"
-					VerticalAlignment="Top" Click="Button_Click"/>
+					VerticalAlignment="Top"/>
 				<Button
-					Margin="0,50,0,0"
 					Content="Back"
 					Height="40"
 					Width="auto"
 					Click="GoBack"/>
-			</Grid>
-		</StackPanel>
+			</StackPanel>
+		</Grid>
 	</ScrollViewer>
 </Page>

@@ -45,10 +45,5 @@ namespace Yoti.Shared.Views
 
 			base.OnNavigatedTo(e);
 		}
-
-		private void Button_Click(object sender, RoutedEventArgs e)
-		{
-
-		}
 	}
 }
