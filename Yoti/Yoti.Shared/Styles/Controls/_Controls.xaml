@@ -6,6 +6,7 @@
         <ResourceDictionary Source="Buttons.xaml"/>
         <ResourceDictionary Source="TextBlock.xaml"/>
         <ResourceDictionary Source="TextBox.xaml"/>
+        <ResourceDictionary Source="PasswordBox.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>
