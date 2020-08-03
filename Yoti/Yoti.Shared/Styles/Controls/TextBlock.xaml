@@ -7,6 +7,7 @@
 		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
 		<Setter Property="TextWrapping" Value="Wrap"/>
 		<Setter Property="TextAlignment" Value="Center"/>
+		<Setter Property="Foreground" Value="White"/>
 	</Style>
 
 	<Style TargetType="TextBlock" BasedOn="{StaticResource DefaultTextBlock}"/>

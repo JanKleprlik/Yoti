@@ -1,9 +1,11 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:Yoti.Shared.Styles.Controls">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
 	<ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Button.xaml"/>
+        <ResourceDictionary Source="Buttons.xaml"/>
+        <ResourceDictionary Source="TextBlock.xaml"/>
+        <ResourceDictionary Source="TextBox.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>
