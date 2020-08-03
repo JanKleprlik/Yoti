@@ -11,6 +11,7 @@
 	<Style TargetType="TextBox">
 		<Setter Property="Template" Value="{StaticResource DefaultTextBox}"/>
 		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
+		<Setter Property="FontSize" Value="17"/>
 		<wasm:Setter Property="Foreground" Value="White"/>
 	</Style>
 
@@ -74,7 +75,7 @@
 						<VisualState.Setters>
 							<Setter Target="PlaceholderTextContentPresenter.Foreground" Value="White"/>
 							<Setter Target="BackgroundElement.Background" Value="{StaticResource PrimaryLightColor}"/>
-							<Setter Target="PlaceholderTextContentPresenter.Opacity" Value="0.6"/>
+							<Setter Target="PlaceholderTextContentPresenter.Opacity" Value="0.4"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="Disabled"/>
@@ -156,6 +157,7 @@
                                     Content="{TemplateBinding PlaceholderText}"
                                     IsHitTestVisible="False"
 									VerticalAlignment="Center"
+									Opacity="0.7"
                                     />
 			<Button x:Name="DeleteButton"
                             Grid.Row="1"

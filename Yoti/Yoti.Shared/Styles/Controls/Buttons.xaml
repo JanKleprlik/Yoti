@@ -27,7 +27,7 @@
 					<VisualState x:Name="Pressed">
 						<VisualState.Setters>
 							<Setter Target="CircleButton.Fill" Value="{StaticResource PrimaryLightColor}"/>
-							<Setter Target="CircleButton.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="CircleButton.Stroke" Value="{StaticResource SecondaryHighlightedColor}"/>
 							<Setter Target="CircleScale.ScaleX" Value="0.9"/>
 							<Setter Target="CircleScale.ScaleY" Value="0.9"/>
 							<Setter Target="Icon.Margin" Value="0,1,0,0"/>
@@ -71,7 +71,7 @@
 					<VisualState x:Name="Pressed">
 						<VisualState.Setters>
 							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
-							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryHighlightedColor}"/>
 							<Setter Target="Scale.ScaleX" Value="0.95"/>
 							<Setter Target="Scale.ScaleY" Value="0.95"/>
 							<Setter Target="Text.Margin" Value="0,1,0,0"/>
