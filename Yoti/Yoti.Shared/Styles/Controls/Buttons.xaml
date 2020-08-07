@@ -9,6 +9,9 @@
 		<Setter Property="FocusVisualSecondaryThickness" Value="0"/>
 	</Style>
 
+
+
+
 	<ControlTemplate x:Name="IconRoundButton" TargetType="Button">
 
 		<Border>
@@ -39,8 +42,8 @@
 
 				<Ellipse x:Name="CircleButton"
 				         Fill="{StaticResource PrimaryColor}"
-				         Height="40"
-				         Width="40"
+				         Height="{TemplateBinding Height}"
+				         Width="{TemplateBinding Width}"
 				         Stroke="{StaticResource SecondaryColor}"
 				         StrokeThickness="2"
 				         RenderTransformOrigin="0.5, 0.5"
@@ -115,8 +118,5 @@
 					VerticalAlignment="Center"/>
 			</Grid>
 	</ControlTemplate>
-
-	
-	
 
 </ResourceDictionary>
