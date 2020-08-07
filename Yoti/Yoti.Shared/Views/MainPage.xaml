@@ -5,37 +5,67 @@
     xmlns:local="using:Yoti.Shared.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="d">
 
-    <Grid>
+	<Grid Background="{StaticResource MainBackgroundColor}">
 		<Grid.RowDefinitions>
-			<RowDefinition Height="60"/> <!-- Common user controls -->
-			<RowDefinition Height="auto"/> <!-- Task tags-->
-			<RowDefinition Height="*"/> <!-- Tasks -->
+			<RowDefinition Height="100"/>	<!-- Common user controls -->
+			<RowDefinition Height="30"/>	<!-- Task tags-->
+			<RowDefinition Height="*"/>		<!-- Tasks -->
 		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="auto"/>
-			<ColumnDefinition Width="*"/>
-		</Grid.ColumnDefinitions>
 
 
-		<!-- Common user controls-->
-		<Button
-			x:Name="TaskSuggestor"
-			Content="Give me a task"
-			/>
-		<Button
-			x:Name="ScheduledTasks"
-			Content="Scheduled Tasks"
-			Margin="115,0,0,0"
-			/>
-		<Button Template="{StaticResource UserButton}"
-		        Grid.Row="0"
-		        HorizontalAlignment="Center"
-		        VerticalAlignment="Center"
-		        Margin="300,0,0,0"/>
+	    <!-- Common user controls-->
+		<StackPanel Grid.Row="0"
+		            Orientation="Horizontal"
+		            Spacing="30"
+		            Margin="30,30,100,30"
+		            >
+			<Button x:Name="TaskSuggestor"
+			        Content="Task"
+					FontSize="20"
+			        />
+			<Button x:Name="ScheduledTasks"
+			        Content="Plan"
+					FontSize="20"
+					
+			        />
+		</StackPanel>
+	    <Button Template="{StaticResource IconRoundButton}"
+	            Content="Contact"
+	            Grid.Row="0"
+	            HorizontalAlignment="Right"
+	            VerticalAlignment="Center"
+	            Margin="0,0,25,0"
+	            Click="OnBack"
+				Height="50"
+				Width="50"
+				/>
 		
 
-	</Grid>
+		<!-- Task tags -->
+
+
+		<ScrollViewer Grid.Row="1"
+					  HorizontalScrollBarVisibility="Hidden"
+					  HorizontalScrollMode="Enabled"
+					  VerticalScrollMode="Disabled"
+					  VerticalScrollBarVisibility="Disabled"
+					  >
+			<!-- ToggleButton Style will be applied automatically -->
+			<ScrollViewer.Resources>
+				<Style TargetType="ToggleButton" BasedOn="{StaticResource HalvedToggleButton}"/>
+			</ScrollViewer.Resources>
+
+			<StackPanel x:Name="TagButtonsPanel"
+						Orientation="Horizontal">
+
+			</StackPanel>
+		</ScrollViewer>
+
+		<ListView Grid.Row="2">
+		</ListView>
+
+    </Grid>
 </Page>
