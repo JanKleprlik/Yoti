@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Text;
 
 namespace Yoti.Shared.Models
 {
-	struct Tag
+	public struct Tag 
 	{
 		public Tag(string name, Color color)
 		{
@@ -15,6 +16,5 @@ namespace Yoti.Shared.Models
 
 		public string Name { get; }
 		public Color Color { get; }
-
 	}
 }

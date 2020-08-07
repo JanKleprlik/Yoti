@@ -23,7 +23,7 @@
 				<TextBlock  
 					FontSize="30"
 					Padding="50"
-					Text="Welcome to Yoti"
+					Text="Welcome to Yöti"
 					HorizontalAlignment="Center"/>
 				<TextBlock 
 					Padding="30"
