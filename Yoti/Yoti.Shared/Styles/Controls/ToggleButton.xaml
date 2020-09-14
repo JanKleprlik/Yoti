@@ -17,34 +17,35 @@
 					<VisualState x:Name="Normal"/>
 					<VisualState x:Name="PointerOver">
 						<VisualState.Setters>
-							<Setter Target="Button.Opacity" Value="0.9"/>
+							<Setter Target="Button.Opacity" Value="0.8"/>
+							<Setter Target="Button.Background" Value="{StaticResource PrimaryColor}"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="Pressed">
 						<VisualState.Setters>
-							<Setter Target="Button.Opacity" Value="0.9"/>
+							<Setter Target="Button.Opacity" Value="1"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="Focused">
 						<VisualState.Setters>
-							<Setter Target="Button.Opacity" Value="0.9"/>
+							<Setter Target="Button.Opacity" Value="0.5"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="Checked">
 						<VisualState.Setters>
-							<Setter Target="Button.Opacity" Value="0.9"/>
 							<Setter Target="SelectedPipe.Visibility" Value="Visible"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="CheckedPointerOver">
 						<VisualState.Setters>
-							<Setter Target="Button.Opacity" Value="0.9"/>
+							<Setter Target="Button.Opacity" Value="0.8"/>
+							<Setter Target="Button.Background" Value="{StaticResource PrimaryColor}"/>
 							<Setter Target="SelectedPipe.Visibility" Value="Visible"/>
 						</VisualState.Setters>
 					</VisualState>
 					<VisualState x:Name="CheckedPressed">
 						<VisualState.Setters>
-							<Setter Target="Button.Opacity" Value="0.9"/>
+							<Setter Target="Button.Opacity" Value="1"/>
 							<Setter Target="SelectedPipe.Visibility" Value="Visible"/>
 						</VisualState.Setters>
 					</VisualState>
@@ -58,11 +59,10 @@
 					Width="{TemplateBinding Width}"
 					Height="{TemplateBinding Height}"
 					CornerRadius="15,15,0,0"
-					Background="{TemplateBinding Background}"
+					Background="{StaticResource PrimaryDarkColor}"
 					Opacity="0.6"
-					BorderBrush="{TemplateBinding Background}"
 					RenderTransformOrigin="0.5,0.5">
-				<Border.RenderTransform>
+			<Border.RenderTransform>
 					<ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
 				</Border.RenderTransform>
 			</Border>
@@ -77,15 +77,24 @@
 					HorizontalAlignment="Center"
 					VerticalAlignment="Center"/>
 			<Rectangle x:Name="SelectedPipe"
-					   Fill="LightGray"
+					   Fill="{TemplateBinding Background}"
 					   Height="2"
 					   VerticalAlignment="Bottom"
-					   HorizontalAlignment="Center"
-					   Width="{Binding ActualWidth, ElementName=Text}"
-					   Opacity="0.7"
-					   Margin="0,0,0,2"
+					   HorizontalAlignment="Stretch"
+					   Width="auto"
+					   Opacity="0.8"
+					   Margin="18,0,18,5"
 					   Visibility="Collapsed"
 					   />
+			<Rectangle x:Name="TagColor"
+			           Fill="{TemplateBinding Background}"
+					   RadiusX="2"
+					   RadiusY="2"
+			           Width="6"
+					   Height="{Binding ActualHeight, ElementName=Text}"
+					   HorizontalAlignment="Right"
+					   Margin="0,7,10,7"
+			           />
 
 		</Grid>
 	</ControlTemplate>
