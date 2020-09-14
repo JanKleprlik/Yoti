@@ -52,26 +52,28 @@
 					Header="Password again"
 					Width="300"/>
 			</StackPanel>
-			<StackPanel 
+			<Grid 
 				Grid.Row="2"
-				HorizontalAlignment="Center"
-				Orientation="Horizontal"
-				FlowDirection="RightToLeft"
-				Spacing="70"
-				Padding="50"
+				Padding="0,50"
+				Width="300"
 				>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="180"/>
+				</Grid.ColumnDefinitions>
 				<!--register button-->
-				<Button 
-					Content="Register" 
-					Width = "180"
-					Height = "40"
-					VerticalAlignment="Top"/>
-				<Button
-					Content="Back"
-					Height="40"
-					Width="auto"
-					Click="GoBack"/>
-			</StackPanel>
+				<Button x:Name="RegisterButton"
+						Grid.Column="1"
+						Content="Register" 
+						Width = "180"
+						Height = "40"/>
+				<Button x:Name="BackButton"
+						Grid.Column="0"
+						Content="Back"
+						Height="40"
+						Width="auto"
+						Click="GoBack"/>
+			</Grid>
 		</Grid>
 	</ScrollViewer>
 </Page>

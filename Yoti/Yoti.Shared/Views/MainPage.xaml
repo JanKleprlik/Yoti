@@ -17,21 +17,25 @@
 
 
 	    <!-- Common user controls-->
-		<StackPanel Grid.Row="0"
-		            Orientation="Horizontal"
-		            Spacing="30"
-		            Margin="30,30,100,30"
-		            >
+		<Grid Grid.Row="0"
+					Margin="30,30,100,30"
+					>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="80"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<Grid.ColumnSpacing>30</Grid.ColumnSpacing>
 			<Button x:Name="TaskSuggestor"
+					Grid.Column="0"
 			        Content="Task"
-					FontSize="20"
-			        />
+			        FontSize="20"
+			/>
 			<Button x:Name="ScheduledTasks"
+			        Grid.Column="1"
 			        Content="Plan"
 					FontSize="20"
-					
 			        />
-		</StackPanel>
+		</Grid>
 	    <Button Template="{StaticResource IconRoundButton}"
 	            Content="Contact"
 	            Grid.Row="0"
@@ -45,14 +49,12 @@
 		
 
 		<!-- Task tags -->
-
-
-		<ScrollViewer Grid.Row="1"
-					  HorizontalScrollBarVisibility="Hidden"
-					  HorizontalScrollMode="Enabled"
-					  VerticalScrollMode="Disabled"
-					  VerticalScrollBarVisibility="Disabled"
-					  >
+	    <ScrollViewer Grid.Row="1"
+	                  HorizontalScrollBarVisibility="Hidden"
+	                  HorizontalScrollMode="Enabled"
+	                  VerticalScrollMode="Disabled"
+	                  VerticalScrollBarVisibility="Disabled"
+	    >
 			<!-- ToggleButton Style will be applied automatically -->
 			<ScrollViewer.Resources>
 				<Style TargetType="ToggleButton" BasedOn="{StaticResource HalvedToggleButton}"/>
@@ -63,8 +65,10 @@
 
 			</StackPanel>
 		</ScrollViewer>
-
-		<ListView Grid.Row="2">
+		<Border Grid.Row="1"
+		        BorderThickness="0,0,0,2"
+		        BorderBrush="{StaticResource PrimaryLightColor}"/>
+	    <ListView Grid.Row="2">
 		</ListView>
 
     </Grid>
