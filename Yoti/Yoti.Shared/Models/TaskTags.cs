@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
+using Windows.UI;
 using System.Text;
 
 namespace Yoti.Shared.Models
