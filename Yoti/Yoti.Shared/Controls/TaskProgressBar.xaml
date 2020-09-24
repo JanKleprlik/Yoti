@@ -10,19 +10,19 @@
     d:DesignWidth="400">
 
 	<Grid x:Name="Border"
-	         BorderBrush="{StaticResource PrimaryColor}"
-	         BorderThickness="2"
-	         CornerRadius="7"
-			 MinHeight="104"
-	         Height="{Binding Height}"
-	         Width="{Binding Width}">
+	      BorderBrush="{StaticResource PrimaryColor}"
+	      BorderThickness="2"
+	      CornerRadius="7"
+	      MinHeight="104"
+	      Height="{Binding Height}"
+	      Width="{Binding Width}">
 		<Rectangle
 			x:Name="Bar"
 			MaxHeight="100"
 			RadiusX="10"
 			RadiusY="10"
-			Height="40"
-			Width="20"
+			Height="0"
+			Width="18"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Bottom">
 			<Rectangle.Fill>
