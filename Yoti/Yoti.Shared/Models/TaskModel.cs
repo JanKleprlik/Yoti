@@ -12,13 +12,14 @@ namespace Yoti.Shared.Models
 
 		// Regular properties
 		public string Name { get; set; }
-		public short Difficulty { get; set; }
-		public TimeSpan Time {get; set;}
-		public DateTime Deadline { get; set; }
+		public short Difficulty { get; set; } = 0;
+		public TimeSpan Time {get; set;} = TimeSpan.Zero;
+		public TimeSpan TimeDone { get; set; } = TimeSpan.Zero;
+		public DateTime Deadline { get; set; } = DateTime.Now;
 		public Tag Tag { get; set; }
-		public string Description { get; set; }
+		public string Description { get; set; } = "";
 		public List<Task> Dependencies = new List<Task>();
-		public bool IsSeparable { get; set; }
+		public bool IsSeparable { get; set; } = false;
 
 		// Properties for automatically generated tasks
 		public bool IsAutomatic { get; set; }
