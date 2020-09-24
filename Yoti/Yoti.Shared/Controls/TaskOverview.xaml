@@ -14,16 +14,17 @@
     <Grid
 	    x:Name="Table"
         Width="{Binding Width}"
-        Height="{Binding Height}"
+	    Height="{Binding Height}"
+		HorizontalAlignment="Stretch"
 	    >
 		<Grid.RowDefinitions>
-            <RowDefinition Height="0.8*"/>
-            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.1*"/>
-            <ColumnDefinition Width="0.3*"/>
-            <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
 		<local:TaskProgressBar
@@ -33,7 +34,7 @@
 			Width="20"
 			Height="104"
 			Progress="0" 
-            Margin="10"
+            Margin="0,0,0,0"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			/>
@@ -42,10 +43,11 @@
 			x:Name="TagBorder"
 			Grid.Row="1"
 			Grid.Column="1"
-			Background="Red"
+			Background="Gray"
 			Height="auto"
 			Width="auto"
-			Padding="4,0"
+			Margin="10,0"
+			Padding="5,0"
 			CornerRadius="5"
 			HorizontalAlignment="Left"
 			VerticalAlignment="Center"
@@ -63,7 +65,8 @@
 			Grid.ColumnSpan="2"
 			HorizontalScrollBarVisibility="Disabled"
 			not_wasm:VerticalScrollBarVisibility="Auto"
-			wasm:VerticalScrollBarVisibility="Disabled">
+			wasm:VerticalScrollBarVisibility="Hidden"
+			Padding="0,10,0,5">
 			<TextBlock
 				x:Name="DescriptionText"
 				Text="SAMPLE TEXT"
