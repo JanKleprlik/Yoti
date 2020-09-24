@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -36,6 +37,8 @@ namespace Yoti.Shared.Views
 				b.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(tag.Color.A, tag.Color.R, tag.Color.G, tag.Color.B));
 				b.Content = tag.Name;
 				TagButtonsPanel.Children.Add(b);
+				//TaskList.ItemsSource = MPVM.Tasks;
+				TempListView.ItemsSource = MPVM.Tasks;
 			}
 		}
 
@@ -43,5 +46,6 @@ namespace Yoti.Shared.Views
 		{
 			this.Frame.Navigate(typeof(LoginPage));
 		}
+
 	}
 }

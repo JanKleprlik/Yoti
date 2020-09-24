@@ -1,12 +1,18 @@
-﻿<Page
+﻿<Page  
     x:Class="Yoti.Shared.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:Yoti.Shared.Views"
+	xmlns:models="using:Yoti.Shared.Models"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:win="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    mc:Ignorable="d">
+    xmlns:wasm="http://uno.ui/wasm"
+    xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:not_win="http:/uno.ui/xamarin"
+    xmlns:controls="using:Yoti.Shared.Controls"
+    mc:Ignorable="d wasm not_win">
+
 
 	<Grid Background="{StaticResource MainBackgroundColor}">
 		<Grid.RowDefinitions>
@@ -68,8 +74,55 @@
 		<Border Grid.Row="1"
 		        BorderThickness="0,0,0,2"
 		        BorderBrush="{StaticResource PrimaryLightColor}"/>
-	    <ListView Grid.Row="2">
+	    
+		<ListView
+			x:Name="TempListView"
+			Grid.Row="2"
+			Padding="20"
+			>
+			<ListView.ItemTemplate>
+				<DataTemplate x:DataType="models:Task">
+					<win:Grid>
+						<controls:TaskOverview
+							Height="130"
+							Units="Hrs"
+							TagColor="{x:Bind Tag.Color}"
+							TagName="{x:Bind Tag.Name}"
+							Description="{x:Bind Description}"
+							TotalTime="{x:Bind Time.Hours}"
+							CompleteTime="{x:Bind TimeDone.Hours}"
+							Progress="{Binding Value, ElementName=BarSlider}"
+							/>
+					</win:Grid>
+					<not_win:Grid>
+						<controls:TaskOverview
+							Height="130"
+							Units="Hrs"
+							TagName="{x:Bind Tag.Name}"
+							Description="{x:Bind Description}"
+							TotalTime="{x:Bind Time.Hours}"
+							CompleteTime="{x:Bind TimeDone.Hours}"
+							Progress="{Binding Value, ElementName=BarSlider}"
+						/>
+					</not_win:Grid>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+				</Style>
+			</ListView.ItemContainerStyle>
 		</ListView>
+	    <!-- USER CONTROL -->
+	    <Slider
+			x:Name="BarSlider"
+			Grid.Row="2"
+			VerticalAlignment="Bottom"
+			Value="66"
+			Minimum="0"
+			Maximum="100"
+			StepFrequency="5"
+			Margin="50"/>
 
     </Grid>
 </Page>
