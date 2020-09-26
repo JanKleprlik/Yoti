@@ -7,19 +7,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{StaticResource MainBackgroundColor}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>      <!-- Common user controls -->
-            <RowDefinition Height="Auto"/>     <!-- Task Name-->
-            <RowDefinition Height="Auto"/>     <!-- Necessary details -->
-            <RowDefinition Height="*"/>        <!-- Optional details-->
-            <RowDefinition Height="Auto"/>     <!-- Advanced details -->
-            <RowDefinition Height="50"/>       <!-- Add button -->
-        </Grid.RowDefinitions>
+	<ScrollViewer>
+		<Grid Background="{StaticResource MainBackgroundColor}">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="100"/> <!-- Common user controls -->
+				<RowDefinition Height="Auto"/> <!-- Task Name-->
+			</Grid.RowDefinitions>
 
 
-        <!-- Common user controls -->
-		<Button 
+			<!-- Common user controls -->
+			<Button 
             x:Name="CancelButton"
 			Template="{StaticResource IconRoundButton}"
 			Content="Cancel"
@@ -28,8 +25,8 @@
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			Height="50"
-			Width="50"/>		
-        <Button 
+			Width="50"/>
+			<Button 
 			Template="{StaticResource IconRoundButton}"
 			Content="Contact"
 			Grid.Row="0"
@@ -39,58 +36,97 @@
 			Height="50"
 			Width="50"/>
 
-        <!-- Task information -->
-         <TextBox 
-	         x:Name="TaskName"
-	         Grid.Row="1"
-	         Margin="25,0"
-	         PlaceholderText="Name"/>
-        <!-- Necessary details -->
-		<Grid
-			Grid.Row="2">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto"/>
-				<RowDefinition Height="Auto"/>
-			</Grid.RowDefinitions>
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="*"/>
-			</Grid.ColumnDefinitions>
-			<DropDownButton
-				x:Name="DifficultyPicker"
-				Grid.Row="0"
-				Grid.Column="0"
-				Content="Difficulty"
-				 >
-				<DropDownButton.Flyout>
-					<MenuFlyout Placement="Bottom">
-						<MenuFlyoutItem Text="1"/>
-						<MenuFlyoutItem Text="2"/>
-						<MenuFlyoutItem Text="3"/>
-						<MenuFlyoutItem Text="4"/>
-						<MenuFlyoutItem Text="5"/>
-					</MenuFlyout>
-				</DropDownButton.Flyout>
-			</DropDownButton>
-			<TimePicker
-				x:Name="TimePicker"
-				Grid.Row="0"
-				Grid.Column="1"
-				ClockIdentifier="24HourClock"
-				Header="Time"
-			/>
-			<DropDownButton
-				x:Name="TagPicker"
-				Grid.Row="1"
-				Grid.Column="0"
-				Content="Tag"
-			/>			
-			<CalendarDatePicker
-				x:Name="DeadlinePicker"
-				Grid.Row="1"
-				Grid.Column="1"
-			/>
-
+			<StackPanel
+				Grid.Row="1">
+				<!-- Task information -->
+				<TextBlock 
+					Text="Task Details"
+					Opacity="0.5"
+					VerticalAlignment="Top"/>
+				<TextBox 
+			         x:Name="TaskName"
+			         Margin="25,10"
+					 MaxWidth="450"
+			         PlaceholderText="Name"/>
+				<!-- Necessary details -->
+				<RelativePanel
+					HorizontalAlignment="Center">
+						<!-- Difficulty -->
+					<DropDownButton
+						x:Name="DifficultyPicker"
+						Content="Difficulty"
+						Margin="50,20">
+						<DropDownButton.Flyout>
+							<MenuFlyout Placement="Bottom">
+								<MenuFlyoutItem Text="1"/>
+								<MenuFlyoutItem Text="2"/>
+								<MenuFlyoutItem Text="3"/>
+								<MenuFlyoutItem Text="4"/>
+								<MenuFlyoutItem Text="5"/>
+							</MenuFlyout>
+						</DropDownButton.Flyout>
+					</DropDownButton>
+					<!-- Time -->
+					<TimePicker
+						x:Name="TimePicker"
+						ClockIdentifier="24HourClock"
+						Header="Time"
+						RelativePanel.RightOf="DifficultyPicker"/>
+					<!-- Tag -->
+					<DropDownButton
+						x:Name="TagPicker"
+						Content="Tag"
+						Margin="50,20"
+						RelativePanel.Below="DifficultyPicker"/>
+					<!-- Deadline -->
+					<CalendarDatePicker
+						x:Name="DeadlinePicker"
+						PlaceholderText="Deadline"
+						Header="Deadline"
+						RelativePanel.AlignVerticalCenterWith="TagPicker"
+						RelativePanel.AlignLeftWith="TimePicker"/>
+				</RelativePanel>
+				<TextBlock 
+					Text="Optional"
+					Opacity="0.5"
+					VerticalAlignment="Top"/>
+				<!-- Description -->
+				<TextBox
+					x:Name="TaskDescription"
+					Margin="25,10"
+					MinHeight="80"
+					MaxWidth="450"
+					PlaceholderText="Description"
+					AutomationProperties.Name="multi-line TextBox"
+					IsSpellCheckEnabled="True"
+					AcceptsReturn="True"
+					TextWrapping="Wrap"/>
+				<Grid
+					MaxWidth="350"
+					Width="350"
+					HorizontalAlignment="Center">
+					<ToggleSwitch
+						x:Name="SeparableButton"
+						OnContent="Is separable"
+						OffContent="Is not separable"
+						HorizontalAlignment="Left"
+						/>
+					<ToggleSwitch
+						x:Name="AutomatedButton"
+						OnContent="Is automated"
+						OffContent="Is not automated"
+						HorizontalAlignment="Right"
+						/>
+				</Grid>
+				<Button
+					x:Name="AddButton"
+					Content="Add"
+					HorizontalAlignment="Right"
+					Width="130"
+					Margin="25"/>
+			</StackPanel>
+		
 		</Grid>
-    </Grid>
+	</ScrollViewer>
+    
 </Page>
