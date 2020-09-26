@@ -52,7 +52,17 @@
 				Height="50"
 				Width="50"
 				/>
-		
+	    <Button Template="{StaticResource IconRoundButton}"
+	            Content="Add"
+	            Grid.Row="0"
+	            HorizontalAlignment="Right"
+	            VerticalAlignment="Center"
+	            Margin="0,0,105,0"
+	            Click="OnAdd"
+	            Height="50"
+	            Width="50"
+	    />
+
 
 		<!-- Task tags -->
 	    <ScrollViewer Grid.Row="1"

@@ -47,5 +47,10 @@ namespace Yoti.Shared.Views
 			this.Frame.Navigate(typeof(LoginPage));
 		}
 
+		public void OnAdd(object sender, RoutedEventArgs e)
+		{
+			this.Frame.Navigate(typeof(AddTaskPage));
+		}
+
 	}
 }
