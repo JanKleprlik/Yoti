@@ -31,6 +31,9 @@
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\LoginPageVM.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageVM.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\RegisterPageVM.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\AddTaskPage.xaml.cs">
+      <DependentUpon>AddTaskPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Views\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -99,6 +102,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="$(MSBuildThisFileDirectory)Themes\Generic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\AddTaskPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
