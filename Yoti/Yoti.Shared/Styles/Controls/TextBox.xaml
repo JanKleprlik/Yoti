@@ -145,7 +145,6 @@
                                   AutomationProperties.AccessibilityView="Raw"
                                   ZoomMode="Disabled"
 								  Foreground="White"
-                                  Height="35"
                                   />
 			<ContentControl x:Name="PlaceholderTextContentPresenter"
                                     Grid.Row="1"
@@ -156,7 +155,7 @@
                                     Grid.ColumnSpan="2"
                                     Content="{TemplateBinding PlaceholderText}"
                                     IsHitTestVisible="False"
-									VerticalAlignment="Center"
+									VerticalAlignment="Top"
 									Opacity="0.7"
                                     />
 			<Button x:Name="DeleteButton"
