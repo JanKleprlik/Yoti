@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Yoti.Shared.ViewModels;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -25,6 +26,8 @@ namespace Yoti.Shared.Views
 		public AddTaskPage()
 		{
 			this.InitializeComponent();
+			MainPageVM MPVM = new MainPageVM();
+			TagPicker.ItemsSource = MPVM.Tags;
 		}
 
 		public void OnCancel(object sender, RoutedEventArgs e)
