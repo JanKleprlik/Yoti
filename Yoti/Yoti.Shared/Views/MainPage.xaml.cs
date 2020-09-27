@@ -37,7 +37,6 @@ namespace Yoti.Shared.Views
 				b.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(tag.Color.A, tag.Color.R, tag.Color.G, tag.Color.B));
 				b.Content = tag.Name;
 				TagButtonsPanel.Children.Add(b);
-				//TaskList.ItemsSource = MPVM.Tasks;
 				TempListView.ItemsSource = MPVM.Tasks;
 			}
 		}
