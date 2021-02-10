@@ -38,7 +38,7 @@ namespace BP
         MediaCapture capture;
         InMemoryRandomAccessStream buffer;
         string filename;
-        string audioFile = "UWP_recording.mp3";
+        string audioFile = "UWP_recording.wav";
         private async Task<bool> RecordProcess()
         {
             if (buffer != null)
@@ -132,7 +132,7 @@ namespace BP
 				#region UWP
 #if NETFX_CORE
 				await RecordProcess();
-                await capture.StartRecordToStreamAsync(MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Auto), buffer);
+                await capture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.Low), buffer);
                 if (record)
                 {
                     throw new InvalidOperationException();
