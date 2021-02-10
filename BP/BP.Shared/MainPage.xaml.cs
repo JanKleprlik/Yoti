@@ -23,6 +23,11 @@ using System.Threading;
 using Windows.UI.Core;
 #endif
 
+#if __ANDROID__
+using Android.Media;
+using Android.Content.PM;
+#endif
+
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace BP
@@ -111,6 +116,13 @@ namespace BP
         }
 #endif
         #endregion
+
+        #region ANDROID
+#if __ANDROID__
+        private MediaRecorder recorder;
+        private Android.Media.MediaPlayer player;
+#endif
+#endregion
         public MainPage()
         {
             this.InitializeComponent();
@@ -129,7 +141,7 @@ namespace BP
             else
             {
                 textBlk.Text = "Recording ...";
-				#region UWP
+                #region UWP
 #if NETFX_CORE
 				await RecordProcess();
                 await capture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.Low), buffer);
@@ -138,21 +150,81 @@ namespace BP
                     throw new InvalidOperationException();
                 }
 
-                record = true;
 #endif
-				#endregion
-			}
-		}
+                #endregion
+                #region ANDROID
+#if __ANDROID__
+                string filePath = "/data/data/SongRecognition.SongRecognition/files/testAudio.mp4";
+                try
+                {
+                    /*
+		            if (Java.IO.File.Exists(filePath))
+		            {
+			            Java.IO.File.Delete(filePath);
+		            }
+                    */
+                    if (recorder == null)
+                    {
+                        recorder = new MediaRecorder(); // Initial state.
+                    }
+                    else
+                    {
+                        recorder.Reset();
+                    }
+
+                    Console.Out.WriteLine("[DEBUG] mic");
+                    recorder.SetAudioSource(AudioSource.Mic);
+                    recorder.SetOutputFormat(OutputFormat.Mpeg4);
+                    recorder.SetAudioChannels(1);
+                    recorder.SetAudioSamplingRate(11025);
+                    recorder.SetAudioEncodingBitRate(44000);
+                    recorder.SetAudioEncoder(AudioEncoder.HeAac);
+                    Console.Out.WriteLine("[DEBUG] encoder");
+                    Console.Out.WriteLine("[DEBUG] seting up outputfile");
+                    recorder.SetOutputFile(filePath);
+                    recorder.Prepare();
+                    Console.Out.WriteLine("[DEBUG] starting to listen");
+                    recorder.Start();
+
+
+                }
+                catch (Exception ex)
+                {
+                    Console.Out.WriteLine(ex.StackTrace);
+                }
+#endif
+                #endregion
+
+                record = true;
+
+            }
+        }
 
 
         private async void stopBtn_Click(object sender, RoutedEventArgs e)
         {
             textBlk.Text = "Stopped recording.";
-			#region UWP
+            #region UWP
 #if NETFX_CORE
 			Thread.Sleep(300);
             await capture.StopRecordAsync();
 #endif
+            #endregion
+            #region ANDROID
+
+#if __ANDROID__
+            Console.Out.WriteLine("[DEBUG] STOP recording clicked.");
+            if (recorder != null)
+            {
+                Console.Out.WriteLine("[DEBUG] Stopping the recording.");
+                recorder.Stop();
+                recorder.Release();
+                recorder = null;
+                record = false;
+                Console.Out.WriteLine("[DEBUG] Stopped the recording.");
+            }
+#endif
+
             #endregion
         }
 
@@ -162,6 +234,31 @@ namespace BP
             #region UWP
 #if NETFX_CORE
             await PlayRecordedAudio(Dispatcher);
+#endif
+            #endregion
+
+            #region ANDROID
+
+#if __ANDROID__
+            Console.Out.WriteLine("[DEBUG] PLAY clicked.");
+
+            string filePath = "/data/data/SongRecognition.SongRecognition/files/testAudio.mp4";
+            if (player == null)
+            {
+                player = new Android.Media.MediaPlayer();
+            }
+            else
+            {
+                player.Reset();
+            }
+            Console.Out.WriteLine("[DEBUG] Playiing the recording.");
+
+            //Java.IO.File file = new Java.IO.File(filePath);
+            //Java.IO.FileInputStream fis = new Java.IO.FileInputStream(file);
+            player.SetDataSource(filePath);
+            //await player.SetDataSourceAsync(fis.FD);
+            player.Prepare();
+            player.Start();
 #endif
             #endregion
         }
