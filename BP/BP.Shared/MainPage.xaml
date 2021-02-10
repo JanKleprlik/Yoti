@@ -8,6 +8,14 @@
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-		<TextBlock Text="Hello, world!" Margin="20" FontSize="30" />
-    </Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+		<TextBlock x:Name ="textBlk" Grid.Row ="0" Text="Hello World"/>
+		<Button Grid.Row="0" x:Name="recordBtn" Content="Microphone" HorizontalAlignment="Center" Click="recordBtn_Click" BorderBrush="Blue"/>
+		<Button Grid.Row="1" x:Name="stopBtn" Content="Stop" HorizontalAlignment="Center" Click="stopBtn_Click" BorderBrush="Blue"/>
+		<Button Grid.Row="2" x:Name="playBtn" Content="Play" HorizontalAlignment="Center" Click="playBtn_Click" BorderBrush="Blue"/>
+	</Grid>
 </Page>
