@@ -119,7 +119,8 @@ namespace BP
 
         #region ANDROID
 #if __ANDROID__
-        private string filePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "recording.mp4");
+        bool external = false;
+        private string filePath;
         private MediaRecorder recorder;
         private Android.Media.MediaPlayer player;
 #endif
@@ -128,6 +129,17 @@ namespace BP
         {
             this.InitializeComponent();
             textBlk.Text = "I am ready";
+
+#if __ANDROID__
+            if (external)
+			{
+                filePath = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryMusic).AbsolutePath, "recording.mp4");
+            }
+            else
+			{
+                filePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "recording.mp4");
+            }
+#endif
         }
 
 
@@ -168,11 +180,16 @@ namespace BP
                     return;
 				}
 
-                /*
-                bool canAccessStorage = await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.);
-                if (!canAccessMicrophone)
-                    return;
-                */
+				if (external)
+				{
+                    bool canAccessStorageW = await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.WriteExternalStorage);
+                    if (!canAccessStorageW)
+                        return;                
+                    bool canAccessStorageR = await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.ReadExternalStorage);
+                    if (!canAccessStorageR)
+                        return;
+				}
+                
                 try
                 {
                     
@@ -250,6 +267,7 @@ namespace BP
 
         private async void playBtn_Click(object sender, RoutedEventArgs e)
         {
+            Console.Out.WriteLine("[DEBUG] PLAY clicked.");
             #region UWP
 #if NETFX_CORE
             await PlayRecordedAudio(Dispatcher);
@@ -258,9 +276,7 @@ namespace BP
             #region ANDROID
 
 #if __ANDROID__
-            Console.Out.WriteLine("[DEBUG] PLAY clicked.");
 
-            //string filePath = "/data/data/BP.BP/files/testAudio.mp4";
             if (player == null)
             {
                 player = new Android.Media.MediaPlayer();
@@ -269,12 +285,8 @@ namespace BP
             {
                 player.Reset();
             }
-            Console.Out.WriteLine("[DEBUG] Playiing the recording.");
-
-            //Java.IO.File file = new Java.IO.File(filePath);
-            //Java.IO.FileInputStream fis = new Java.IO.FileInputStream(file);
+            Console.Out.WriteLine("[DEBUG] Playing the recording.");
             player.SetDataSource(filePath);
-            //await player.SetDataSourceAsync(fis.FD);
             player.Prepare();
             player.Start();
 #endif
