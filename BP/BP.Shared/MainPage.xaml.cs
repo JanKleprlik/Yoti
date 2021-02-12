@@ -26,7 +26,11 @@ using Windows.UI.Core;
 #if __ANDROID__
 using Android.Media;
 using Android.Content.PM;
+#endif
 
+#if __WASM__
+using Uno.Foundation;
+using System.Text.RegularExpressions;
 #endif
 
 
@@ -38,7 +42,7 @@ namespace BP
     public sealed partial class MainPage : Page
     {
         bool record;
-        #region UWP
+#region UWP
 #if NETFX_CORE
         MediaCapture capture;
         InMemoryRandomAccessStream buffer;
@@ -115,9 +119,8 @@ namespace BP
             });
         }
 #endif
-        #endregion
-
-        #region ANDROID
+#endregion
+#region ANDROID
 #if __ANDROID__
         bool external = false;
         private string filePath;
@@ -125,11 +128,15 @@ namespace BP
         private Android.Media.MediaPlayer player;
 #endif
 #endregion
-        public MainPage()
+#region WASM
+
+#endregion
+
+		public MainPage()
         {
             this.InitializeComponent();
             textBlk.Text = "I am ready";
-
+#region ANDROID
 #if __ANDROID__
             if (external)
 			{
@@ -140,12 +147,13 @@ namespace BP
                 filePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "recording.mp4");
             }
 #endif
-        }
+#endregion
+		}
 
 
 
 
-        private async void recordBtn_Click(object sender, RoutedEventArgs e)
+		private async void recordBtn_Click(object sender, RoutedEventArgs e)
         {
             if (record)
             {
@@ -153,7 +161,7 @@ namespace BP
             }
             else
             {
-                #region UWP
+#region UWP
 #if NETFX_CORE
 				await RecordProcess();
                 await capture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.Low), buffer);
@@ -163,8 +171,8 @@ namespace BP
                 }
 
 #endif
-                #endregion
-                #region ANDROID
+#endregion
+#region ANDROID
 #if __ANDROID__
 
                 //check for permission
@@ -229,7 +237,40 @@ namespace BP
                     Console.Out.WriteLine("[DEBUG]" + ex.StackTrace);
                 }
 #endif
-                #endregion
+#endregion
+
+#region WASM
+#if __WASM__
+
+                MainPage.FileSelectedEvent -= OnFileSelectedEvent;
+                MainPage.FileSelectedEvent += OnFileSelectedEvent;
+                WebAssemblyRuntime.InvokeJS(@"
+    console.log('calling javascript');
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.wav';
+    input.onchange = e => {
+        var file = e.target.files[0];
+        if ((file.size /1024 /1024)>5){
+            alert('File size exceeds 5 MB');
+        }
+        else
+        {
+            console.log(file.size);
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content
+                console.log('spitting out content');
+                console.log(content);
+                var selectFile = Module.mono_bind_static_method(" + "\"[BP.Wasm] BP.MainPage:SelectFile\""+@");
+                selectFile(content);
+        }
+        };
+    };
+    input.click(); ");
+#endif
+#endregion
 
                 record = true;
                 textBlk.Text = "Recording ...";
@@ -237,16 +278,15 @@ namespace BP
             }
         }
 
-
         private async void stopBtn_Click(object sender, RoutedEventArgs e)
         {
-            #region UWP
+#region UWP
 #if NETFX_CORE
 			Thread.Sleep(300);
             await capture.StopRecordAsync();
 #endif
-            #endregion
-            #region ANDROID
+#endregion
+#region ANDROID
 
 #if __ANDROID__
             Console.Out.WriteLine("[DEBUG] STOP recording clicked.");
@@ -260,7 +300,7 @@ namespace BP
             }
 #endif
 
-            #endregion
+#endregion
             record = false;
             textBlk.Text = "Stopped recording.";
         }
@@ -268,12 +308,12 @@ namespace BP
         private async void playBtn_Click(object sender, RoutedEventArgs e)
         {
             Console.Out.WriteLine("[DEBUG] PLAY clicked.");
-            #region UWP
+#region UWP
 #if NETFX_CORE
             await PlayRecordedAudio(Dispatcher);
 #endif
-            #endregion
-            #region ANDROID
+#endregion
+#region ANDROID
 
 #if __ANDROID__
 
@@ -290,9 +330,38 @@ namespace BP
             player.Prepare();
             player.Start();
 #endif
-            #endregion
+#endregion
             textBlk.Text = "Replaying captured sound.";
         }
 
-	}
+        public static void SelectFile(string imageAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(imageAsDataUrl));
+
+        private void OnFileSelectedEvent(object sender, FileSelectedEventHandlerArgs e)
+        {
+            FileSelectedEvent -= OnFileSelectedEvent;
+            var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+            //Console.Out.WriteLine("[DEBUG] bas64Data:");
+            //Console.Out.WriteLine("[DEBUG] len: " + base64Data.Length);
+            var binData = Convert.FromBase64String(base64Data); //this is the data I want
+			//Console.Out.WriteLine("[DEBUG] binData:");
+            //Console.Out.WriteLine("[DEBUG] len: " + binData.Length);
+            //print first 100 ascii chars
+            for (int i = 0; i < 100; i++)
+			{
+			    Console.Out.WriteLine((char)binData[i]);
+			}
+		}
+
+        private static event FileSelectedEventHandler FileSelectedEvent;
+
+        private delegate void FileSelectedEventHandler(object sender, FileSelectedEventHandlerArgs args);
+
+        private class FileSelectedEventHandlerArgs
+        {
+            public string FileAsDataUrl { get; }
+            public FileSelectedEventHandlerArgs(string fileAsDataUrl) => FileAsDataUrl = fileAsDataUrl;
+
+        }
+
+    }
 }
