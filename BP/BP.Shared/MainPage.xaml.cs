@@ -12,23 +12,23 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using System.Threading.Tasks;
+using System.Threading;
 #if NETFX_CORE
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using System.Threading.Tasks;
-using System.Threading;
 using Windows.UI.Core;
 #endif
 
 #if __ANDROID__
 using Android.Media;
 using Android.Content.PM;
+
 #endif
 
-// The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace BP
 {
@@ -119,6 +119,7 @@ namespace BP
 
         #region ANDROID
 #if __ANDROID__
+        private string filePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "recording.mp4");
         private MediaRecorder recorder;
         private Android.Media.MediaPlayer player;
 #endif
@@ -140,7 +141,6 @@ namespace BP
             }
             else
             {
-                textBlk.Text = "Recording ...";
                 #region UWP
 #if NETFX_CORE
 				await RecordProcess();
@@ -154,15 +154,34 @@ namespace BP
                 #endregion
                 #region ANDROID
 #if __ANDROID__
-                string filePath = "/data/data/SongRecognition.SongRecognition/files/testAudio.mp4";
+
+                //check for permission
+                CancellationTokenSource source = new CancellationTokenSource();
+                CancellationToken token = source.Token;
+
+                
+                Console.Out.WriteLine("[DEBUG] granting access to microphone");
+                bool canAccessMicrophone = await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.RecordAudio);
+                if (!canAccessMicrophone)
+				{
+                    Console.Out.WriteLine("[DEBUG] cannot access microphone");
+                    return;
+				}
+
+                /*
+                bool canAccessStorage = await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.);
+                if (!canAccessMicrophone)
+                    return;
+                */
                 try
                 {
-                    /*
-		            if (Java.IO.File.Exists(filePath))
+                    
+		            if (System.IO.File.Exists(filePath))
 		            {
-			            Java.IO.File.Delete(filePath);
+                        Console.Out.WriteLine("[DEBUG] deleting existing file");
+			            System.IO.File.Delete(filePath);
 		            }
-                    */
+                    
                     if (recorder == null)
                     {
                         recorder = new MediaRecorder(); // Initial state.
@@ -172,15 +191,15 @@ namespace BP
                         recorder.Reset();
                     }
 
-                    Console.Out.WriteLine("[DEBUG] mic");
+                    Console.Out.WriteLine("[DEBUG] setting up recording options");
                     recorder.SetAudioSource(AudioSource.Mic);
                     recorder.SetOutputFormat(OutputFormat.Mpeg4);
                     recorder.SetAudioChannels(1);
                     recorder.SetAudioSamplingRate(11025);
                     recorder.SetAudioEncodingBitRate(44000);
                     recorder.SetAudioEncoder(AudioEncoder.HeAac);
-                    Console.Out.WriteLine("[DEBUG] encoder");
                     Console.Out.WriteLine("[DEBUG] seting up outputfile");
+                    Console.Out.WriteLine("[DEBUG]" + filePath);
                     recorder.SetOutputFile(filePath);
                     recorder.Prepare();
                     Console.Out.WriteLine("[DEBUG] starting to listen");
@@ -190,12 +209,13 @@ namespace BP
                 }
                 catch (Exception ex)
                 {
-                    Console.Out.WriteLine(ex.StackTrace);
+                    Console.Out.WriteLine("[DEBUG]" + ex.StackTrace);
                 }
 #endif
                 #endregion
 
                 record = true;
+                textBlk.Text = "Recording ...";
 
             }
         }
@@ -203,7 +223,6 @@ namespace BP
 
         private async void stopBtn_Click(object sender, RoutedEventArgs e)
         {
-            textBlk.Text = "Stopped recording.";
             #region UWP
 #if NETFX_CORE
 			Thread.Sleep(300);
@@ -226,23 +245,22 @@ namespace BP
 #endif
 
             #endregion
+            textBlk.Text = "Stopped recording.";
         }
 
         private async void playBtn_Click(object sender, RoutedEventArgs e)
         {
-            textBlk.Text = "Replaying captured sound.";
             #region UWP
 #if NETFX_CORE
             await PlayRecordedAudio(Dispatcher);
 #endif
             #endregion
-
             #region ANDROID
 
 #if __ANDROID__
             Console.Out.WriteLine("[DEBUG] PLAY clicked.");
 
-            string filePath = "/data/data/SongRecognition.SongRecognition/files/testAudio.mp4";
+            //string filePath = "/data/data/BP.BP/files/testAudio.mp4";
             if (player == null)
             {
                 player = new Android.Media.MediaPlayer();
@@ -261,6 +279,7 @@ namespace BP
             player.Start();
 #endif
             #endregion
+            textBlk.Text = "Replaying captured sound.";
         }
 
 	}
