@@ -256,12 +256,12 @@ namespace BP
                 recorder.Stop();
                 recorder.Release();
                 recorder = null;
-                record = false;
                 Console.Out.WriteLine("[DEBUG] Stopped the recording.");
             }
 #endif
 
             #endregion
+            record = false;
             textBlk.Text = "Stopped recording.";
         }
 
