@@ -13,7 +13,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Threading.Tasks;
+
 using System.Threading;
+using System.Text.RegularExpressions;
 #if NETFX_CORE
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
@@ -30,7 +32,6 @@ using Android.Content.PM;
 
 #if __WASM__
 using Uno.Foundation;
-using System.Text.RegularExpressions;
 #endif
 
 
@@ -238,7 +239,6 @@ namespace BP
                 }
 #endif
 #endregion
-
 #region WASM
 #if __WASM__
 
