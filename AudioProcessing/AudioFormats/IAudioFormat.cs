@@ -11,6 +11,5 @@ namespace AudioProcessing.AudioFormats
 		int NumOfDataSamples { get; set; }
 		//Song PlayData
 		short[] Data { get; set; }
-		bool IsCorrectFormat(byte[] data);
 	}
 }
