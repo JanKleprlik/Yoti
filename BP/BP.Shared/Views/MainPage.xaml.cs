@@ -42,10 +42,7 @@ namespace BP
     public sealed partial class MainPage : Page
     {
 
-		Shared.AudioRecorder.Recorder recorder;
-#region WASM
-
-#endregion
+		private Shared.AudioRecorder.Recorder recorder;
 
 		public MainPage()
         {
@@ -54,48 +51,12 @@ namespace BP
             textBlk.Text = "I am ready";
 		}
 
-
-
-
 		private async void recordBtn_Click(object sender, RoutedEventArgs e)
         {
 			if (await recorder.StartRecording())
 			{
 				textBlk.Text = "Called library and am recording...";
-			}
-#region WASM
-#if __WASM__
-
-                MainPage.FileSelectedEvent -= OnFileSelectedEvent;
-                MainPage.FileSelectedEvent += OnFileSelectedEvent;
-                WebAssemblyRuntime.InvokeJS(@"
-    console.log('calling javascript');
-    var input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.wav';
-    input.onchange = e => {
-        var file = e.target.files[0];
-        if ((file.size /1024 /1024)>5){
-            alert('File size exceeds 5 MB');
-        }
-        else
-        {
-            console.log(file.size);
-            var reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = readerEvent => {
-                var content = readerEvent.target.result; // this is the content
-                console.log('spitting out content');
-                console.log(content);
-                var selectFile = Module.mono_bind_static_method(" + "\"[BP.Wasm] BP.MainPage:SelectFile\""+@");
-                selectFile(content);
-        }
-        };
-    };
-    input.click(); ");
-#endif
-#endregion
-            
+			} 
 		}
 
 		private async void stopBtn_Click(object sender, RoutedEventArgs e)
@@ -118,42 +79,77 @@ namespace BP
 		#endregion
 		#region ANDROID
 #if __ANDROID__
-		if (await recorder.ReplayRecordingANDROID())
-		{
-			textBlk.Text = "Replaying recorded sound.";
-		}
+			if (await recorder.ReplayRecordingANDROID())
+			{
+				textBlk.Text = "Replaying recorded sound.";
+			}
 #endif
 		#endregion
         }
-	/*
-        public static void SelectFile(string imageAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(imageAsDataUrl));
 
-        private void OnFileSelectedEvent(object sender, FileSelectedEventHandlerArgs e)
-        {
+		#region WASM
+#if __WASM__
+		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
+		{
+			
             FileSelectedEvent -= OnFileSelectedEvent;
-            var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-            //Console.Out.WriteLine("[DEBUG] bas64Data:");
-            //Console.Out.WriteLine("[DEBUG] len: " + base64Data.Length);
-            var binData = Convert.FromBase64String(base64Data); //this is the data I want
-			//Console.Out.WriteLine("[DEBUG] binData:");
-            //Console.Out.WriteLine("[DEBUG] len: " + binData.Length);
-            //print first 100 ascii chars
-            for (int i = 0; i < 100; i++)
+            FileSelectedEvent += OnFileSelectedEvent;
+            WebAssemblyRuntime.InvokeJS(@"
+				console.log('calling javascript');
+				var input = document.createElement('input');
+				input.type = 'file';
+				input.accept = '.wav';
+				input.onchange = e => {
+					var file = e.target.files[0];
+					//size in MBs cannot be bigger than 5
+					if ((file.size / 1024 / 1024)>5){ 
+						alert('File size exceeds 5 MB');
+					}
+					else
+					{
+						var reader = new FileReader();
+						reader.readAsDataURL(file);
+						reader.onload = readerEvent => {
+							//this is the binary uploaded content
+							var content = readerEvent.target.result; 
+							//invoke C# method to get audio binary data
+							var selectFile = Module.mono_bind_static_method(" + "\"[BP.Wasm] BP.MainPage:SelectFile\""+@");
+							selectFile(content);
+						}
+					};
+				};
+				input.click(); "
+			);
+		}
+		public static void SelectFile(string imageAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(imageAsDataUrl));
+
+		private void OnFileSelectedEvent(object sender, FileSelectedEventHandlerArgs e)
+		{
+			FileSelectedEvent -= OnFileSelectedEvent;
+			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+			var binData = Convert.FromBase64String(base64Data); //this is the data I want
+#if DEBUG
+			//print first 100 ascii chars
+			for (int i = 0; i < 100; i++)
 			{
-			    Console.Out.WriteLine((char)binData[i]);
+				Console.Out.WriteLine((char)binData[i]);
 			}
+#endif
 		}
 
-        private static event FileSelectedEventHandler FileSelectedEvent;
+		private static event FileSelectedEventHandler FileSelectedEvent;
 
-        private delegate void FileSelectedEventHandler(object sender, FileSelectedEventHandlerArgs args);
+		private delegate void FileSelectedEventHandler(object sender, FileSelectedEventHandlerArgs args);
 
-        private class FileSelectedEventHandlerArgs
-        {
-            public string FileAsDataUrl { get; }
-            public FileSelectedEventHandlerArgs(string fileAsDataUrl) => FileAsDataUrl = fileAsDataUrl;
+		private class FileSelectedEventHandlerArgs
+		{
+			public string FileAsDataUrl { get; }
+			public FileSelectedEventHandlerArgs(string fileAsDataUrl) => FileAsDataUrl = fileAsDataUrl;
 
-        }
-	*/
-    }
+		}
+#endif
+		#endregion
+
+
+	}
 }

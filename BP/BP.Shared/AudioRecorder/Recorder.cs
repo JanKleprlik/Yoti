@@ -52,7 +52,6 @@ namespace BP.Shared.AudioRecorder
 #endif
 		#endregion
 
-
 		public async Task<bool> StartRecording()
 		{
 			if (isRecording)
@@ -115,6 +114,8 @@ namespace BP.Shared.AudioRecorder
 #endif
 				#endregion
 			}
+			//true is returned in UWP or ANDROID if all goes well
+			return false;
 		}
 
 		public async Task<bool> StopRecording()
