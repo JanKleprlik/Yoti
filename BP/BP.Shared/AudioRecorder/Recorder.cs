@@ -294,11 +294,16 @@ namespace BP.Shared.AudioRecorder
 
 #region ANDROID - helper functions
 #if __ANDROID__
-		public async Task<bool> getMicPermission()
+		private async Task<bool> getMicPermission()
 		{
 			CancellationTokenSource source = new CancellationTokenSource();
 			CancellationToken token = source.Token;
 			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.RecordAudio);
+		}
+
+		public string getFilePath()
+		{
+			return filePath;
 		}
 #endif
 #endregion
