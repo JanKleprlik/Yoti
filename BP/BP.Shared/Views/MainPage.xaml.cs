@@ -97,11 +97,19 @@ namespace BP
 
 		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
-			AudioProcessing.Converters.AudioConverter.MP4toWAV(await recorder.GetDataFromStream());
+			AudioProcessing.Tools.Printer.Print(await recorder.GetDataFromStream());
 			#region UWP
 #if NETFX_CORE
+			AudioProcessing.AudioFormats.WavFormat recordedAudio = new AudioProcessing.AudioFormats.WavFormat(await recorder.GetDataFromStream());
+
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudio.Channels);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudio.SampleRate);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudio.NumOfDataSamples);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Data: ");
+			AudioProcessing.Tools.Printer.PrintShortAsBytes(recordedAudio.Data);
+
 #endif
-#endregion
+			#endregion
 			#region ANDROID
 #if __ANDROID__
 			

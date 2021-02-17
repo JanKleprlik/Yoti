@@ -11,6 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\IAudioFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\WavFormat.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Converters\AudioFormatConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\Debug\Printer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\Converters\ByteConverter.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tools\Debug\" />
   </ItemGroup>
 </Project>
