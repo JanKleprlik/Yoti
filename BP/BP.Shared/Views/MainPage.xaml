@@ -15,42 +15,52 @@
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-			<TextBlock x:Name ="textBlk" Grid.Row ="0" Text="Hello World"/>
-			<not_wasm:Button 
-					Grid.Row="0"
-					x:Name="recordBtn" 
-					Content="Microphone" 
-					Click="recordBtn_Click" 
-					BorderBrush="Blue"
-					Margin="10, 0"
-					HorizontalAlignment="Center"
-					/>
-			<not_wasm:Button 
-					Grid.Row="1"
-					x:Name="stopBtn" 
-					Content="Stop" 
-					Click="stopBtn_Click" 
-					BorderBrush="Blue"
-					HorizontalAlignment="Center"
-					/>
-			<not_wasm:Button 
-					Grid.Row="2"
-					x:Name="playBtn" 
-					Content="Play" 
-					Click="playBtn_Click" 
-					BorderBrush="Blue"
-					HorizontalAlignment="Center"
-					/>			
-			<wasm:Button 
-					Grid.Row="0"
-					x:Name="uploadBtn" 
-					Content="Upload"
-					Click="uploadBtn_Click"
-					BorderBrush="Blue"
-					Margin="300, 0"
-					HorizontalAlignment="Center"
-					/>
+		<TextBlock x:Name ="textBlk" Grid.Row ="0" Text="Hello World"/>
+		<not_wasm:Button 
+			Grid.Row="0"
+			x:Name="recordBtn" 
+			Content="Microphone" 
+			Click="recordBtn_Click" 
+			BorderBrush="Blue"
+			Margin="10, 0"
+			HorizontalAlignment="Center"
+			/>
+		<not_wasm:Button 
+			Grid.Row="1"
+			x:Name="stopBtn" 
+			Content="Stop" 
+			Click="stopBtn_Click" 
+			BorderBrush="Blue"
+			HorizontalAlignment="Center"
+			/>
+		<not_wasm:Button 
+			Grid.Row="2"
+			x:Name="playBtn" 
+			Content="Play" 
+			Click="playBtn_Click" 
+			BorderBrush="Blue"
+			Margin="0, 0, 100, 0"
+			HorizontalAlignment="Center"
+			/>
 		
-		
+		<wasm:Button 
+			Grid.Row="0"
+			x:Name="uploadBtn" 
+			Content="Upload"
+			Click="uploadBtn_Click"
+			BorderBrush="Blue"
+			Margin="300, 0"
+			HorizontalAlignment="Center"
+			/>
+		<Button
+			Grid.Row="2"
+			x:Name="recognizeBtn"
+			Content="Recognize"
+			Click="recognizeBtn_Click"
+			BorderBrush="Green"
+			Margin="100, 0, 0, 0"
+			HorizontalAlignment="Center"
+			/>
+
 	</Grid>
 </Page>
