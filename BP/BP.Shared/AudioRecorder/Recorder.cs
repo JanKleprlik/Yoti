@@ -41,23 +41,18 @@ namespace BP.Shared.AudioRecorder
 		#endregion
 		#region ANDROID
 #if __ANDROID__
-		private string filePath;
-		private MediaRecorder recorder;
-		private MediaPlayer player;
-
-		public Recorder()
-		{
-			filePath = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "recording.mp4");
-		}
+		private byte[] buffer;
+		private AudioRecord rec;
+		private const int bufferLimit = 100000;
 #endif
 		#endregion
 
-		public async Task<bool> StartRecording()
+		public async void StartRecording()
 		{
 			if (isRecording)
 			{
 				//already recording
-				return false;
+				return;
 			}
 			else
 			{
@@ -66,64 +61,58 @@ namespace BP.Shared.AudioRecorder
 				await setupRecording();
 				await audioCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.Low), buffer);
 				isRecording = true;
-				return true;
+				return;
 #endif
 				#endregion
 				#region ANDROID
 #if __ANDROID__
-				try
+				if (!await getMicPermission())
+					return;
+
+				buffer = new byte[bufferLimit];
+				rec = new AudioRecord(
+					AudioSource.Mic,
+					11025,
+					ChannelIn.Mono,
+					Android.Media.Encoding.Pcm16bit,
+					bufferLimit
+					);
+				Console.Out.WriteLine("[DEBUG] starting to record ...");
+				rec.StartRecording();
+				isRecording = true;
+				int totalBytesRead = 0;
+				while (totalBytesRead < bufferLimit)
 				{
-					if (System.IO.File.Exists(filePath))
-						System.IO.File.Delete(filePath);
-								
-					//setup recorder
-					if (recorder == null)
+					try
 					{
-						recorder = new MediaRecorder(); // Initial state.
+						int bytesRead = rec.Read(buffer, 0, bufferLimit);
+						if (bytesRead < 0)
+						{
+							throw new Exception(String.Format("Exception code: {0}", bytesRead));
+						}
+						else
+						{
+							totalBytesRead += bytesRead;
+						}
 					}
-					else
+					catch(Exception e)
 					{
-						recorder.Reset();
+						Console.Out.WriteLine("[DEBUG] " + e.Message);
+						break;
 					}
-
-					//prepare recording settings
-					recorder.SetAudioSource(AudioSource.Mic);
-					recorder.SetOutputFormat(OutputFormat.Mpeg4);
-					recorder.SetAudioChannels(1);
-					recorder.SetAudioSamplingRate(11025);
-					recorder.SetAudioEncodingBitRate(44000);
-					recorder.SetAudioEncoder(AudioEncoder.HeAac);
-
-					//setup 
-					recorder.SetOutputFile(filePath);
-					recorder.Prepare();
-
-					//record
-					recorder.Start();
-
-
-					isRecording = true;
-					return true;
 				}
-				catch (Exception ex)
-				{
-					Console.Out.WriteLine(ex.StackTrace);
-					isRecording = false;
-					return false;
-				}
+				Console.Out.WriteLine("[DEBUG] finished recording");
 #endif
 				#endregion
 			}
-			//true is returned in UWP or ANDROID if all goes well
-			return false;
 		}
 
-		public async Task<bool> StopRecording()
+		public async void StopRecording()
 		{
 			if (!isRecording)
 			{
 				//not recording yet
-				return false;
+				return;
 			}
 			else
 			{
@@ -136,12 +125,11 @@ namespace BP.Shared.AudioRecorder
 				#endregion
 				#region ANDROID
 #if __ANDROID__
-				recorder.Stop();
-				recorder.Release();
+				rec.Stop();
+				rec.Dispose();
 #endif
 				#endregion
 				isRecording = false;
-				return true;
 			}
 
 		}
@@ -159,10 +147,7 @@ namespace BP.Shared.AudioRecorder
 			dataReader.ReadBytes(data);
 			return data;
 #else 
-			if (filePath == null)
-				return new byte[0];
-
-			return await File.ReadAllBytesAsync(filePath);
+			return buffer;
 #endif
 		}
 
@@ -218,27 +203,24 @@ namespace BP.Shared.AudioRecorder
 #endregion
 #region ANDROID
 #if __ANDROID__
-		public async Task<bool> ReplayRecordingANDROID()
+		public void ReplayRecordingANDROID()
 		{
-			//dont do anything if nothing was recorded
-			if (filePath == null)
-				return false;
+			AudioTrack audioTrack = new AudioTrack(
+				// Stream type
+				Android.Media.Stream.Music,
+				// Frequency
+				11025,
+				// Mono or stereo
+				ChannelOut.Mono,
+				// Audio encoding
+				Android.Media.Encoding.Pcm16bit,
+				// Length of the audio clip.
+				buffer.Length,
+				// Mode. Stream or static.
+				AudioTrackMode.Stream);
 
-			//reset player
-			if (player == null)
-			{
-				player = new Android.Media.MediaPlayer();
-			}
-			else
-			{
-				player.Reset();
-			}
-
-			//replay the song
-			player.SetDataSource(filePath);
-			player.Prepare();
-			player.Start();
-			return true;
+			audioTrack.Play();
+			audioTrack.Write(buffer, 0, buffer.Length);
 		}
 #endif
 #endregion
@@ -299,11 +281,6 @@ namespace BP.Shared.AudioRecorder
 			CancellationTokenSource source = new CancellationTokenSource();
 			CancellationToken token = source.Token;
 			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.RecordAudio);
-		}
-
-		public string getFilePath()
-		{
-			return filePath;
 		}
 #endif
 #endregion

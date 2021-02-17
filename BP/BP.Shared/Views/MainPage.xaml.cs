@@ -43,6 +43,8 @@ namespace BP
     {
 
 		private Shared.AudioRecorder.Recorder recorder;
+		private bool isRecording = false;
+		private bool wasRecording = false;
 
 		public MainPage()
         {
@@ -53,34 +55,40 @@ namespace BP
 
 		private async void recordBtn_Click(object sender, RoutedEventArgs e)
         {
-			if (await recorder.StartRecording())
+			if (!isRecording)
 			{
+				Task.Run(() => recorder.StartRecording());
+				isRecording = true;
 				textBlk.Text = "Called library and am recording...";
-			} 
+			}
 		}
 
 		private async void stopBtn_Click(object sender, RoutedEventArgs e)
         {
-			if (await recorder.StopRecording())
+			if (isRecording)
 			{
+				recorder.StopRecording();
+				isRecording = false;
+				wasRecording = true;
 				textBlk.Text = "Stopped recording from lib.";
 			}
         }
 
         private async void playBtn_Click(object sender, RoutedEventArgs e)
         {
-		#region UWP
+			#region UWP
 #if NETFX_CORE
 			if (await recorder.ReplayRecordingUWP(Dispatcher))
 			{
 				textBlk.Text = "Replaying recorded sound.";				
 			}
 #endif
-		#endregion
-		#region ANDROID
+			#endregion
+			#region ANDROID
 #if __ANDROID__
-			if (await recorder.ReplayRecordingANDROID())
+			if (wasRecording)
 			{
+				recorder.ReplayRecordingANDROID();
 				textBlk.Text = "Replaying recorded sound.";
 			}
 #endif

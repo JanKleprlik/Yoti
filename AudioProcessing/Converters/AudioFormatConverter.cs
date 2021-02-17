@@ -9,10 +9,10 @@ namespace AudioProcessing.Converters
 		public static void MP4toWAV(byte[] data)
 		{
 			System.Diagnostics.Debug.WriteLine("[DEBUG] In Converter...");
-			int limit = Math.Min(10, data.Length);
+			int limit = Math.Min(20, data.Length);
 			for (int i = 0; i < limit; i++)
 			{
-				System.Diagnostics.Debug.WriteLine((char)data[i]);
+				System.Diagnostics.Debug.WriteLine(data[i]);
 			}
 		}
 	}
