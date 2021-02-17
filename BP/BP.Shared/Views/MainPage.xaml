@@ -1,0 +1,56 @@
+﻿<Page
+    x:Class="BP.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:wasm="http://uno.ui/wasm"
+	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    mc:Ignorable="d wasm">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+			<TextBlock x:Name ="textBlk" Grid.Row ="0" Text="Hello World"/>
+			<not_wasm:Button 
+					Grid.Row="0"
+					x:Name="recordBtn" 
+					Content="Microphone" 
+					Click="recordBtn_Click" 
+					BorderBrush="Blue"
+					Margin="10, 0"
+					HorizontalAlignment="Center"
+					/>
+			<not_wasm:Button 
+					Grid.Row="1"
+					x:Name="stopBtn" 
+					Content="Stop" 
+					Click="stopBtn_Click" 
+					BorderBrush="Blue"
+					HorizontalAlignment="Center"
+					/>
+			<not_wasm:Button 
+					Grid.Row="2"
+					x:Name="playBtn" 
+					Content="Play" 
+					Click="playBtn_Click" 
+					BorderBrush="Blue"
+					HorizontalAlignment="Center"
+					/>			
+			<wasm:Button 
+					Grid.Row="0"
+					x:Name="uploadBtn" 
+					Content="Upload"
+					Click="uploadBtn_Click"
+					BorderBrush="Blue"
+					Margin="300, 0"
+					HorizontalAlignment="Center"
+					/>
+		
+		
+	</Grid>
+</Page>
