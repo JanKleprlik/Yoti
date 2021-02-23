@@ -98,21 +98,29 @@ namespace BP
 		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
 #if !__WASM__
-			AudioProcessing.Converters.AudioConverter.MP4toWAV(await recorder.GetDataFromStream());
+			AudioProcessing.Tools.Printer.Print(await recorder.GetDataFromStream());
 #endif
-#region UWP
+			#region UWP
 #if NETFX_CORE
+			AudioProcessing.AudioFormats.WavFormat recordedAudio = new AudioProcessing.AudioFormats.WavFormat(await recorder.GetDataFromStream());
+
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudio.Channels);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudio.SampleRate);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudio.NumOfDataSamples);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Data: ");
+			AudioProcessing.Tools.Printer.PrintShortAsBytes(recordedAudio.Data);
+
 #endif
-#endregion
-#region ANDROID
+			#endregion
+			#region ANDROID
 #if __ANDROID__
 			//byte[] data = 
 #endif
-#endregion
+			#endregion
 
 		}
 
-#region WASM
+		#region WASM
 #if __WASM__
 		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -173,7 +181,7 @@ namespace BP
 
 		}
 #endif
-#endregion
+		#endregion
 
 
 	}

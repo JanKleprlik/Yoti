@@ -59,7 +59,10 @@ namespace BP.Shared.AudioRecorder
 				#region UWP
 #if NETFX_CORE
 				await setupRecording();
-				await audioCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateWav(AudioEncodingQuality.Low), buffer);
+				var profile = MediaEncodingProfile.CreateWav(AudioEncodingQuality.Auto);
+				profile.Audio = AudioEncodingProperties.CreatePcm(48000, 1, 16);
+
+				await audioCapture.StartRecordToStreamAsync(profile, buffer);
 				isRecording = true;
 				return;
 #endif
