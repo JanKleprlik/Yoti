@@ -39,6 +39,7 @@
 					Content="Play" 
 					Click="playBtn_Click" 
 					BorderBrush="Blue"
+					Margin="0, 0, 100, 0"
 					HorizontalAlignment="Center"
 					/>			
 			<wasm:Button 
@@ -50,7 +51,14 @@
 					Margin="300, 0"
 					HorizontalAlignment="Center"
 					/>
-		
-		
+			<Button
+				Grid.Row="2"
+				x:Name="recognizeBtn"
+				Content="Recognize"
+				Click="recognizeBtn_Click"
+				BorderBrush="Green"
+				Margin="100, 0, 0, 0"
+				HorizontalAlignment="Center"
+				/>
 	</Grid>
 </Page>
