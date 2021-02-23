@@ -9,6 +9,8 @@
     <Import_RootNamespace>AudioProcessing</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\IAduioFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\WavFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\AudioFormatConverter.cs" />
   </ItemGroup>
 </Project>
