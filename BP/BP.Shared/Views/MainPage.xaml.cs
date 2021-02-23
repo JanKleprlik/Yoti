@@ -43,6 +43,8 @@ namespace BP
     {
 
 		private Shared.AudioRecorder.Recorder recorder;
+		private bool isRecording = false;
+		private bool wasRecording = false;
 
 		public MainPage()
         {
@@ -53,16 +55,21 @@ namespace BP
 
 		private async void recordBtn_Click(object sender, RoutedEventArgs e)
         {
-			if (await recorder.StartRecording())
+			if (!isRecording)
 			{
+				Task.Run(() => recorder.StartRecording());
+				isRecording = true;
 				textBlk.Text = "Called library and am recording...";
 			} 
 		}
 
 		private async void stopBtn_Click(object sender, RoutedEventArgs e)
         {
-			if (await recorder.StopRecording())
+			if (isRecording)
 			{
+				recorder.StopRecording();
+				isRecording = false;
+				wasRecording = true;
 				textBlk.Text = "Stopped recording from lib.";
 			}
         }
@@ -76,16 +83,17 @@ namespace BP
 				textBlk.Text = "Replaying recorded sound.";				
 			}
 #endif
-		#endregion
+			#endregion
 		#region ANDROID
 #if __ANDROID__
-			if (await recorder.ReplayRecordingANDROID())
+			if (wasRecording)
 			{
+				recorder.ReplayRecordingANDROID();
 				textBlk.Text = "Replaying recorded sound.";
 			}
 #endif
 		#endregion
-        }
+		}
 
 		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
