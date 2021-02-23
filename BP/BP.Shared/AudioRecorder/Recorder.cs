@@ -145,10 +145,29 @@ namespace BP.Shared.AudioRecorder
 			}
 
 		}
-		
-		
+#if !__WASM__
+		public async Task<byte[]> GetDataFromStream()
+		{
+#if NETFX_CORE
+			if (buffer == null)
+				return new byte[0];
+
+			DataReader dataReader = new DataReader(buffer.GetInputStreamAt(0));
+			byte[] data = new byte[buffer.Size];
+
+			await dataReader.LoadAsync((uint)buffer.Size);
+			dataReader.ReadBytes(data);
+			return data;
+#else
+			if (filePath == null)
+				return new byte[0];
+
+			return await File.ReadAllBytesAsync(filePath);
+#endif
+		}
+#endif
 		//replay functions
-		#region UWP
+#region UWP
 #if NETFX_CORE
 
 		public async Task<bool> ReplayRecordingUWP(CoreDispatcher UIDispatcher)
@@ -196,8 +215,8 @@ namespace BP.Shared.AudioRecorder
 			return true;
 		}
 #endif
-		#endregion
-		#region ANDROID
+#endregion
+#region ANDROID
 #if __ANDROID__
 		public async Task<bool> ReplayRecordingANDROID()
 		{
@@ -222,11 +241,11 @@ namespace BP.Shared.AudioRecorder
 			return true;
 		}
 #endif
-		#endregion
+#endregion
 
 
 		// helper functons
-		#region UWP - helper functions
+#region UWP - helper functions
 #if NETFX_CORE
 
 		private async Task<bool> setupRecording()
@@ -271,9 +290,9 @@ namespace BP.Shared.AudioRecorder
 		}
 
 #endif
-		#endregion
+#endregion
 
-		#region ANDROID - helper functions
+#region ANDROID - helper functions
 #if __ANDROID__
 		public async Task<bool> getMicPermission()
 		{

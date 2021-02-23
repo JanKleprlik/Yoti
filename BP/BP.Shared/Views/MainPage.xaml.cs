@@ -87,7 +87,24 @@ namespace BP
 		#endregion
         }
 
-		#region WASM
+		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
+		{
+#if !__WASM__
+			AudioProcessing.Converters.AudioConverter.MP4toWAV(await recorder.GetDataFromStream());
+#endif
+#region UWP
+#if NETFX_CORE
+#endif
+#endregion
+#region ANDROID
+#if __ANDROID__
+			//byte[] data = 
+#endif
+#endregion
+
+		}
+
+#region WASM
 #if __WASM__
 		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -148,7 +165,7 @@ namespace BP
 
 		}
 #endif
-		#endregion
+#endregion
 
 
 	}

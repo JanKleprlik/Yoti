@@ -19,8 +19,11 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		BP\BP.Shared\BP.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
 		AudioProcessing\AudioProcessing.projitems*{7bb6aae9-7265-49f6-9d7a-f801cde914df}*SharedItemsImports = 13
+		AudioProcessing\AudioProcessing.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
 		BP\BP.Shared\BP.Shared.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
+		AudioProcessing\AudioProcessing.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
 		BP\BP.Shared\BP.Shared.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
+		AudioProcessing\AudioProcessing.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
 		BP\BP.Shared\BP.Shared.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

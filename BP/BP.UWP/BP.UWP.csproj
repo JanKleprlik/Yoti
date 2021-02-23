@@ -18,7 +18,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>8262e473-3782-4f26-b5c0-bb900c6245ec</ProjectGuid>
+    <ProjectGuid>{8262E473-3782-4F26-B5C0-BB900C6245EC}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BP</RootNamespace>
@@ -147,6 +147,7 @@
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <Import Project="..\BP.Shared\BP.Shared.projitems" Label="Shared" Condition="Exists('..\BP.Shared\BP.Shared.projitems')" />
+  <Import Project="..\..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
