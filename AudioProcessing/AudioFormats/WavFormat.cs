@@ -17,7 +17,7 @@ namespace AudioProcessing.AudioFormats
 
 		public WavFormat(byte[] rawData)
 		{
-			if (!IsCorrectFormat(new[] { rawData[0], rawData[1], rawData[2], rawData[3] }))
+			if ( rawData.Length < 4 || !IsCorrectFormat(new[] { rawData[0], rawData[1], rawData[2], rawData[3] }))
 			{
 				throw new InvalidCastException("Invalid data format given to Wav format constructor.");
 			}
