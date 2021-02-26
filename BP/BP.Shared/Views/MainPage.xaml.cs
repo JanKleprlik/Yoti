@@ -16,6 +16,8 @@ using System.Threading.Tasks;
 
 using System.Threading;
 using System.Text.RegularExpressions;
+using SQLite;
+
 #if NETFX_CORE
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
@@ -28,6 +30,7 @@ using Windows.UI.Core;
 #if __ANDROID__
 using Android.Media;
 using Android.Content.PM;
+using Xamarin.Essentials;
 #endif
 
 #if __WASM__
@@ -46,10 +49,13 @@ namespace BP
 		private bool isRecording = false;
 		private bool wasRecording = false;
 
+		private AudioProcessing.Database.Database database;
+
 		public MainPage()
         {
             this.InitializeComponent();
 			recorder = new Shared.AudioRecorder.Recorder();
+			database = new AudioProcessing.Database.Database();
             textBlk.Text = "I am ready";
 		}
 
@@ -120,15 +126,64 @@ namespace BP
 
 		}
 
-		#region WASM
-#if __WASM__
-		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
+		private async void uploadNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
-			
-            FileSelectedEvent -= OnFileSelectedEvent;
-            FileSelectedEvent += OnFileSelectedEvent;
-            WebAssemblyRuntime.InvokeJS(@"
-				console.log('calling javascript');
+			#region UWP
+#if NETFX_CORE
+			var picker = new Windows.Storage.Pickers.FileOpenPicker();
+			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+			picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
+			picker.FileTypeFilter.Add(".wav");
+
+			StorageFile file = await picker.PickSingleFileAsync();
+			if (file != null)
+			{
+				this.textBlk.Text = "Picked song: " + file.Name;
+			}
+			else
+			{
+				this.textBlk.Text = "Operation cancelled.";
+			}
+
+#endif
+			#endregion
+
+			#region ANDORID
+#if __ANDROID__
+			if (await getExternalStoragePermission())
+			{
+				PickOptions options = new PickOptions
+				{
+					PickerTitle = "Please select a wav song file",
+					FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+					{
+						{DevicePlatform.Android, new[]{"audio/x-wav"} }
+					})
+				};
+
+				FileResult result = await FilePicker.PickAsync(options);
+
+				if (result != null)
+				{
+					textBlk.Text = $"File selected: {result.FileName}";
+				}
+				else
+				{
+					textBlk.Text = "No audio file selected";
+				}
+
+			}
+			else
+			{
+				textBlk.Text = "Acces to read storage denied.";
+			}
+#endif
+			#endregion
+			#region WASM
+#if __WASM__
+			FileSelectedEvent -= OnNewSongUploadedEvent;
+			FileSelectedEvent += OnNewSongUploadedEvent;
+			WebAssemblyRuntime.InvokeJS(@"
 				var input = document.createElement('input');
 				input.type = 'file';
 				input.accept = '.wav';
@@ -137,6 +192,42 @@ namespace BP
 					//size in MBs cannot be bigger than 5
 					if ((file.size / 1024 / 1024)>5){ 
 						alert('File size exceeds 5 MB');
+					}
+					else
+					{
+						var reader = new FileReader();
+						reader.readAsDataURL(file);
+						reader.onload = readerEvent => {
+							//this is the binary uploaded content
+							var content = readerEvent.target.result; 
+							//invoke C# method to get audio binary data
+							var selectFile = Module.mono_bind_static_method(" + "\"[BP.Wasm] BP.MainPage:SelectFile\"" + @");
+							selectFile(content);
+						}
+					};
+				};
+				input.click(); "
+			);
+#endif
+			#endregion
+		}
+
+		#region WASM
+#if __WASM__
+		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
+		{
+            FileSelectedEvent -=OnSongToRecognizeUploadedEvent;
+            FileSelectedEvent += OnSongToRecognizeUploadedEvent;
+            WebAssemblyRuntime.InvokeJS(@"
+				console.log('calling javascript');
+				var input = document.createElement('input');
+				input.type = 'file';
+				input.accept = '.wav';
+				input.onchange = e => {
+					var file = e.target.files[0];
+					//size in MBs cannot be bigger than 5
+					if ((file.size / 1024 / 1024)>50){ 
+						alert('File size exceeds 50 MB');
 					}
 					else
 					{
@@ -156,18 +247,36 @@ namespace BP
 		}
 		public static void SelectFile(string imageAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(imageAsDataUrl));
 
-		private void OnFileSelectedEvent(object sender, FileSelectedEventHandlerArgs e)
+		private void OnSongToRecognizeUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
 		{
-			FileSelectedEvent -= OnFileSelectedEvent;
+			FileSelectedEvent -= OnSongToRecognizeUploadedEvent;
 			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
 			var binData = Convert.FromBase64String(base64Data); //this is the data I want
 #if DEBUG
-			//print first 100 ascii chars
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < 10; i++)
 			{
-				Console.Out.WriteLine((char)binData[i]);
+				Console.Out.Write((char)binData[i]);
 			}
+			Console.Out.WriteLine();
 #endif
+			Console.Out.WriteLine("Recognize song");
+
+		}
+
+		private void OnNewSongUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
+		{
+			FileSelectedEvent -= OnNewSongUploadedEvent;
+			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+			var binData = Convert.FromBase64String(base64Data); //this is the data I want
+#if DEBUG
+			for (int i = 0; i < 10; i++)
+			{
+				Console.Out.Write((char)binData[i]);
+			}
+			Console.Out.WriteLine();
+#endif
+			Console.Out.WriteLine("New song");
+
 		}
 
 		private static event FileSelectedEventHandler FileSelectedEvent;
@@ -183,6 +292,15 @@ namespace BP
 #endif
 		#endregion
 
-
+		#region ANDROID - helper functions
+#if __ANDROID__
+		private async Task<bool> getExternalStoragePermission()
+		{
+			CancellationTokenSource source = new CancellationTokenSource();
+			CancellationToken token = source.Token;
+			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.ReadExternalStorage);
+		}
+#endif
+#endregion
 	}
 }
