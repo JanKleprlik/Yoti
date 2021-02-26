@@ -15,4 +15,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Printer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Converters\ByteConverter.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Database\" />
+  </ItemGroup>
 </Project>
