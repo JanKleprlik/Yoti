@@ -11,11 +11,10 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\IAduioFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\WavFormat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Database\Database.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Database\Types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Recognizer\AudioRecognizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Printer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Converters\ByteConverter.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Database\" />
   </ItemGroup>
 </Project>
