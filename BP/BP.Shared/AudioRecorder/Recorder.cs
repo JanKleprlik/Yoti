@@ -28,7 +28,7 @@ using System.IO;
 
 namespace BP.Shared.AudioRecorder
 {
-	public class Recorder
+	public sealed partial class Recorder
 	{
 		private bool isRecording;
 		#region UWP
@@ -43,7 +43,7 @@ namespace BP.Shared.AudioRecorder
 #if __ANDROID__
 		private byte[] buffer;
 		private AudioRecord rec;
-		private const int bufferLimit = 100000;
+		private const int bufferLimit = 480000;
 #endif
 		#endregion
 
@@ -60,7 +60,7 @@ namespace BP.Shared.AudioRecorder
 #if NETFX_CORE
 				await setupRecording();
 				var profile = MediaEncodingProfile.CreateWav(AudioEncodingQuality.Auto);
-				profile.Audio = AudioEncodingProperties.CreatePcm(48000, 1, 16);
+				profile.Audio = AudioEncodingProperties.CreatePcm((uint)Parameters.SamplingRate, (uint)Parameters.Channels, 16);
 
 				await audioCapture.StartRecordToStreamAsync(profile, buffer);
 				isRecording = true;
@@ -73,13 +73,17 @@ namespace BP.Shared.AudioRecorder
 					return;
 
 				buffer = new byte[bufferLimit];
+
+				ChannelIn channels = Parameters.Channels == 1 ? ChannelIn.Mono : ChannelIn.Stereo;
+
 				rec = new AudioRecord(
 					AudioSource.Mic,
-					11025,
-					ChannelIn.Mono,
+					Parameters.SamplingRate,
+					channels,
 					Android.Media.Encoding.Pcm16bit,
 					bufferLimit
 					);
+
 				Console.Out.WriteLine("[DEBUG] starting to record ...");
 				rec.StartRecording();
 				isRecording = true;
@@ -209,13 +213,15 @@ namespace BP.Shared.AudioRecorder
 #if __ANDROID__
 		public async void ReplayRecordingANDROID()
 		{
+			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
+
 			AudioTrack audioTrack = new AudioTrack(
 				// Stream type
 				Android.Media.Stream.Music,
 				// Frequency
-				11025,
+				Parameters.SamplingRate,
 				// Mono or stereo
-				ChannelOut.Mono,
+				channels,
 				// Audio encoding
 				Android.Media.Encoding.Pcm16bit,
 				// Length of the audio clip.
