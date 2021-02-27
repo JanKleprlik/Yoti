@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AudioProcessing.Recognizer
 {
-	public class AudioRecognizer
+	public partial class AudioRecognizer
 	{
 		public AudioRecognizer()
 		{
