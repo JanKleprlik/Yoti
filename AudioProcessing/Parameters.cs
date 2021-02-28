@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace AudioProcessing
+namespace AudioProcessing.Recognizer
 {
 	public partial class AudioRecognizer
 	{
-		static class Parameters
+		public static class Parameters
 		{
 			public const int TargetSamplingRate = 12000;
 

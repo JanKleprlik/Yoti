@@ -14,8 +14,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Parameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Database\Database.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Database\Types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\AudioProcessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\ButterworthFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Recognizer\AudioRecognizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Printer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Converters\ByteConverter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tools\Tools.cs" />
   </ItemGroup>
 </Project>
