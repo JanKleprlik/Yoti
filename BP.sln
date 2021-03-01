@@ -19,6 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizer", "Visualizer\Vi
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		AudioProcessing\AudioProcessing.projitems*{34c88066-3dd3-402a-aa82-801e2f47fc53}*SharedItemsImports = 5
 		BP\BP.Shared\BP.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
 		AudioProcessing\AudioProcessing.projitems*{7bb6aae9-7265-49f6-9d7a-f801cde914df}*SharedItemsImports = 13
 		AudioProcessing\AudioProcessing.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
