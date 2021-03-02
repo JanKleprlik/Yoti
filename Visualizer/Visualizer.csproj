@@ -7,10 +7,18 @@
 
   <ItemGroup>
     <PackageReference Include="SFML.Net" Version="2.5.0" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.7.335" />
+    <PackageReference Include="SQLiteNetExtensions" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Spectrograms\" />
+    <Folder Include="Resources\Songs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Resources\Songs\400Hz.wav">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Import Project="..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />

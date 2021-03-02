@@ -1,7 +1,7 @@
 ﻿using System;
 using Visualizer.MusicModes;
 using SFML.Audio;
-
+using AudioProcessing.AudioFormats;
 
 namespace Visualizer
 {
@@ -9,17 +9,24 @@ namespace Visualizer
 	{
 		Amplitude,
 		Frequencies,
-		Spectogram
+		Spectrogram
 	}
-
-	public class Visualiser
+	
+	public class Visualizer
 	{
 		#region Constructors
-		public Visualiser(short[] data, uint channelCount, uint sampleRate, VisualisationModes vm, int downSampleCoef = 1)
+		public Visualizer(short[] data, uint channelCount, uint sampleRate, VisualisationModes vm, int downSampleCoef = 1)
 		{
 			soundBuffer = new SoundBuffer(data, channelCount, sampleRate);
 			visualisation = CreateMode(soundBuffer, vm, downSampleCoef);
 		}
+
+		public Visualizer(IAudioFormat audio, VisualisationModes vm, int downSampleCoef = 1)
+		{
+			soundBuffer = new SoundBuffer(audio.Data, audio.Channels, audio.SampleRate);
+			visualisation = CreateMode(soundBuffer, vm, downSampleCoef);
+		}
+
 		#endregion
 
 		private static IVisualiserMode CreateMode(SoundBuffer sb, VisualisationModes vm, int downSampleCoef)
@@ -28,6 +35,10 @@ namespace Visualizer
 			{
 				case VisualisationModes.Amplitude:
 					return new AmplitudeMode(sb);
+				case VisualisationModes.Frequencies:
+					return new FrequenciesMode(sb, downSampleCoef);
+				case VisualisationModes.Spectrogram:
+					return new Spectrogram(sb, downSampleCoef);
 				default:
 					throw new ArgumentException($"Mode {vm.ToString()} is not supported");
 			}
@@ -35,13 +46,16 @@ namespace Visualizer
 
 		internal readonly IVisualiserMode visualisation;
 		private readonly SoundBuffer soundBuffer;
+		private const int FPS = 30;
+		private const int width = 1224;
+		private const int height = 800;
 
 		public void Run()
 		{
-			var mode = new SFML.Window.VideoMode(1224, 800);
+			var mode = new SFML.Window.VideoMode(width, height);
 			var window = new SFML.Graphics.RenderWindow(mode, visualisation.GetType().ToString());
 			window.KeyPressed += Window_KeyPressed;
-			window.SetFramerateLimit(30);
+			window.SetFramerateLimit(FPS);
 
 			// Start the game loop
 			while (window.IsOpen)

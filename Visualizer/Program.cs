@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AudioProcessing.Processor;
+using System;
 
 namespace Visualizer
 {
@@ -6,7 +7,10 @@ namespace Visualizer
 	{
 		static void Main(string[] args)
 		{
-			Console.WriteLine("Hello World!");
+			var audio = Recorder.GetAudio("Resources/Songs/Hertz.wav");
+			AudioProcessor.ConvertToMono(audio);
+			var window = new global::Visualizer.Visualizer(audio.Data, audio.Channels, audio.SampleRate, VisualisationModes.Spectrogram);
+			window.Run();
 		}
 	}
 }
