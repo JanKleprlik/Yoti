@@ -16,6 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Database\Types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\AudioProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\ButterworthFilter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\FastFourierTransformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Recognizer\AudioRecognizer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Printer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Tools\Converters\ByteConverter.cs" />
