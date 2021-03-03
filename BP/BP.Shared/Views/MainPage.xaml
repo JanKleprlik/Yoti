@@ -22,7 +22,7 @@
 				Content="Microphone" 
 				Click="recordBtn_Click" 
 				BorderBrush="Blue"
-				Margin="-100, 0, 0, 0"
+				Margin="-150, 0, 0, 0"
 				HorizontalAlignment="Center"
 				/>
 		<not_wasm:Button 
@@ -48,7 +48,7 @@
 			Content="Upload new song" 
 			Click="uploadNewSongBtn_Click" 
 			BorderBrush="Red"
-			Margin="150, 0, 0, 0"
+			Margin="100, 0, 0, 0"
 			HorizontalAlignment="Center"
 			/>
 		<Button
@@ -57,7 +57,7 @@
 			Content="Add" 
 			Click="addNewSongBtn_Click" 
 			BorderBrush="Red"
-			Margin="350, 0, 0, 0"
+			Margin="300, 0, 0, 0"
 			HorizontalAlignment="Center"
 			/>
 		<TextBox
@@ -66,7 +66,7 @@
 			PlaceholderText="name"
 			Height="35"
 			Width="150"
-			Margin="168,0,0,80"
+			Margin="0,0,0,160"
 			/>
 		<TextBox
 			Grid.Row="0"
@@ -74,7 +74,7 @@
 			PlaceholderText="author"
 			Height="35"
 			Width="150"
-			Margin="488,0,0,80"
+			Margin="0,0,0,80"
 			/>		
 		<wasm:Button 
 				Grid.Row="0"

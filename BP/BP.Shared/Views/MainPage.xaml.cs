@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Text.RegularExpressions;
 using Database;
-
+using AudioProcessing.Recognizer;
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -47,6 +47,7 @@ namespace BP
     {
 
 		private Shared.AudioRecorder.Recorder recorder;
+		private AudioProcessing.Recognizer.AudioRecognizer recognizer;
 		private bool isRecording = false;
 		private bool wasRecording = false;
 		private byte[] uploadedSong;
@@ -57,6 +58,7 @@ namespace BP
             this.InitializeComponent();
 			recorder = new Shared.AudioRecorder.Recorder();
 			database = new Database.Database();
+			recognizer = new AudioRecognizer();
 			database.InsertDummyData();
 			UpdateSongList();
             textBlk.Text = "I am ready";
@@ -172,6 +174,9 @@ namespace BP
 				if (result != null)
 				{
 					textBlk.Text = $"File selected: {result.FileName}";
+					var audioFileData = await result.OpenReadAsync();
+					uploadedSong = new byte[(int)audioFileData.Length];
+					audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
 				}
 				else
 				{
@@ -196,8 +201,8 @@ namespace BP
 				input.onchange = e => {
 					var file = e.target.files[0];
 					//size in MBs cannot be bigger than 5
-					if ((file.size / 1024 / 1024)>5){ 
-						alert('File size exceeds 5 MB');
+					if ((file.size / 1024 / 1024)>50){ 
+						alert('File size exceeds 50 MB');
 					}
 					else
 					{
@@ -220,8 +225,17 @@ namespace BP
 
 		private async void addNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
-			database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
-			UpdateSongList();
+			if (uploadedSong != null && nameTxtBox.Text != "" && authorTxtBox.Text != "")
+			{
+				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
+				database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
+				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+				database.AddFingerprint(tfps);
+
+				UpdateSongList();
+
+				textBlk.Text = "New song added to database.";
+			}
 		}
 
 		#region WASM
@@ -238,8 +252,8 @@ namespace BP
 				input.onchange = e => {
 					var file = e.target.files[0];
 					//size in MBs cannot be bigger than 5
-					if ((file.size / 1024 / 1024)>50){ 
-						alert('File size exceeds 50 MB');
+					if ((file.size / 1024 / 1024)>5){ 
+						alert('File size exceeds 5 MB');
 					}
 					else
 					{
@@ -288,7 +302,7 @@ namespace BP
 			Console.Out.WriteLine();
 #endif
 			Console.Out.WriteLine("New song");
-
+			uploadedSong = binData;
 		}
 
 		private static event FileSelectedEventHandler FileSelectedEvent;
@@ -317,16 +331,16 @@ namespace BP
 	
 		private async void testBtn_Click(object sender, RoutedEventArgs e)
 		{
-			//database.PrintDatabase();
-			if(uploadedSong != null)
-			{
-				AudioProcessing.Tools.Printer.Print(uploadedSong);
+			database.PrintDatabase();
+			//if(uploadedSong != null)
+			//{
+			//	AudioProcessing.Tools.Printer.Print(uploadedSong);
 
-				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
-				System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + audioWav.Channels);
-				System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + audioWav.SampleRate);
-				System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + audioWav.NumOfDataSamples);
-			}
+			//	var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
+			//	System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + audioWav.Channels);
+			//	System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + audioWav.SampleRate);
+			//	System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + audioWav.NumOfDataSamples);
+			//}
 
 
 
