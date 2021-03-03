@@ -56,7 +56,8 @@ namespace BP
             this.InitializeComponent();
 			recorder = new Shared.AudioRecorder.Recorder();
 			database = new Database.Database();
-
+			database.InsertDummyData();
+			UpdateSongList();
             textBlk.Text = "I am ready";
 		}
 
@@ -213,6 +214,12 @@ namespace BP
 			#endregion
 		}
 
+		private async void addNewSongBtn_Click(object sender, RoutedEventArgs e)
+		{
+			database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
+			UpdateSongList();
+		}
+
 		#region WASM
 #if __WASM__
 		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
@@ -303,5 +310,14 @@ namespace BP
 		}
 #endif
 #endregion
+	
+		private async void testBtn_Click(object sender, RoutedEventArgs e)
+		{
+			database.PrintDatabase();
+		}
+		private void UpdateSongList()
+		{
+			songList.ItemsSource = database.GetSongs();
+		}
 	}
 }

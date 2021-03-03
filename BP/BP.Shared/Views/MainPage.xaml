@@ -42,13 +42,47 @@
 				Margin="0, 0, 100, 0"
 				HorizontalAlignment="Center"
 				/>			
+		<Button
+			Grid.Row="0"
+			x:Name="uploadNewSongBtn" 
+			Content="Upload new song" 
+			Click="uploadNewSongBtn_Click" 
+			BorderBrush="Red"
+			Margin="150, 0, 0, 0"
+			HorizontalAlignment="Center"
+			/>
+		<Button
+			Grid.Row="0"
+			x:Name="addNewSongBtn" 
+			Content="Add" 
+			Click="addNewSongBtn_Click" 
+			BorderBrush="Red"
+			Margin="350, 0, 0, 0"
+			HorizontalAlignment="Center"
+			/>
+		<TextBox
+			Grid.Row="0"
+			x:Name="nameTxtBox"
+			PlaceholderText="name"
+			Height="35"
+			Width="150"
+			Margin="168,0,0,80"
+			/>
+		<TextBox
+			Grid.Row="0"
+			x:Name="authorTxtBox"
+			PlaceholderText="author"
+			Height="35"
+			Width="150"
+			Margin="488,0,0,80"
+			/>		
 		<wasm:Button 
 				Grid.Row="0"
 				x:Name="uploadBtn" 
 				Content="Upload"
 				Click="uploadBtn_Click"
 				BorderBrush="Blue"
-				Margin="300, 0"
+				Margin="0, 0, 0, 0"
 				HorizontalAlignment="Center"
 				/>
 		<Button
@@ -60,14 +94,22 @@
 			Margin="100, 0, 0, 0"
 			HorizontalAlignment="Center"
 			/>
-		<Button
+		
+		<!-- DEBUG -->
+		<Button 
 			Grid.Row="0"
-			x:Name="uploadNewSongBtn" 
-			Content="Upload new song" 
-			Click="uploadNewSongBtn_Click" 
-			BorderBrush="Red"
-			Margin="150, 0, 0, 0"
-			HorizontalAlignment="Center"
+			x:Name="testButton"
+			Content="TEST"
+			Click="testBtn_Click"
+			BorderBrush="YellowGreen"
+			HorizontalAlignment="Right"
+			VerticalAlignment="Top"
+			/>
+		<ListView 
+			Grid.Row="1" 
+			x:Name="songList" 
+			HorizontalAlignment="Right"
+			VerticalAlignment="Center"
 			/>
 
 	</Grid>

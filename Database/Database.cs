@@ -1,6 +1,10 @@
 ﻿using SQLite;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Database
 {
@@ -14,13 +18,7 @@ namespace Database
 			bool exists = File.Exists(databasePath);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
 			SQLiteConnection connection = new SQLiteConnection(databasePath);
-#if DEBUG
-			//create new database on each debug run
-			if (exists)
-			{
-				File.Delete(databasePath);
-			}
-#endif
+
 			//create tables
 			if (!exists)
 			{
@@ -28,21 +26,6 @@ namespace Database
 			}
 
 			this.connection = connection;
-#if DEBUG
-			var songs = connection.GetTableInfo("Songs");
-			var fingerpints = connection.GetTableInfo("Fingerprints");
-			System.Diagnostics.Debug.WriteLine(songs.ToString());
-			System.Diagnostics.Debug.WriteLine(fingerpints.ToString());
-			foreach (var song in songs)
-			{
-				System.Diagnostics.Debug.WriteLine(song.ToString());
-			}
-			foreach (var fp in fingerpints)
-			{	
-				System.Diagnostics.Debug.WriteLine(fp.ToString());
-			}
-#endif
-			InsertDummyData();
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Leaving Database constructor");
 
 		}
@@ -52,32 +35,52 @@ namespace Database
 			Song song = new Song
 			{
 				Name = name,
-				Author = author
+				Author = author,
 			};
 			connection.Insert(song);
-
-			//SQLiteCommand addSongCmd = new SQLiteCommand(connection);
-			//addSongCmd.CommandText = "INSERT INTO Songs (name, author) VALUES(? ,?)";
-			//addSongCmd.Bind("name", name);
-			//addSongCmd.Bind("author", name);
-
-			//try
-			//{
-			//	addSongCmd.ExecuteNonQuery();
-			//}
-			//catch (Exception e)
-			//{
-			//	System.Diagnostics.Debug.WriteLine($"[DEBUG] Exception occured on add new song into database: {e.Message}");
-			//}
 		}
 
-		public void PrintSongs()
+		public void AddFingerprint(List<TimeFrequencyPoint> fingerprint)
 		{
-			var songs = connection.Query<Song>("SELECT * FROM Songs");
+			MemoryStream memStream = new MemoryStream();
+			BinaryFormatter binFormatter = new BinaryFormatter();
+			binFormatter.Serialize(memStream, fingerprint);
 
+			Fingerprint fp = new Fingerprint
+			{
+				Data = memStream.ToArray()
+			};
+			connection.Insert(fp);
+		}
+
+		public List<Song> GetSongs()
+		{
+			return connection.Table<Song>().Select(s => s).ToList();
+		}
+
+		public void PrintDatabase()
+		{
+
+			//Print songs
+			var songs = connection.Query<Song>("SELECT * FROM Songs");
 			foreach(Song song in songs)
 			{
 				System.Diagnostics.Debug.WriteLine($"{song.ID}\t{song.Author}\t{song.Name}");
+			}
+
+
+			//print fingerprints
+			var fps = connection.Query<Fingerprint>("SELECT * FROM Fingerprints");
+			foreach (Fingerprint fp in fps)
+			{
+				var memStream = new MemoryStream();
+				var binFormatter = new BinaryFormatter();
+				memStream.Write(fp.Data, 0, fp.Data.Length);
+				memStream.Position = 0;
+
+				List<TimeFrequencyPoint> fpData = binFormatter.Deserialize(memStream) as List<TimeFrequencyPoint>;
+				System.Diagnostics.Debug.WriteLine($"{fp.ID}\t{fp.Data[0]} {fpData[1].Time} {fpData[2].Time} {fpData[3].Time} {fpData[4].Time}");
+				System.Diagnostics.Debug.WriteLine($"{fp.ID}\t{fp.Data[0]} {fpData[1].Frequency} {fpData[2].Frequency} {fpData[3].Frequency} {fpData[4].Frequency}");
 			}
 		}
 
@@ -89,15 +92,26 @@ namespace Database
 			connection.CreateTable<Song>();
 			//Fingerprints table
 			connection.CreateTable<Fingerprint>();
-
-			//SQLiteCommand addFingerprintTableCmd = new SQLiteCommand(connection);
-			//addFingerprintTableCmd.CommandText = "CREATE TABLE Fingerprints(id INTEGER PRIMARY KEY AUTOINCREMENT, timeFrequencyPoints BLOB)";
-			//addFingerprintTableCmd.ExecuteNonQuery();
-
 		}
 
-		private void InsertDummyData()
+		public void InsertDummyData()
 		{
+			TimeFrequencyPoint A = new TimeFrequencyPoint { Time = 0, Frequency = 0 };
+			TimeFrequencyPoint B = new TimeFrequencyPoint { Time = 1, Frequency = 1 };
+			TimeFrequencyPoint C = new TimeFrequencyPoint { Time = 2, Frequency = 2 };
+			TimeFrequencyPoint D = new TimeFrequencyPoint { Time = 3, Frequency = 3 };
+			TimeFrequencyPoint E = new TimeFrequencyPoint { Time = 4, Frequency = 4 };
+
+			List<TimeFrequencyPoint> l = new List<TimeFrequencyPoint>(
+				new TimeFrequencyPoint[]{ A, B, D, C, E });
+			
+			//ADD 5 fingerpints
+			for (int i = 0; i < 5; i++)
+			{
+				AddFingerprint(l);
+			}
+
+			//Add 5 sogns
 			AddSong("A", "A");
 			AddSong("B", "B");
 			AddSong("C", "C");
