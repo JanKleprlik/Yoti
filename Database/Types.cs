@@ -26,7 +26,7 @@ namespace Database
 		[Column("data")]
 		public byte[] Data { get; set; }
 	}
-
+	[Serializable]
 	public struct TimeFrequencyPoint
 	{
 		public uint Time { get; set; }
