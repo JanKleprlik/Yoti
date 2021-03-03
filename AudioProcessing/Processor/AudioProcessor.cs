@@ -105,7 +105,6 @@ namespace AudioProcessing.Processor
 
 			return Window;
 		}
-
 		public static double[] GenerateHannWindow(uint windowSize)
 		{
 			var Window = new double[windowSize];
@@ -117,5 +116,8 @@ namespace AudioProcessing.Processor
 
 			return Window;
 		}
+
+
+
 	}
 }

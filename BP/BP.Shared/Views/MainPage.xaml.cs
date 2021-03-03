@@ -141,6 +141,9 @@ namespace BP
 			StorageFile file = await picker.PickSingleFileAsync();
 			if (file != null)
 			{
+				var audioFileData = await file.OpenStreamForReadAsync();
+				uploadedSong = new byte[(int)audioFileData.Length];
+				audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
 				this.textBlk.Text = "Picked song: " + file.Name;
 			}
 			else
@@ -314,7 +317,19 @@ namespace BP
 	
 		private async void testBtn_Click(object sender, RoutedEventArgs e)
 		{
-			database.PrintDatabase();
+			//database.PrintDatabase();
+			if(uploadedSong != null)
+			{
+				AudioProcessing.Tools.Printer.Print(uploadedSong);
+
+				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
+				System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + audioWav.Channels);
+				System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + audioWav.SampleRate);
+				System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + audioWav.NumOfDataSamples);
+			}
+
+
+
 		}
 		private void UpdateSongList()
 		{
