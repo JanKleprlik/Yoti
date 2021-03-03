@@ -18,15 +18,13 @@ namespace Database
 		public string Author { get; set; }
 	}
 
-	[Serializable]
+	[Table("Fingerprints")]
 	public class Fingerprint
 	{
 		[PrimaryKey, AutoIncrement, Column("id")]
 		public int ID { get; set; }
-
-		[TextBlob("TimeFrequencyPointsBlobbed")]
-		public List<TimeFrequencyPoint> TimeFrequencyPoints { get; set; }
-		public string TimeFrequencyPointsBlobbed { get; set; }
+		[Column("data")]
+		public byte[] Data { get; set; }
 	}
 
 	public struct TimeFrequencyPoint

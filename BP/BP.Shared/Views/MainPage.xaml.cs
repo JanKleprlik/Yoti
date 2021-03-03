@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 using System.Threading;
 using System.Text.RegularExpressions;
-using SQLite;
+
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -49,13 +49,14 @@ namespace BP
 		private bool isRecording = false;
 		private bool wasRecording = false;
 
-		private AudioProcessing.Database.Database database;
+		private Database.Database database;
 
 		public MainPage()
         {
             this.InitializeComponent();
 			recorder = new Shared.AudioRecorder.Recorder();
-			database = new AudioProcessing.Database.Database();
+			database = new Database.Database();
+
             textBlk.Text = "I am ready";
 		}
 
