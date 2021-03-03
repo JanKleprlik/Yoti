@@ -10,7 +10,7 @@ namespace AudioProcessing.Recognizer
 {
 	public partial class AudioRecognizer
 	{
-		public void AddNewSong(IAudioFormat audio)
+		public List<TimeFrequencyPoint> GetTimeFrequencyPoints(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
 
@@ -19,7 +19,9 @@ namespace AudioProcessing.Recognizer
 			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate);
 
 			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef; //default: 4096/4 = 1024
-			//var TimeFrequencyPoitns = CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
+			var TimeFrequencyPoints = AudioProcessor.CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
+
+			return TimeFrequencyPoints;
 		}
 
 		public string RecognizeSong()
