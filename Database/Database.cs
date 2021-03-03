@@ -16,8 +16,16 @@ namespace Database
 			System.Diagnostics.Debug.WriteLine("[DEBUG] In Database constructor");
 			string databasePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "AudioDatabase.db");
 			bool exists = File.Exists(databasePath);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
 			SQLiteConnection connection = new SQLiteConnection(databasePath);
+#if DEBUG
+			if (exists)
+			{
+				connection.DropTable<Song>();
+				connection.DropTable<Fingerprint>();
+				exists = false;
+			}
+#endif   
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
 
 			//create tables
 			if (!exists)
@@ -60,9 +68,9 @@ namespace Database
 
 		public void PrintDatabase()
 		{
-
 			//Print songs
 			var songs = connection.Query<Song>("SELECT * FROM Songs");
+			System.Diagnostics.Debug.WriteLine($"Total songs:{songs.Count}");
 			foreach(Song song in songs)
 			{
 				System.Diagnostics.Debug.WriteLine($"{song.ID}\t{song.Author}\t{song.Name}");
@@ -71,6 +79,7 @@ namespace Database
 
 			//print fingerprints
 			var fps = connection.Query<Fingerprint>("SELECT * FROM Fingerprints");
+			System.Diagnostics.Debug.WriteLine($"Total fps:{fps.Count}");
 			foreach (Fingerprint fp in fps)
 			{
 				var memStream = new MemoryStream();
@@ -96,6 +105,7 @@ namespace Database
 
 		public void InsertDummyData()
 		{
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] Inserting dummy data");
 			TimeFrequencyPoint A = new TimeFrequencyPoint { Time = 0, Frequency = 0 };
 			TimeFrequencyPoint B = new TimeFrequencyPoint { Time = 1, Frequency = 1 };
 			TimeFrequencyPoint C = new TimeFrequencyPoint { Time = 2, Frequency = 2 };
@@ -117,6 +127,7 @@ namespace Database
 			AddSong("C", "C");
 			AddSong("D", "D");
 			AddSong("E", "E");
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] Done inserting dummy data");
 		}
 	}
 }

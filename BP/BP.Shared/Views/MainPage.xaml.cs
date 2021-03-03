@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 
 using System.Threading;
 using System.Text.RegularExpressions;
+using Database;
 
 
 #if NETFX_CORE
@@ -48,7 +49,7 @@ namespace BP
 		private Shared.AudioRecorder.Recorder recorder;
 		private bool isRecording = false;
 		private bool wasRecording = false;
-
+		private byte[] uploadedSong;
 		private Database.Database database;
 
 		public MainPage()
@@ -317,7 +318,13 @@ namespace BP
 		}
 		private void UpdateSongList()
 		{
-			songList.ItemsSource = database.GetSongs();
+			var songs = database.GetSongs();
+			List<string> songNames = new List<string>();
+			foreach(Song song in songs)
+			{
+				songNames.Add(song.Name);
+			}
+			songList.ItemsSource = songNames;
 		}
 	}
 }
