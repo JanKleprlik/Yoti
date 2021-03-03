@@ -117,7 +117,142 @@ namespace AudioProcessing.Processor
 			return Window;
 		}
 
+		public static List<TimeFrequencyPoint> CreateTimeFrequencyPoints(int bufferSize, double[] data, double sensitivity = 0.9)
+		{
+			List<TimeFrequencyPoint> TimeFrequencyPoitns = new List<TimeFrequencyPoint>();
+			double[] HammingWindow = GenerateHammingWindow((uint)bufferSize);
+			double Avg = 0d;// = GetBinAverage(data, HammingWindow);
 
+			int offset = 0;
+			var sampleData = new double[bufferSize * 2]; //*2  because of Re + Im
+			uint AbsTime = 0;
+			while (offset < data.Length)
+			{
+				if (offset + bufferSize < data.Length)
+				{
+					for (int i = 0; i < bufferSize; i++) //setup for FFT
+					{
+						sampleData[i * 2] = data[i + offset] * HammingWindow[i];
+						sampleData[i * 2 + 1] = 0d;
+					}
+
+					FastFourierTransformation.FFT(sampleData);
+					double[] maxs =
+					{
+						GetStrongestBin(data, 0, 10),
+						GetStrongestBin(data, 10, 20),
+						GetStrongestBin(data, 20, 40),
+						GetStrongestBin(data, 40, 80),
+						GetStrongestBin(data, 80, 160),
+						GetStrongestBin(data, 160, 512),
+					};
+
+
+					for (int i = 0; i < maxs.Length; i++)
+					{
+						Avg += maxs[i];
+					}
+
+					Avg /= maxs.Length;
+					//get doubles of frequency and time 
+					RegisterTFPoints(sampleData, Avg, AbsTime, ref TimeFrequencyPoitns, sensitivity);
+
+				}
+
+				offset += bufferSize;
+				AbsTime++;
+			}
+
+			return TimeFrequencyPoitns;
+		}
+
+		/// <summary>
+		/// Returns normalized value of the strongest bin in given bounds
+		/// </summary>
+		/// <param name="bins">Complex values alternating Real and Imaginary values</param>
+		/// <param name="from">lower bound</param>
+		/// <param name="to">upper bound</param>
+		/// <returns>Normalized value of the strongest bin</returns>
+		private static double GetStrongestBin(double[] bins, int from, int to)
+		{
+			var max = double.MinValue;
+			for (int i = from; i < to; i++)
+			{
+				var normalized = 2 * Math.Sqrt((bins[i * 2] * bins[i * 2] + bins[i * 2 + 1] * bins[i * 2 + 1]) / 2048);
+				var decibel = 20 * Math.Log10(normalized);
+
+				if (decibel > max)
+				{
+					max = decibel;
+				}
+
+			}
+
+			return max;
+		}
+
+		/// <summary>
+		/// Filter outs the strongest bins of logarithmically scaled parts of bins. Chooses the strongest and remembers it if its value is above average. Those points are
+		/// chornologically added to the <c>timeFrequencyPoints</c> List.
+		/// </summary>
+		/// <param name="data">bins to choose from, alternating real and complex values as doubles. Must contain 512 complex values</param>
+		/// <param name="average">Limit that separates weak spots from important ones.</param>
+		/// <param name="absTime">Absolute time in the song.</param>
+		/// <param name="timeFrequencyPoitns">List to add points to.</param>
+		private static void RegisterTFPoints(double[] data, in double average, in uint absTime, ref List<TimeFrequencyPoint> timeFrequencyPoitns, double coefficient = 0.9)
+		{
+			int[] BinBoundries =
+			{
+				//low   high
+				0 , 10,
+				10, 20,
+				20, 40,
+				40, 80,
+				80, 160,
+				160,512
+			};
+
+			//loop through logarithmically scalled sections of bins
+			for (int i = 0; i < BinBoundries.Length / 2; i++)
+			{
+				//get strongest bin from a section if its above average
+				var idx = GetStrongestBinIndex(data, BinBoundries[i * 2], BinBoundries[i * 2 + 1], average, coefficient);
+				if (idx != null)
+				{
+					//idx is divided by 2 because of (Re + Im)
+					timeFrequencyPoitns.Add(new TimeFrequencyPoint { Time = absTime, Frequency = (uint)idx/2});
+				}
+			}
+		}
+
+		/// <summary>
+		/// Finds the strongest bin above limit in given segment.
+		/// </summary>
+		/// <param name="bins">Complex values alternating Real and Imaginary values</param>
+		/// <param name="from">lower bound</param>
+		/// <param name="to">upper bound</param>
+		/// <param name="limit">limit indicating weak bin</param>
+		/// <param name="sensitivity">sensitivity of the limit (the higher the lower sensitivity)</param>
+		/// <returns>index of strongest bin or null if none of the bins is strong enought</returns>
+		private static int? GetStrongestBinIndex(double[] bins, int from, int to, double limit, double sensitivity = 0.9d)
+		{
+			var max = double.MinValue;
+			int? index = null;
+			for (int i = from; i < to; i++)
+			{
+				var normalized = 2 * Math.Sqrt((bins[i * 2] * bins[i * 2] + bins[i * 2 + 1] * bins[i * 2 + 1]) / 2048);
+				var decibel = 20 * Math.Log10(normalized);
+
+				if (decibel > max && decibel * sensitivity > limit)
+				{
+					max = decibel;
+					index = i * 2;
+				}
+
+			}
+
+			return index;
+		}
 
 	}
 }
