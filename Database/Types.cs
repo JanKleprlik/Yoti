@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using SQLite;
 using SQLiteNetExtensions.Attributes;
 
-namespace AudioProcessing.Database
+namespace Database
 {
 	[Table("Songs")]
 	public class Song
@@ -29,7 +28,7 @@ namespace AudioProcessing.Database
 		public List<TimeFrequencyPoint> TimeFrequencyPoints { get; set; }
 		public string TimeFrequencyPointsBlobbed { get; set; }
 	}
-	
+
 	public struct TimeFrequencyPoint
 	{
 		public uint Time { get; set; }

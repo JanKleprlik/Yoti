@@ -12,8 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\IAduioFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\WavFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Parameters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Database\Database.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Database\Types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\AudioProcessor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\ButterworthFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\FastFourierTransformation.cs" />

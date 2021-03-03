@@ -49,4 +49,5 @@
   </ItemGroup>
   <Import Project="..\BP.Shared\BP.Shared.projitems" Label="Shared" Condition="Exists('..\BP.Shared\BP.Shared.projitems')" />
   <Import Project="..\..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />
+  <Import Project="..\..\Database\Database.projitems" Label="Shared" />
 </Project>

@@ -15,19 +15,25 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BP.Shared", "BP\BP.Shared\B
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AudioProcessing", "AudioProcessing\AudioProcessing.shproj", "{7BB6AAE9-7265-49F6-9D7A-F801CDE914DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizer", "Visualizer\Visualizer.csproj", "{34C88066-3DD3-402A-AA82-801E2F47FC53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visualizer", "Visualizer\Visualizer.csproj", "{34C88066-3DD3-402A-AA82-801E2F47FC53}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Database", "Database\Database.shproj", "{7358A2C4-04CE-49DA-B95E-1677F2CD54BA}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		AudioProcessing\AudioProcessing.projitems*{34c88066-3dd3-402a-aa82-801e2f47fc53}*SharedItemsImports = 5
 		BP\BP.Shared\BP.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
+		Database\Database.projitems*{7358a2c4-04ce-49da-b95e-1677f2cd54ba}*SharedItemsImports = 13
 		AudioProcessing\AudioProcessing.projitems*{7bb6aae9-7265-49f6-9d7a-f801cde914df}*SharedItemsImports = 13
 		AudioProcessing\AudioProcessing.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
 		BP\BP.Shared\BP.Shared.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
+		Database\Database.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
 		AudioProcessing\AudioProcessing.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
 		BP\BP.Shared\BP.Shared.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
+		Database\Database.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
 		AudioProcessing\AudioProcessing.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
 		BP\BP.Shared\BP.Shared.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
+		Database\Database.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Ad-Hoc|Any CPU = Ad-Hoc|Any CPU
