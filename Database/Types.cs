@@ -24,6 +24,12 @@ namespace Database
 		[PrimaryKey, AutoIncrement, Column("id")]
 		public int ID { get; set; }
 		[Column("data")]
-		public byte[] Data { get; set; }
+		public byte[] serializedData { get; set; }
+	}
+	[Table("SearchData")]
+	public class SearchData
+	{
+		[Column("data")]
+		public byte[] serializedData { get; set; }
 	}
 }

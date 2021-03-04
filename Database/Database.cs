@@ -11,6 +11,9 @@ namespace Database
 	public class Database
 	{
 		private SQLiteConnection connection;
+
+		#region INITIALIZATION
+
 		public Database()
 		{
 			System.Diagnostics.Debug.WriteLine("[DEBUG] In Database constructor");
@@ -22,6 +25,7 @@ namespace Database
 			{
 				connection.DropTable<Song>();
 				connection.DropTable<Fingerprint>();
+				connection.DropTable<SearchData>();
 				exists = false;
 			}
 #endif   
@@ -37,6 +41,22 @@ namespace Database
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Leaving Database constructor");
 
 		}
+		private void InitializeTables(SQLiteConnection connection)
+		{
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Creating tables");
+
+			//Songs table
+			connection.CreateTable<Song>();
+			//Fingerprints table
+			connection.CreateTable<Fingerprint>();
+			//Data
+			connection.CreateTable<SearchData>();
+
+		}
+
+		#endregion
+
+		#region INSERTING API
 
 		public void AddSong(string name, string author)
 		{
@@ -56,15 +76,51 @@ namespace Database
 
 			Fingerprint fp = new Fingerprint
 			{
-				Data = memStream.ToArray()
+				serializedData = memStream.ToArray()
 			};
 			connection.Insert(fp);
 		}
+
+		public void UpdateSearchData(Dictionary<uint, List<long>> newSearchData)
+		{
+			MemoryStream memStream = new MemoryStream();
+			BinaryFormatter binFormatter = new BinaryFormatter();
+			binFormatter.Serialize(memStream, newSearchData);
+
+			SearchData searchData = new SearchData
+			{
+				serializedData = memStream.ToArray()
+			};
+			//delete last version of searchData
+			connection.DeleteAll<SearchData>();
+			//create new 
+			connection.Insert(searchData);
+		}
+
+		#endregion
+
+		#region QUERY API
 
 		public List<Song> GetSongs()
 		{
 			return connection.Table<Song>().Select(s => s).ToList();
 		}
+
+		public Dictionary<uint, List<long>> GetSearchData()
+		{
+			var searchData = connection.Query<SearchData>("SELECT * FROM SearchData")[0];
+
+			var memStream = new MemoryStream();
+			var binFormatter = new BinaryFormatter();
+			memStream.Write(searchData.serializedData, 0, searchData.serializedData.Length);
+			memStream.Position = 0;
+
+			return binFormatter.Deserialize(memStream) as Dictionary<uint, List<long>>;
+		}
+
+		#endregion
+
+		#region DEBUG helpers
 
 		public void PrintDatabase()
 		{
@@ -84,23 +140,12 @@ namespace Database
 			{
 				var memStream = new MemoryStream();
 				var binFormatter = new BinaryFormatter();
-				memStream.Write(fp.Data, 0, fp.Data.Length);
+				memStream.Write(fp.serializedData, 0, fp.serializedData.Length);
 				memStream.Position = 0;
 
 				List<TimeFrequencyPoint> fpData = binFormatter.Deserialize(memStream) as List<TimeFrequencyPoint>;
-				System.Diagnostics.Debug.WriteLine($"{fp.ID}\t{fp.Data[0]} {fpData[1].Time} {fpData[2].Time} {fpData[3].Time} {fpData[4].Time}");
-				System.Diagnostics.Debug.WriteLine($"{fp.ID}\t{fp.Data[0]} {fpData[1].Frequency} {fpData[2].Frequency} {fpData[3].Frequency} {fpData[4].Frequency}");
+				System.Diagnostics.Debug.WriteLine($"{fp.ID}\t{fp.serializedData[0]} {fpData[1].Time} {fpData[2].Time} {fpData[3].Time} {fpData[4].Time}");
 			}
-		}
-
-		private void InitializeTables(SQLiteConnection connection)
-		{
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Creating tables");
-
-			//Songs table
-			connection.CreateTable<Song>();
-			//Fingerprints table
-			connection.CreateTable<Fingerprint>();
 		}
 
 		public void InsertDummyData()
@@ -129,5 +174,7 @@ namespace Database
 			AddSong("E", "E");
 			System.Diagnostics.Debug.WriteLine($"[DEBUG] Done inserting dummy data");
 		}
+
+		#endregion
 	}
 }
