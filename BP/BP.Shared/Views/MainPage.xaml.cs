@@ -211,7 +211,7 @@ namespace BP
 				input.accept = '.wav';
 				input.onchange = e => {
 					var file = e.target.files[0];
-					//size in MBs cannot be bigger than 5
+					//size in MBs cannot be bigger than 50
 					if ((file.size / 1024 / 1024)>50){ 
 						alert('File size exceeds 50 MB');
 					}
@@ -282,7 +282,7 @@ namespace BP
 				input.click(); "
 			);
 		}
-		public static void SelectFile(string imageAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(imageAsDataUrl));
+		public static void SelectFile(string fileAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(fileAsDataUrl));
 
 		private void OnSongToRecognizeUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
 		{
@@ -304,16 +304,16 @@ namespace BP
 		{
 			FileSelectedEvent -= OnNewSongUploadedEvent;
 			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-			var binData = Convert.FromBase64String(base64Data); //this is the data I want
+			uploadedSong = Convert.FromBase64String(base64Data); //this is the data I want
 #if DEBUG
 			for (int i = 0; i < 10; i++)
 			{
-				Console.Out.Write((char)binData[i]);
+				Console.Out.Write((char)uploadedSong[i]);
 			}
 			Console.Out.WriteLine();
 #endif
 			Console.Out.WriteLine("New song");
-			uploadedSong = binData;
+			//uploadedSong = binData;
 		}
 
 		private static event FileSelectedEventHandler FileSelectedEvent;

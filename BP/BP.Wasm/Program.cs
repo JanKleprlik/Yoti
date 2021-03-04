@@ -9,8 +9,8 @@ namespace BP.Wasm
 
 		static int Main(string[] args)
 		{
+			SQLitePCL.Batteries.Init();
 			Windows.UI.Xaml.Application.Start(_ => _app = new App());
-
 			return 0;
 		}
 	}
