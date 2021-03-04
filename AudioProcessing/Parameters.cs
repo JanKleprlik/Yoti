@@ -9,7 +9,6 @@ namespace AudioProcessing.Recognizer
 		public static class Parameters
 		{
 			public const int TargetSamplingRate = 12000;
-
 			/// <summary>
 			/// Default size of FFT window
 			/// </summary>

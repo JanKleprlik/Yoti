@@ -41,5 +41,23 @@ namespace AudioProcessing.Tools
 
 			return res;
 		}
+
+
+		/// <summary>
+		/// Transforms byte audio data into short audio data
+		/// </summary>
+		/// <param name="data"></param>
+		/// <returns></returns>
+		public static short[] BytesToShorts(byte[] data)
+		{
+			short[] dataShorts = new short[data.Length / 2];
+
+			for (int i = 0; i < data.Length; i += 2)
+			{
+				dataShorts[i / 2] = Tools.Converter.BytesToShort(new byte[] { data[i], data[i + 1] });
+			}
+
+			return dataShorts;
+		}
 	}
 }

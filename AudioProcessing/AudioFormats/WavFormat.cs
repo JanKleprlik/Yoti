@@ -33,7 +33,7 @@ namespace AudioProcessing.AudioFormats
 			this.NumOfDataSamples = Tools.Converter.BytesToInt(new byte[]
 				{rawData[dataOffset - 4], rawData[dataOffset - 3], rawData[dataOffset - 2], rawData[dataOffset - 1]}) / 2;
 			var byteData = rawData.Skip(dataOffset).Take(this.NumOfDataSamples * 2).ToArray();
-			this.Data = GetSoundDataFromBytes(byteData);
+			this.Data = Tools.Converter.BytesToShorts(byteData);
 		}
 
 		public uint Channels { get; set; }
@@ -101,23 +101,6 @@ namespace AudioProcessing.AudioFormats
 				}
 			}
 			throw new ArgumentException("Part with data not found.");
-		}
-
-		/// <summary>
-		/// Transforms byte audio data into short audio data
-		/// </summary>
-		/// <param name="data"></param>
-		/// <returns></returns>
-		private static short[] GetSoundDataFromBytes(byte[] data)
-		{
-			short[] dataShorts = new short[data.Length / 2];
-
-			for (int i = 0; i < data.Length; i += 2)
-			{
-				dataShorts[i / 2] = Tools.Converter.BytesToShort(new byte[] { data[i], data[i + 1] });
-			}
-
-			return dataShorts;
 		}
 	}
 }
