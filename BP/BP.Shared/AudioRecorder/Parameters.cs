@@ -8,9 +8,9 @@ namespace BP.Shared.AudioRecorder
 	{
 		public static class Parameters
 		{
-			public static int SamplingRate = 48000;
+			public static uint SamplingRate = 48000;
 
-			public static int Channels = 1;
+			public static uint Channels = 1;
 		}
 
 	}

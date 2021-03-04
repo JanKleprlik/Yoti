@@ -9,7 +9,7 @@
 	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     mc:Ignorable="d wasm">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="*"/>
@@ -41,7 +41,7 @@
 				BorderBrush="Blue"
 				Margin="0, 0, 100, 0"
 				HorizontalAlignment="Center"
-				/>			
+				/>
 		<Button
 			Grid.Row="0"
 			x:Name="uploadNewSongBtn" 
@@ -75,7 +75,7 @@
 			Height="35"
 			Width="150"
 			Margin="0,0,0,80"
-			/>		
+			/>
 		<wasm:Button 
 				Grid.Row="0"
 				x:Name="uploadBtn" 
@@ -94,7 +94,7 @@
 			Margin="100, 0, 0, 0"
 			HorizontalAlignment="Center"
 			/>
-		
+
 		<!-- DEBUG -->
 		<Button 
 			Grid.Row="0"
@@ -106,10 +106,11 @@
 			VerticalAlignment="Top"
 			/>
 		<ListView 
-			Grid.Row="1" 
+			not_wasm:Grid.Row="1" 
 			x:Name="songList" 
-			HorizontalAlignment="Right"
+			HorizontalAlignment="Left"
 			VerticalAlignment="Center"
+			Width="100" 
 			/>
 
 	</Grid>

@@ -51,6 +51,7 @@ namespace BP
 		private bool isRecording = false;
 		private bool wasRecording = false;
 		private byte[] uploadedSong;
+		private byte[] recordedSong;
 		private Database.Database database;
 
 		public MainPage()
@@ -108,27 +109,38 @@ namespace BP
 
 		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
+			AudioProcessing.AudioFormats.WavFormat recordedAudioWav;
 #if !__WASM__
-			AudioProcessing.Tools.Printer.Print(await recorder.GetDataFromStream());
+			recordedSong = await recorder.GetDataFromStream();
 #endif
 			#region UWP
 #if NETFX_CORE
-			AudioProcessing.AudioFormats.WavFormat recordedAudio = new AudioProcessing.AudioFormats.WavFormat(await recorder.GetDataFromStream());
-
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudio.Channels);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudio.SampleRate);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudio.NumOfDataSamples);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Data: ");
-			AudioProcessing.Tools.Printer.PrintShortAsBytes(recordedAudio.Data);
-
+			recordedAudioWav = new AudioProcessing.AudioFormats.WavFormat(recordedSong);
 #endif
 			#endregion
 			#region ANDROID
 #if __ANDROID__
-			//byte[] data = 
+
+			//at android we only get raw data without metadata
+			// so I have to convert them manually to shorts and then use different constructor
+			short[] recordedDataShort = AudioProcessing.Tools.Converter.BytesToShorts(recordedSong);
+
+			recordedAudioWav = new AudioProcessing.AudioFormats.WavFormat(
+				Shared.AudioRecorder.Recorder.Parameters.SamplingRate,
+				Shared.AudioRecorder.Recorder.Parameters.Channels,
+				recordedDataShort.Length,
+				recordedDataShort);
 #endif
 			#endregion
-
+			#region WASM
+#if __WASM__
+			recordedAudioWav = new AudioProcessing.AudioFormats.WavFormat(recordedSong);
+#endif
+			#endregion
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
 		}
 
 		private async void uploadNewSongBtn_Click(object sender, RoutedEventArgs e)
@@ -155,7 +167,6 @@ namespace BP
 
 #endif
 			#endregion
-
 			#region ANDORID
 #if __ANDROID__
 			if (await getExternalStoragePermission())
@@ -228,8 +239,8 @@ namespace BP
 			if (uploadedSong != null && nameTxtBox.Text != "" && authorTxtBox.Text != "")
 			{
 				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
-				database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
 				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+				database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
 				database.AddFingerprint(tfps);
 
 				UpdateSongList();
@@ -285,8 +296,8 @@ namespace BP
 			}
 			Console.Out.WriteLine();
 #endif
+			recordedSong = binData;
 			Console.Out.WriteLine("Recognize song");
-
 		}
 
 		private void OnNewSongUploadedEvent(object sender, FileSelectedEventHandlerArgs e)

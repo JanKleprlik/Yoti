@@ -78,7 +78,7 @@ namespace BP.Shared.AudioRecorder
 
 				rec = new AudioRecord(
 					AudioSource.Mic,
-					Parameters.SamplingRate,
+					(int)Parameters.SamplingRate,
 					channels,
 					Android.Media.Encoding.Pcm16bit,
 					bufferLimit
@@ -219,7 +219,7 @@ namespace BP.Shared.AudioRecorder
 				// Stream type
 				Android.Media.Stream.Music,
 				// Frequency
-				Parameters.SamplingRate,
+				(int)Parameters.SamplingRate,
 				// Mono or stereo
 				channels,
 				// Audio encoding
