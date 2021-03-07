@@ -64,4 +64,38 @@ namespace AudioProcessing.Tools
 			return true;
 		}
 	}
+
+	public static class Builders
+	{
+		/// <summary>
+		/// Builds address from parts
+		/// </summary>
+		/// <param name="anchorFreq">Frequency of anchor point</param>
+		/// <param name="pointFreq">Frequency of Self point</param>
+		/// <param name="delta">Time delta between Anchor and Self point</param>
+		/// <returns>Left to right: 9bits Anchor frequency, 9bits Self point frequency, 14 bits delta</returns>
+		internal static uint BuildAddress(in uint anchorFreq, in uint pointFreq, uint delta)
+		{
+			uint res = anchorFreq;
+			res <<= 9; //move 9 bits 
+			res += pointFreq;
+			res <<= 14; //move 14 bits 
+			res += delta;
+			return res;
+		}
+
+		/// <summary>
+		/// Builds song value out of parts
+		/// </summary>
+		/// <param name="absAnchorTime">Absolute time of anchor</param>
+		/// <param name="id">ID of a song</param>
+		/// <returns>Left to right: 32bits AbsAnchTime, 32 bits songID</returns>
+		internal static ulong BuildSongValue(in uint absAnchorTime, uint id)
+		{
+			ulong res = absAnchorTime;
+			res <<= 32;
+			res += id;
+			return res;
+		}
+	}
 }
