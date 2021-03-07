@@ -53,14 +53,17 @@ namespace BP
 		private byte[] uploadedSong;
 		private byte[] recordedSong;
 		private Database.Database database;
-
+		private Dictionary<uint, List<ulong>> songValueDatabase;
 		public MainPage()
         {
             this.InitializeComponent();
 			recorder = new Shared.AudioRecorder.Recorder();
 			database = new Database.Database();
 			recognizer = new AudioRecognizer();
-			database.InsertDummyData();
+			//database.InsertDummyData();
+			songValueDatabase = database.GetSearchData();
+
+
 			UpdateSongList();
             textBlk.Text = "I am ready";
 		}
@@ -110,6 +113,8 @@ namespace BP
 		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
 			AudioProcessing.AudioFormats.WavFormat recordedAudioWav;
+			
+			#region GETTING recordedAudioWav
 #if !__WASM__
 			recordedSong = await recorder.GetDataFromStream();
 #endif
@@ -134,13 +139,20 @@ namespace BP
 			#endregion
 			#region WASM
 #if __WASM__
-			recordedAudioWav = new AudioProcessing.AudioFormats.WavFormat(recordedSong);
+			throw new NotImplementedException("Song recognition is not yet implemented in WASM");
 #endif
 			#endregion
+			#endregion
+			
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
+
+			uint? ID = recognizer.RecognizeSong(recordedAudioWav, songValueDatabase);
+
+			textBlk.Text = $"ID of recognized song is {ID}";
+
 		}
 
 		private async void uploadNewSongBtn_Click(object sender, RoutedEventArgs e)
@@ -238,11 +250,15 @@ namespace BP
 		{
 			if (uploadedSong != null && nameTxtBox.Text != "" && authorTxtBox.Text != "")
 			{
+				System.Diagnostics.Debug.WriteLine("[DEBUG] Adding new song into database.");
 				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
 				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-				database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
+				uint songID = database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
 				database.AddFingerprint(tfps);
-
+				System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
+				recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
+				database.UpdateSearchData(songValueDatabase);
+				System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
 				UpdateSongList();
 
 				textBlk.Text = "New song added to database.";
