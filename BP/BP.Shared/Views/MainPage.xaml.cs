@@ -60,7 +60,6 @@ namespace BP
 			recorder = new Shared.AudioRecorder.Recorder();
 			database = new Database.Database();
 			recognizer = new AudioRecognizer();
-			//database.InsertDummyData();
 			songValueDatabase = database.GetSearchData();
 
 
