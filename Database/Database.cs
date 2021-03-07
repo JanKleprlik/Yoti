@@ -11,25 +11,24 @@ namespace Database
 	public class Database
 	{
 		private SQLiteConnection connection;
-
 		#region INITIALIZATION
 
 		public Database()
 		{
 			System.Diagnostics.Debug.WriteLine("[DEBUG] In Database constructor");
 			string databasePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "AudioDatabase.db");
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
 			bool exists = File.Exists(databasePath);
 			SQLiteConnection connection = new SQLiteConnection(databasePath);
 #if DEBUG
-			if (exists)
-			{
-				connection.DropTable<Song>();
-				connection.DropTable<Fingerprint>();
-				connection.DropTable<SearchData>();
-				exists = false;
-			}
-#endif   
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
+			//if (exists)
+			//{
+			//	connection.DropTable<Song>();
+			//	connection.DropTable<Fingerprint>();
+			//	connection.DropTable<SearchData>();
+			//	exists = false;
+			//}
+#endif
 
 			//create tables
 			if (!exists)
@@ -58,7 +57,7 @@ namespace Database
 
 		#region INSERTING API
 
-		public void AddSong(string name, string author)
+		public uint AddSong(string name, string author)
 		{
 			Song song = new Song
 			{
@@ -66,6 +65,8 @@ namespace Database
 				Author = author,
 			};
 			connection.Insert(song);
+			return (uint)SQLite3.LastInsertRowid(connection.Handle);
+
 		}
 
 		public void AddFingerprint(List<TimeFrequencyPoint> fingerprint)
@@ -81,7 +82,7 @@ namespace Database
 			connection.Insert(fp);
 		}
 
-		public void UpdateSearchData(Dictionary<uint, List<long>> newSearchData)
+		public void UpdateSearchData(Dictionary<uint, List<ulong>> newSearchData)
 		{
 			MemoryStream memStream = new MemoryStream();
 			BinaryFormatter binFormatter = new BinaryFormatter();
@@ -106,16 +107,27 @@ namespace Database
 			return connection.Table<Song>().Select(s => s).ToList();
 		}
 
-		public Dictionary<uint, List<long>> GetSearchData()
+		public Dictionary<uint, List<ulong>> GetSearchData()
 		{
-			var searchData = connection.Query<SearchData>("SELECT * FROM SearchData")[0];
+			var searchDataQueryRes = connection.Query<SearchData>("SELECT * FROM SearchData");
+			if (searchDataQueryRes.Count != 0)
+			{
+				System.Diagnostics.Debug.WriteLine("[DEBUG] Database is NOT empty.");
+				var searchData = searchDataQueryRes[0];
+				var memStream = new MemoryStream();
+				var binFormatter = new BinaryFormatter();
+				memStream.Write(searchData.serializedData, 0, searchData.serializedData.Length);
+				memStream.Position = 0;
 
-			var memStream = new MemoryStream();
-			var binFormatter = new BinaryFormatter();
-			memStream.Write(searchData.serializedData, 0, searchData.serializedData.Length);
-			memStream.Position = 0;
+				return binFormatter.Deserialize(memStream) as Dictionary<uint, List<ulong>>;
+			}
+			else
+			{
+				//database is empty
+				System.Diagnostics.Debug.WriteLine("[DEBUG] Database is empty.");
+				return new Dictionary<uint, List<ulong>>();
+			}
 
-			return binFormatter.Deserialize(memStream) as Dictionary<uint, List<long>>;
 		}
 
 		#endregion
