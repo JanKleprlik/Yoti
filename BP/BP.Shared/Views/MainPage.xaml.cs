@@ -358,6 +358,114 @@ namespace BP
 		private async void testBtn_Click(object sender, RoutedEventArgs e)
 		{
 			database.PrintDatabase();
+#if __WASM__
+			WebAssemblyRuntime.InvokeJS(
+				@"
+    var audioContext = new AudioContext();
+    console.log('audio is starting up ...');
+    console.log(audioContext.sampleRate);
+
+    var BUFF_SIZE_RENDERER = 16384;
+    var SIZE_SHOW = 1; // number of array elements to show in console output
+
+    var audioInput = null,
+    microphone_stream = null,
+    gain_node = null,
+    script_processor_node = null,
+    script_processor_analysis_node = null,
+    analyser_node = null;
+
+    if (!navigator.getUserMedia)
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ||
+    navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+    if (navigator.getUserMedia){
+
+        navigator.getUserMedia({audio:true}, 
+            function(stream) {
+                start_microphone(stream);
+            },
+            function(e) {
+                alert('Error capturing audio.');
+            }
+            );
+
+    } else { alert('getUserMedia not supported in this browser.'); }
+
+    function process_microphone_buffer(event) {
+
+        var i, N, inp, microphone_output_buffer;
+
+        // not needed for basic feature set
+        // microphone_output_buffer = event.inputBuffer.getChannelData(0); // just mono - 1 channel for now
+    }
+    
+    function indexOfMax(arr) {
+    if (arr.length === 0) {
+        return -1;
+    }
+
+    var max = arr[0];
+    var maxIndex = 0;
+
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] > max) {
+            maxIndex = i;
+            max = arr[i];
+        }
+    }
+
+    return maxIndex;
+}
+
+    function start_microphone(stream){
+
+        gain_node = audioContext.createGain();
+        gain_node.connect( audioContext.destination );
+
+        microphone_stream = audioContext.createMediaStreamSource(stream);
+        microphone_stream.connect(gain_node); 
+
+        script_processor_node = audioContext.createScriptProcessor(BUFF_SIZE_RENDERER, 1, 1);
+        script_processor_node.onaudioprocess = process_microphone_buffer;
+
+        microphone_stream.connect(script_processor_node);
+
+        // --- setup FFT
+
+        script_processor_analysis_node = audioContext.createScriptProcessor(2048, 1, 1);
+        script_processor_analysis_node.connect(gain_node);
+
+        analyser_node = audioContext.createAnalyser();
+        analyser_node.smoothingTimeConstant = 0;
+        analyser_node.fftSize = 2048;
+
+        microphone_stream.connect(analyser_node);
+
+        analyser_node.connect(script_processor_analysis_node);
+
+        var buffer_length = analyser_node.frequencyBinCount;
+
+        var array_freq_domain = new Uint8Array(buffer_length);
+        var array_time_domain = new Uint8Array(buffer_length);
+        console.log(array_freq_domain);
+        console.log('buffer_length ' + buffer_length);
+
+        script_processor_analysis_node.onaudioprocess = function() {
+
+            // get the average for the first channel
+            analyser_node.getByteFrequencyData(array_freq_domain);
+            analyser_node.getByteTimeDomainData(array_time_domain);
+
+            // draw the spectrogram
+            if (microphone_stream.playbackState == microphone_stream.PLAYING_STATE) {
+                console.log(48000 * indexOfMax(array_freq_domain) / 2048);
+            }
+        };
+    }
+"
+				);
+#endif
 			//if(uploadedSong != null)
 			//{
 			//	AudioProcessing.Tools.Printer.Print(uploadedSong);
