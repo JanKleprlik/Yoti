@@ -85,6 +85,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\Fonts\uno-fluentui-assets.ttf" />
+    <AndroidAsset Include="..\Assets\Fonts\Sansation\Sansation_Regular.ttf">
+      <Link>Assets\Fonts\Sansation_Regular.ttf</Link>
+    </AndroidAsset>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
   </ItemGroup>

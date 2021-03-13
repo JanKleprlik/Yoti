@@ -1,0 +1,121 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+	<Style TargetType="Button">
+		<Setter Property="Template" Value="{StaticResource DefaultButton}"/>
+		<Setter Property="FocusVisualPrimaryThickness" Value="0"/>
+		<Setter Property="FocusVisualSecondaryThickness" Value="0"/>
+	</Style>
+
+
+
+
+	<ControlTemplate x:Name="IconRoundButton" TargetType="Button">
+
+		<Border>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="CircleButton.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="CircleButton.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="CircleScale.ScaleX" Value="1.05"/>
+							<Setter Target="CircleScale.ScaleY" Value="1.05"/>
+							<Setter Target="Icon.Margin" Value="1,0,0,0"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="CircleButton.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="CircleButton.Stroke" Value="{StaticResource SecondaryHighlightedColor}"/>
+							<Setter Target="CircleScale.ScaleX" Value="0.9"/>
+							<Setter Target="CircleScale.ScaleY" Value="0.9"/>
+							<Setter Target="Icon.Margin" Value="0,1,0,0"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+			<Grid>
+
+				<Ellipse x:Name="CircleButton"
+				         Fill="{StaticResource PrimaryColor}"
+				         Height="{TemplateBinding Height}"
+				         Width="{TemplateBinding Width}"
+				         Stroke="{StaticResource SecondaryColor}"
+				         StrokeThickness="2"
+				         RenderTransformOrigin="0.5, 0.5"
+				>
+					<Ellipse.RenderTransform>
+						<ScaleTransform x:Name="CircleScale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
+					</Ellipse.RenderTransform>
+				</Ellipse>
+				<SymbolIcon x:Name="Icon" Symbol="{TemplateBinding Content}" Foreground="White"/>
+			</Grid>
+		</Border>
+	</ControlTemplate>
+
+	<ControlTemplate x:Name="DefaultButton" TargetType="Button">
+		<Grid>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="Scale.ScaleX" Value="1.05"/>
+							<Setter Target="Scale.ScaleY" Value="1.05"/>
+							<Setter Target="Text.Margin" Value="1,0,0,1"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryHighlightedColor}"/>
+							<Setter Target="Scale.ScaleX" Value="0.95"/>
+							<Setter Target="Scale.ScaleY" Value="0.95"/>
+							<Setter Target="Text.Margin" Value="0,1,0,0"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Focused">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="Scale.ScaleX" Value="1.05"/>
+							<Setter Target="Scale.ScaleY" Value="1.05"/>
+							<Setter Target="Text.Margin" Value="1,0,0,1"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+
+
+			<Rectangle
+					x:Name="Button"
+					RadiusX="20"
+					RadiusY="20"
+					Width="{TemplateBinding Width}"
+					Height="{TemplateBinding Height}"
+					Fill="{StaticResource PrimaryColor}"
+					Stroke="{StaticResource SecondaryColor}"
+					StrokeThickness="2"
+					RenderTransformOrigin="0.5,0.5">
+				<Rectangle.RenderTransform>
+					<ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
+				</Rectangle.RenderTransform>
+			</Rectangle>
+			<TextBlock 
+					x:Name="Text"
+					Padding="15,10,15,10"
+					Text="{TemplateBinding Content}"
+					FontFamily="{StaticResource Sansation}"
+					TextWrapping="Wrap"
+					Foreground="White"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"/>
+		</Grid>
+	</ControlTemplate>
+</ResourceDictionary>
