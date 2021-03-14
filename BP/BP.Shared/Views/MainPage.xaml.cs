@@ -68,16 +68,29 @@ namespace BP.Shared.Views
             textBlk.Text = "I am ready";
 		}
 
-		private async void recordBtn_Click(object sender, RoutedEventArgs e)
+		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
 			if (!isRecording)
 			{
 				Task.Run(() => recorder.StartRecording());
 				isRecording = true;
 				textBlk.Text = "Called library and am recording...";
+
+				await Task.Run(() => Thread.Sleep(10000));
+
+				recorder.StopRecording();
+				isRecording = false;
+				wasRecording = true;
+				textBlk.Text = "Stopped recording from lib.";
+
 			} 
 		}
 
+		/// <summary>
+		/// OBSOLETE
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private async void stopBtn_Click(object sender, RoutedEventArgs e)
         {
 			if (isRecording)
@@ -246,8 +259,14 @@ namespace BP.Shared.Views
 			#endregion
 		}
 
+		/// <summary>
+		/// OBSOLETE
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private async void addNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
+			/*
 			if (uploadedSong != null && nameTxtBox.Text != "" && authorTxtBox.Text != "")
 			{
 				System.Diagnostics.Debug.WriteLine("[DEBUG] Adding new song into database.");
@@ -263,6 +282,7 @@ namespace BP.Shared.Views
 
 				textBlk.Text = "New song added to database.";
 			}
+			*/
 		}
 
 		#region WASM
@@ -356,24 +376,12 @@ namespace BP.Shared.Views
 #endif
 #endregion
 	
-		private async void testBtn_Click(object sender, RoutedEventArgs e)
+		private async void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
 			Frame.Navigate(typeof(SongList));
-
-			//database.PrintDatabase();
-			//if(uploadedSong != null)
-			//{
-			//	AudioProcessing.Tools.Printer.Print(uploadedSong);
-
-			//	var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
-			//	System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + audioWav.Channels);
-			//	System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + audioWav.SampleRate);
-			//	System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + audioWav.NumOfDataSamples);
-			//}
-
-
-
 		}
+
+
 		private void UpdateSongList()
 		{
 			var songs = database.GetSongs();
@@ -384,5 +392,39 @@ namespace BP.Shared.Views
 			}
 			songList.ItemsSource = songNames;
 		}
+
+
+		//NEW
+
+		private async void AddNewSong_Click(object sender, RoutedEventArgs e)
+		{
+			ShowAddNewSongUI();
+		}
+		private async void CancelNewSong_Click(object sender, RoutedEventArgs e)
+		{
+			HideAddNewSongUI();
+		}
+
+		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
+		{
+			ContentDialogResult result = await settingsContentDialog.ShowAsync();
+		}
+
+
+		#region HELPERS
+		private void HideAddNewSongUI()
+		{
+			UploadGrid.Visibility = Visibility.Collapsed;
+			AddNewSongBtn.Visibility = Visibility.Visible;
+			ListSongsBtn.Visibility = Visibility.Visible;
+		}
+
+		private void ShowAddNewSongUI()
+		{
+			UploadGrid.Visibility = Visibility.Visible;
+			AddNewSongBtn.Visibility = Visibility.Collapsed;
+			ListSongsBtn.Visibility = Visibility.Collapsed;
+		}
+		#endregion
 	}
 }

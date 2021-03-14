@@ -27,36 +27,5 @@ namespace BP.Shared.Views
 		{
 			this.InitializeComponent();
 		}
-
-		private async void AddNewSong_Click(object sender, RoutedEventArgs e)
-		{
-			ShowAddNewSongUI();
-		}		
-		private async void CancelNewSong_Click(object sender, RoutedEventArgs e)
-		{
-			HideAddNewSongUI();
-		}
-
-		private async void ShowTermsOfUseContentDialogButton_Click(object sender, RoutedEventArgs e)
-		{
-			ContentDialogResult result = await settingsContentDialog.ShowAsync();
-		}
-
-
-		#region HELPERS
-		private void HideAddNewSongUI()
-		{
-			UploadGrid.Visibility = Visibility.Collapsed;
-			AddNewSongBtn.Visibility = Visibility.Visible;
-			ListSongsBtn.Visibility = Visibility.Visible;
-		}
-		
-		private void ShowAddNewSongUI()
-		{
-			UploadGrid.Visibility = Visibility.Visible;
-			AddNewSongBtn.Visibility = Visibility.Collapsed;
-			ListSongsBtn.Visibility = Visibility.Collapsed;
-		}
-		#endregion
 	}
 }
