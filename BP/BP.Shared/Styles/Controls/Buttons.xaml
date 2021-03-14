@@ -7,9 +7,15 @@
 		<Setter Property="Template" Value="{StaticResource DefaultButton}"/>
 		<Setter Property="FocusVisualPrimaryThickness" Value="0"/>
 		<Setter Property="FocusVisualSecondaryThickness" Value="0"/>
+		<Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
 	</Style>
 
-
+	<Style x:Name="IconStyle" TargetType="Button">
+		<Setter Property="Template" Value="{StaticResource IconButton}"/>
+		<Setter Property="Height" Value="30"/>
+		<Setter Property="Width" Value="30"/>
+		<Setter Property="Foreground" Value="White"/>
+	</Style>
 
 
 	<ControlTemplate x:Name="IconRoundButton" TargetType="Button">
@@ -57,6 +63,31 @@
 		</Border>
 	</ControlTemplate>
 
+	<ControlTemplate x:Name="IconButton" TargetType="Button">
+		<Border>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="Icon.Margin" Value="-1,-1,-1,-1"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="Icon.Margin" Value="1,1,1,1"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+			<Grid>
+				<Viewbox MaxHeight="{TemplateBinding Height}" MaxWidth="{TemplateBinding Width}">
+					<SymbolIcon x:Name="Icon" Symbol="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
+				</Viewbox>
+			</Grid>
+		</Border>
+	</ControlTemplate>
+
 	<ControlTemplate x:Name="DefaultButton" TargetType="Button">
 		<Grid>
 			<VisualStateManager.VisualStateGroups>
@@ -65,7 +96,6 @@
 					<VisualState x:Name="PointerOver">
 						<VisualState.Setters>
 							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
-							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
 							<Setter Target="Scale.ScaleX" Value="1.05"/>
 							<Setter Target="Scale.ScaleY" Value="1.05"/>
 							<Setter Target="Text.Margin" Value="1,0,0,1"/>
@@ -100,6 +130,59 @@
 					Width="{TemplateBinding Width}"
 					Height="{TemplateBinding Height}"
 					Fill="{StaticResource PrimaryColor}"
+					Stroke="{TemplateBinding BorderBrush}"
+					StrokeThickness="2"
+					RenderTransformOrigin="0.5,0.5">
+				<Rectangle.RenderTransform>
+					<ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
+				</Rectangle.RenderTransform>
+			</Rectangle>
+			<TextBlock 
+					x:Name="Text"
+					Padding="15,10,15,10"
+					Text="{TemplateBinding Content}"
+					FontFamily="{StaticResource Sansation}"
+					TextWrapping="Wrap"
+					Foreground="White"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"/>
+		</Grid>
+	</ControlTemplate>
+
+	<ControlTemplate x:Name="NonexpandingOKButton" TargetType="Button">
+		<Grid>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryHighlightedColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryHighlightedColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Focused">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+
+
+			<Rectangle
+					x:Name="Button"
+					RadiusX="20"
+					RadiusY="20"
+					Width="{TemplateBinding Width}"
+					Height="{TemplateBinding Height}"
+					Fill="{StaticResource PrimaryColor}"
 					Stroke="{StaticResource SecondaryColor}"
 					StrokeThickness="2"
 					RenderTransformOrigin="0.5,0.5">
@@ -118,4 +201,58 @@
 					VerticalAlignment="Center"/>
 		</Grid>
 	</ControlTemplate>
+	
+	<ControlTemplate x:Name="NonexpandingCancelButton" TargetType="Button">
+		<Grid>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource CancelColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource CancelColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Focused">
+						<VisualState.Setters>
+							<Setter Target="Button.Fill" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Button.Stroke" Value="{StaticResource SecondaryDarkColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+
+
+			<Rectangle
+					x:Name="Button"
+					RadiusX="20"
+					RadiusY="20"
+					Width="{TemplateBinding Width}"
+					Height="{TemplateBinding Height}"
+					Fill="{StaticResource PrimaryColor}"
+					Stroke="{StaticResource SecondaryColor}"
+					StrokeThickness="2"
+					RenderTransformOrigin="0.5,0.5">
+				<Rectangle.RenderTransform>
+					<ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1" CenterX="0.5" CenterY="0.5"/>
+				</Rectangle.RenderTransform>
+			</Rectangle>
+			<TextBlock 
+					x:Name="Text"
+					Padding="15,10,15,10"
+					Text="{TemplateBinding Content}"
+					FontFamily="{StaticResource Sansation}"
+					TextWrapping="Wrap"
+					Foreground="White"
+					HorizontalAlignment="Center"
+					VerticalAlignment="Center"/>
+		</Grid>
+	</ControlTemplate>
+
 </ResourceDictionary>

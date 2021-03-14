@@ -1,0 +1,62 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+	<Style TargetType="DropDownButton">
+		<Setter Property="Template" Value="{StaticResource IconDropDownButton}"/>
+		<Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+		<Setter Property="Background" Value="{StaticResource PrimaryColor}"/>
+		<Setter Property="Padding" Value="0"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="CornerRadius" Value="10"/>
+		<Setter Property="Content" Value="Accept"/>
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Height" Value="30"/>
+		<Setter Property="Width" Value="30"/>
+		<Setter Property="Foreground" Value="White"/>
+	</Style>
+	
+	<ControlTemplate x:Name="IconDropDownButton" TargetType="DropDownButton">
+		<Grid x:Name="RootGrid" Background="{TemplateBinding Background}" CornerRadius="{TemplateBinding CornerRadius}">
+
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver">
+						<VisualState.Setters>
+							<Setter Target="RootGrid.BorderBrush" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="InnerGrid.BorderBrush" Value="{StaticResource SecondaryDarkColor}"/>
+							<Setter Target="InnerGrid.Background" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="RootGrid.Background" Value="{StaticResource PrimaryLightColor}"/>
+						</VisualState.Setters>
+					</VisualState>
+
+					<VisualState x:Name="Pressed">
+						<VisualState.Setters>
+							<Setter Target="RootGrid.BorderBrush" Value="{StaticResource SecondaryHighlightedColor}"/>
+							<Setter Target="InnerGrid.BorderBrush" Value="{StaticResource SecondaryHighlightedColor}"/>
+							<Setter Target="InnerGrid.Background" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="RootGrid.Background" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="Icon.Margin" Value="1,1,1,1"/>
+						</VisualState.Setters>
+					</VisualState>
+				</VisualStateGroup>
+
+			</VisualStateManager.VisualStateGroups>
+			<Grid x:Name="InnerGrid" Padding="{TemplateBinding Padding}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+
+				<Viewbox 
+					MaxHeight="{TemplateBinding Height}" 
+					MaxWidth="{TemplateBinding Width}">					
+					<SymbolIcon x:Name="Icon" Symbol="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}"/>
+				</Viewbox>
+				
+			</Grid>
+
+		</Grid>
+
+	</ControlTemplate>
+	
+</ResourceDictionary>

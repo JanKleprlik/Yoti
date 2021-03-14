@@ -1,0 +1,175 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:wasm="http:/uno.ui/wasm"
+    mc:Ignorable="d wasm">
+
+	<Style TargetType="TextBox">
+		<Setter Property="Template" Value="{StaticResource DefaultTextBox}"/>
+		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
+		<Setter Property="FontSize" Value="17"/>
+		<wasm:Setter Property="Foreground" Value="White"/>
+	</Style>
+
+
+
+	<ControlTemplate x:Key="DefaultTextBox" TargetType="TextBox">
+		<Grid>
+			<Grid.Resources>
+				<Style x:Name="DeleteButtonStyle" TargetType="Button">
+					<Setter Property="Template">
+						<Setter.Value>
+							<ControlTemplate TargetType="Button">
+								<Grid x:Name="ButtonLayoutGrid">
+									<VisualStateManager.VisualStateGroups>
+										<VisualStateGroup x:Name="CommonStates">
+											<VisualState x:Name="Normal"/>
+											<VisualState x:Name="PointerOver">
+												<Storyboard>
+													<ObjectAnimationUsingKeyFrames Storyboard.TargetName="GlyphElement" Storyboard.TargetProperty="Foreground">
+														<DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+													</ObjectAnimationUsingKeyFrames>
+												</Storyboard>
+											</VisualState>
+											<VisualState x:Name="Pressed">
+												<Storyboard>
+													<ObjectAnimationUsingKeyFrames Storyboard.TargetName="GlyphElement" Storyboard.TargetProperty="Foreground">
+														<DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightAltChromeWhiteBrush}"/>
+													</ObjectAnimationUsingKeyFrames>
+												</Storyboard>
+											</VisualState>
+											<VisualState x:Name="Disabled">
+												<Storyboard>
+													<DoubleAnimation Storyboard.TargetName="ButtonLayoutGrid" Storyboard.TargetProperty="Opacity" To="0" Duration="0"/>
+												</Storyboard>
+											</VisualState>
+										</VisualStateGroup>
+									</VisualStateManager.VisualStateGroups>
+
+									<TextBlock x:Name="GlyphElement"
+                                                       Foreground="White"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center"
+                                                       FontStyle="Normal"
+                                                       FontSize="12"
+                                                       Text="&#xE10A;"
+                                                       FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                                       AutomationProperties.AccessibilityView="Raw"
+													   />
+								</Grid>
+							</ControlTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</Grid.Resources>
+
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver"/>
+					<VisualState x:Name="Focused">
+						<VisualState.Setters>
+							<Setter Target="PlaceholderTextContentPresenter.Foreground" Value="White"/>
+							<Setter Target="BackgroundElement.Background" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="PlaceholderTextContentPresenter.Opacity" Value="0.4"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Disabled"/>
+				</VisualStateGroup>
+				<VisualStateGroup x:Name="ButtonStates">
+					<VisualState x:Name="ButtonVisible">
+						<Storyboard>
+							<ObjectAnimationUsingKeyFrames Storyboard.TargetName="DeleteButton" Storyboard.TargetProperty="Visibility">
+								<DiscreteObjectKeyFrame KeyTime="0">
+									<DiscreteObjectKeyFrame.Value>
+										<Visibility>Visible</Visibility>
+									</DiscreteObjectKeyFrame.Value>
+								</DiscreteObjectKeyFrame>
+							</ObjectAnimationUsingKeyFrames>
+						</Storyboard>
+					</VisualState>
+					<VisualState x:Name="ButtonCollapsed"/>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+
+			<Border x:Name="BackgroundElement"
+			        Grid.Row="1"
+			        Background="{StaticResource PrimaryColor}"
+			        CornerRadius="15"
+			        Grid.ColumnSpan="2"
+			        Grid.RowSpan="1"
+					/>
+			<Border x:Name="BorderElement"
+                            Grid.Row="1"
+                            BorderBrush="{StaticResource SecondaryColor}"
+                            BorderThickness="2"
+							CornerRadius="15"
+                            Grid.ColumnSpan="2"
+                            Grid.RowSpan="1"
+							/>
+			<ContentPresenter x:Name="HeaderContentPresenter"
+                                      x:DeferLoadStrategy="Lazy"
+                                      Visibility="Collapsed"
+                                      Grid.Row="0"
+                                      Foreground="White"
+                                      Margin="15,0,0,5"
+                                      Grid.ColumnSpan="2"
+                                      Content="{TemplateBinding Header}"
+                                      FontWeight="Normal"
+                                      />
+			<ScrollViewer x:Name="ContentElement"
+                                  Grid.Row="1"
+                                  HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}"
+                                  HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                  VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}"
+                                  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                  IsHorizontalRailEnabled="{TemplateBinding ScrollViewer.IsHorizontalRailEnabled}"
+                                  IsVerticalRailEnabled="{TemplateBinding ScrollViewer.IsVerticalRailEnabled}"
+                                  IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                                  Margin="{TemplateBinding BorderThickness}"
+                                  Padding="10,10,5,7"
+                                  IsTabStop="False"
+                                  AutomationProperties.AccessibilityView="Raw"
+                                  ZoomMode="Disabled"
+								  Foreground="White"
+                                  />
+			<ContentControl x:Name="PlaceholderTextContentPresenter"
+                                    Grid.Row="1"
+                                    Foreground="WhiteSmoke"
+                                    Margin="{TemplateBinding BorderThickness}"
+                                    Padding="10,5,0,7"
+                                    IsTabStop="False"
+                                    Grid.ColumnSpan="2"
+                                    Content="{TemplateBinding PlaceholderText}"
+                                    IsHitTestVisible="False"
+									VerticalAlignment="Top"
+									Opacity="0.7"
+                                    />
+			<Button x:Name="DeleteButton"
+                            Grid.Row="1"
+                            Style="{StaticResource DeleteButtonStyle}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Margin="{ThemeResource HelperButtonThemePadding}"
+                            IsTabStop="False"
+                            Grid.Column="1"
+                            Visibility="Collapsed"
+                            FontSize="{TemplateBinding FontSize}"
+                            MinWidth="34"
+                            VerticalAlignment="Stretch"
+							Foreground="White"
+                            />
+		</Grid>
+	</ControlTemplate>
+
+</ResourceDictionary>

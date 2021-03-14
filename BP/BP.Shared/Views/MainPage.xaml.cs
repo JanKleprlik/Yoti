@@ -38,7 +38,7 @@ using Xamarin.Essentials;
 using Uno.Foundation;
 #endif
 
-namespace BP
+namespace BP.Shared.Views
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -57,6 +57,7 @@ namespace BP
 		public MainPage()
         {
             this.InitializeComponent();
+
 			recorder = new Shared.AudioRecorder.Recorder();
 			database = new Database.Database();
 			recognizer = new AudioRecognizer();
@@ -357,7 +358,9 @@ namespace BP
 	
 		private async void testBtn_Click(object sender, RoutedEventArgs e)
 		{
-			database.PrintDatabase();
+			Frame.Navigate(typeof(SongList));
+
+			//database.PrintDatabase();
 			//if(uploadedSong != null)
 			//{
 			//	AudioProcessing.Tools.Printer.Print(uploadedSong);

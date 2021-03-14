@@ -1,0 +1,53 @@
+﻿<ContentDialog
+    x:Class="BP.Shared.Views.SettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:BP.Shared.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+	
+    Title="Settings"
+    PrimaryButtonText="Done"
+    SecondaryButtonText="Default"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+	
+	CornerRadius="25"
+	BorderBrush="{StaticResource PrimaryLightColor}"
+	>
+	<ContentDialog.Resources>
+		<Style x:Name="DialogOKButtonStyle" TargetType="Button">
+			<Setter Property="Template" Value="{StaticResource NonexpandingOKButton}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+			<Setter Property="Margin" Value="10"/>
+		</Style>
+		<Style x:Name="DialogCancelButtonStyle" TargetType="Button">
+			<Setter Property="Template" Value="{StaticResource NonexpandingCancelButton}"/>
+			<Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
+			<Setter Property="Margin" Value="10"/>
+		</Style>
+	</ContentDialog.Resources>
+
+	<ContentDialog.PrimaryButtonStyle>
+		<Style TargetType="Button" BasedOn="{StaticResource DialogOKButtonStyle}"/>
+	</ContentDialog.PrimaryButtonStyle>
+	<ContentDialog.SecondaryButtonStyle>
+		<Style TargetType="Button" BasedOn="{StaticResource DialogCancelButtonStyle}"/>
+	</ContentDialog.SecondaryButtonStyle>
+
+	<StackPanel x:Name="Options">
+		<ToggleSwitch 
+			x:Name="ConstQAlg"
+			OnContent="Constant Q algorithm"
+			OffContent="Constant Q algorithm"
+			IsOn="False"
+			/>
+		<ToggleSwitch 
+			x:Name="DebugPrint"
+			OnContent="Debug printing"
+			OffContent="Debug printing"
+			IsOn="False"
+			/>
+	</StackPanel>
+</ContentDialog>
