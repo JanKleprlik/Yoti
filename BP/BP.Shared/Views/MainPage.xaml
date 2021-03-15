@@ -8,7 +8,9 @@
 	xmlns:wasm="http://uno.ui/wasm"
 	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     mc:Ignorable="d wasm"
-	Background="{StaticResource PrimaryDarkColor}">
+	Background="{StaticResource PrimaryDarkColor}"
+	NavigationCacheMode="Required"
+	>
 
 	<Grid x:Name="MainGrid">
 		<VisualStateManager.VisualStateGroups>
@@ -161,6 +163,25 @@
 			VerticalAlignment="Center" Grid.Column="1"
 			/>
 
+		<Rectangle
+			x:Name="flickerIcon"
+			RadiusX="20"
+			RadiusY="20"
+			Width="15"
+			Height="15"
+			Fill="Red"
+			Stroke="White"
+			StrokeThickness="2"
+			RenderTransformOrigin="0.5,0.5"
+			Grid.Row="1"
+			Grid.Column="1"
+			Margin="110,32,0,0"
+			VerticalAlignment="Top"
+			HorizontalAlignment="Left"
+			Visibility="Collapsed"
+			Opacity="0.2"
+			/>
+
 		<!-- SECOND ROW -->
 		<Button
 			x:Name="RecognizeBtn"
@@ -169,6 +190,7 @@
 			Content="Recognize"
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
+			Click="{x:Bind RecognizeBtn_Click}"
 			/>
 
 		<Button
@@ -195,7 +217,37 @@
 			Height="30"
 			Width="30"
 			Click="{x:Bind SettingsBtn_Click}"
-			/>
+		>
+			<!--
+			<Button.Triggers>
+				<EventTrigger RoutedEvent="Loaded">
+					<BeginStoryboard>
+						<Storyboard x:Key="AnimateFlicker" RepeatBehavior="Forever">
+							<DoubleAnimation 
+								Storyboard.TargetProperty="Opacity"
+								From="0"
+								To="1"
+								AutoReverse="True"
+								BeginTime="0:0:1"
+								Duration="0:0:0.08" />
+							<DoubleAnimation 
+								Storyboard.TargetProperty="Opacity"
+								From="1"
+								To="1"
+								AutoReverse="True"
+								Duration="0:0:0.4" />
+							<DoubleAnimation 
+								Storyboard.TargetProperty="Opacity"
+								From="1"
+								To="0"
+								AutoReverse="True"
+								Duration="0:0:0.08" />
+						</Storyboard>
+					</BeginStoryboard>
+				</EventTrigger>
+			</Button.Triggers>
+			-->
+		</Button>
 
 		<local:SettingsDialog
 			x:Name="settingsContentDialog"
@@ -240,6 +292,7 @@
 			HorizontalAlignment="Right"
 			Content="List songs"
 			Visibility="Visible"
+			Click="{x:Bind ListSongs_Click}"
 			/>
 
 		<Grid
@@ -400,13 +453,15 @@
 			VerticalAlignment="Top"
 			/>
 		-->
-		
+
+
 		<ListView 
 			not_wasm:Grid.Row="1" 
 			x:Name="songList" 
 			HorizontalAlignment="Left"
 			VerticalAlignment="Center"
 			Width="100" 
+			Visibility="Collapsed"
 			/>
 
 	</Grid>

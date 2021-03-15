@@ -3,13 +3,37 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BP.Shared.Views"
+	xmlns:controls="using:BP.Shared.Styles.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{StaticResource PrimaryDarkColor}">
 
 	<Grid x:Name="MainGrid">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="80"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<Button
+			x:Name="BackBtn"
+			Template="{StaticResource IconRoundButton}"
+			Content="Back"
+			Height="35"
+			Width="35"
+			Margin="30,0,0,0"
+			VerticalAlignment="Center"
+			HorizontalAlignment="Left"
+			Click="{x:Bind BackBtn_Click}"
+			/>
 		
+		<ListView 
+			Grid.Row="2"
+			x:Name="songList" 
+			HorizontalAlignment="Left"
+			VerticalAlignment="Center"
+			Width="100" 
+			/>
 
 	</Grid>
 </Page>

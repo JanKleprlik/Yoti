@@ -18,6 +18,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using Database;
 using AudioProcessing.Recognizer;
+using Windows.UI.Xaml.Media.Animation;
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -54,6 +55,9 @@ namespace BP.Shared.Views
 		private byte[] recordedSong;
 		private Database.Database database;
 		private Dictionary<uint, List<ulong>> songValueDatabase;
+
+		private Storyboard flickerAnimation;
+
 		public MainPage()
         {
             this.InitializeComponent();
@@ -62,16 +66,38 @@ namespace BP.Shared.Views
 			database = new Database.Database();
 			recognizer = new AudioRecognizer();
 			songValueDatabase = database.GetSearchData();
-
-
+			
+			setupFlickerAnimation();
+			
 			UpdateSongList();
             textBlk.Text = "I am ready";
+		}
+
+		private void setupFlickerAnimation()
+		{
+			flickerAnimation = new Storyboard();
+			//storyboard.Duration = new Duration(TimeSpan.FromSeconds(1.0));
+			DoubleAnimation opacityAnimation = new DoubleAnimation()
+			{
+				From = 0.0,
+				To = 1.0,
+				BeginTime = TimeSpan.FromSeconds(1.0),
+				AutoReverse = true,
+				Duration = new Duration(TimeSpan.FromSeconds(0.18))
+			};
+
+			Storyboard.SetTarget(flickerAnimation, flickerIcon);
+			Storyboard.SetTargetProperty(flickerAnimation, "Opacity");
+			flickerAnimation.Children.Add(opacityAnimation);
+			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 		}
 
 		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
 			if (!isRecording)
 			{
+				flickerIcon.Visibility = Visibility.Visible;
+				flickerAnimation.Begin();
 				Task.Run(() => recorder.StartRecording());
 				isRecording = true;
 				textBlk.Text = "Called library and am recording...";
@@ -82,7 +108,9 @@ namespace BP.Shared.Views
 				isRecording = false;
 				wasRecording = true;
 				textBlk.Text = "Stopped recording from lib.";
-
+				flickerAnimation.Pause();
+				flickerIcon.Visibility = Visibility.Collapsed;
+				PlayBtn.Visibility = Visibility.Visible;
 			} 
 		}
 
@@ -394,12 +422,17 @@ namespace BP.Shared.Views
 		}
 
 
-		//NEW
+		// UI
+		private async void ListSongs_Click(object sender, RoutedEventArgs e)
+		{
+			Frame.Navigate(typeof(SongList), database.GetSongs());
+		}
 
 		private async void AddNewSong_Click(object sender, RoutedEventArgs e)
 		{
 			ShowAddNewSongUI();
 		}
+		
 		private async void CancelNewSong_Click(object sender, RoutedEventArgs e)
 		{
 			HideAddNewSongUI();
@@ -411,7 +444,7 @@ namespace BP.Shared.Views
 		}
 
 
-		#region HELPERS
+		#region UI HELPERS
 		private void HideAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Collapsed;
