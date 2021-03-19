@@ -69,8 +69,6 @@ namespace BP.Shared.Views
 			
 			setupFlickerAnimation();
 			
-			UpdateSongList();
-            textBlk.Text = "I am ready";
 		}
 
 		private void setupFlickerAnimation()
@@ -98,19 +96,25 @@ namespace BP.Shared.Views
 			{
 				flickerIcon.Visibility = Visibility.Visible;
 				flickerAnimation.Begin();
-				Task.Run(() => recorder.StartRecording());
+				//await Task.Run(() => recorder.StartRecording());
+				recorder.StartRecording();
 				isRecording = true;
-				textBlk.Text = "Called library and am recording...";
 
-				await Task.Run(() => Thread.Sleep(10000));
+				await Task.Run(() => Thread.Sleep(3000));
 
+				//await Task.Run( ()=>recorder.StopRecording());
 				recorder.StopRecording();
+				
 				isRecording = false;
 				wasRecording = true;
-				textBlk.Text = "Stopped recording from lib.";
 				flickerAnimation.Pause();
 				flickerIcon.Visibility = Visibility.Collapsed;
 				PlayBtn.Visibility = Visibility.Visible;
+
+				RecognizeProgressBar.Visibility = Visibility.Visible;
+				await Task.Run( () => recognizeBtn_Click(sender, e));
+				//recognizeBtn_Click(sender, e);
+				RecognizeProgressBar.Visibility = Visibility.Collapsed;
 			} 
 		}
 
@@ -126,7 +130,6 @@ namespace BP.Shared.Views
 				recorder.StopRecording();
 				isRecording = false;
 				wasRecording = true;
-				textBlk.Text = "Stopped recording from lib.";
 			}
         }
 
@@ -136,7 +139,6 @@ namespace BP.Shared.Views
 #if NETFX_CORE
 			if (await recorder.ReplayRecordingUWP(Dispatcher))
 			{
-				textBlk.Text = "Replaying recorded sound.";				
 			}
 #endif
 			#endregion
@@ -145,7 +147,6 @@ namespace BP.Shared.Views
 			if (wasRecording)
 			{
 				recorder.ReplayRecordingANDROID();
-				textBlk.Text = "Replaying recorded sound.";
 			}
 #endif
 		#endregion
@@ -192,11 +193,11 @@ namespace BP.Shared.Views
 
 			uint? ID = recognizer.RecognizeSong(recordedAudioWav, songValueDatabase);
 
-			textBlk.Text = $"ID of recognized song is {ID}";
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
 
 		}
 
-		private async void uploadNewSongBtn_Click(object sender, RoutedEventArgs e)
+		private async void UploadNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
 			#region UWP
 #if NETFX_CORE
@@ -211,11 +212,11 @@ namespace BP.Shared.Views
 				var audioFileData = await file.OpenStreamForReadAsync();
 				uploadedSong = new byte[(int)audioFileData.Length];
 				audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
-				this.textBlk.Text = "Picked song: " + file.Name;
+				this.UploadedSongText.Text = file.Name;
 			}
 			else
 			{
-				this.textBlk.Text = "Operation cancelled.";
+				this.UploadedSongText.Text = "No song uploaded.";
 			}
 
 #endif
@@ -237,20 +238,20 @@ namespace BP.Shared.Views
 
 				if (result != null)
 				{
-					textBlk.Text = $"File selected: {result.FileName}";
+					UploadedSongText.Text = $"File selected: {result.FileName}";
 					var audioFileData = await result.OpenReadAsync();
 					uploadedSong = new byte[(int)audioFileData.Length];
 					audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
 				}
 				else
 				{
-					textBlk.Text = "No audio file selected";
+					UploadedSongText.Text = "No song uploaded";
 				}
 
 			}
 			else
 			{
-				textBlk.Text = "Acces to read storage denied.";
+				UploadedSongText.Text = "Acces to read storage denied.";
 			}
 #endif
 			#endregion
@@ -288,29 +289,45 @@ namespace BP.Shared.Views
 		}
 
 		/// <summary>
-		/// OBSOLETE
+		/// TODO
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private async void addNewSongBtn_Click(object sender, RoutedEventArgs e)
+		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
-			/*
-			if (uploadedSong != null && nameTxtBox.Text != "" && authorTxtBox.Text != "")
+			
+			if (NewSongNameTB.Text == "")
+			{
+				displayInfoText("Please enter song name.");
+				return;
+			}
+			if (NewSongAuthorTB.Text == "")
+			{
+				displayInfoText("Please enter song author.");
+				return;
+			}
+			if (uploadedSong == null)
+			{
+				displayInfoText("Please upload song file.");
+				return;
+			}
+
+
+			if (uploadedSong != null && NewSongNameTB.Text != "" && NewSongAuthorTB.Text != "")
 			{
 				System.Diagnostics.Debug.WriteLine("[DEBUG] Adding new song into database.");
 				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
 				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-				uint songID = database.AddSong(nameTxtBox.Text, authorTxtBox.Text);
+				uint songID = database.AddSong(NewSongNameTB.Text, NewSongAuthorTB.Text);
 				database.AddFingerprint(tfps);
 				System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
 				recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
 				database.UpdateSearchData(songValueDatabase);
 				System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
-				UpdateSongList();
 
-				textBlk.Text = "New song added to database.";
+				displayInfoText($"Song \"{NewSongNameTB.Text}\" by \"{NewSongAuthorTB.Text}\" was added into the database.");
 			}
-			*/
+			
 		}
 
 		#region WASM
@@ -402,40 +419,23 @@ namespace BP.Shared.Views
 			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.ReadExternalStorage);
 		}
 #endif
-#endregion
-	
-		private async void ListSongsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			Frame.Navigate(typeof(SongList));
-		}
+		#endregion
 
 
-		private void UpdateSongList()
-		{
-			var songs = database.GetSongs();
-			List<string> songNames = new List<string>();
-			foreach(Song song in songs)
-			{
-				songNames.Add(song.Name);
-			}
-			songList.ItemsSource = songNames;
-		}
-
-
-		// UI
-		private async void ListSongs_Click(object sender, RoutedEventArgs e)
+		// UI Navigation
+		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
 			Frame.Navigate(typeof(SongList), database.GetSongs());
 		}
 
-		private async void AddNewSong_Click(object sender, RoutedEventArgs e)
+		private  void OpenNewSongForm_Click(object sender, RoutedEventArgs e)
 		{
-			ShowAddNewSongUI();
+			showAddNewSongUI();
 		}
 		
-		private async void CancelNewSong_Click(object sender, RoutedEventArgs e)
+		private void CancelNewSong_Click(object sender, RoutedEventArgs e)
 		{
-			HideAddNewSongUI();
+			hideAddNewSongUI();
 		}
 
 		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
@@ -445,19 +445,25 @@ namespace BP.Shared.Views
 
 
 		#region UI HELPERS
-		private void HideAddNewSongUI()
+		private void hideAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Collapsed;
-			AddNewSongBtn.Visibility = Visibility.Visible;
+			OpenNewSongFormBtn.Visibility = Visibility.Visible;
 			ListSongsBtn.Visibility = Visibility.Visible;
 		}
 
-		private void ShowAddNewSongUI()
+		private void showAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Visible;
-			AddNewSongBtn.Visibility = Visibility.Collapsed;
+			OpenNewSongFormBtn.Visibility = Visibility.Collapsed;
 			ListSongsBtn.Visibility = Visibility.Collapsed;
 		}
+		
+		private void displayInfoText(string text)
+		{
+			InformationTextBlk.Text = text;
+		}
+
 		#endregion
 	}
 }

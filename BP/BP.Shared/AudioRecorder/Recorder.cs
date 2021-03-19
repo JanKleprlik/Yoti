@@ -12,6 +12,7 @@ using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
+
 #endif
 
 #if __ANDROID__
@@ -31,6 +32,7 @@ namespace BP.Shared.AudioRecorder
 	public sealed partial class Recorder
 	{
 		private bool isRecording;
+
 		#region UWP
 #if NETFX_CORE
 		MediaCapture audioCapture;
@@ -59,9 +61,9 @@ namespace BP.Shared.AudioRecorder
 				#region UWP
 #if NETFX_CORE
 				await setupRecording();
+				Monitor.Enter(buffer);
 				var profile = MediaEncodingProfile.CreateWav(AudioEncodingQuality.Auto);
 				profile.Audio = AudioEncodingProperties.CreatePcm((uint)Parameters.SamplingRate, (uint)Parameters.Channels, 16);
-
 				await audioCapture.StartRecordToStreamAsync(profile, buffer);
 				isRecording = true;
 				return;
@@ -127,7 +129,7 @@ namespace BP.Shared.AudioRecorder
 				#region UWP
 #if NETFX_CORE
 				//to disalbe fast RUN-STOP sequences
-				Thread.Sleep(300);
+				//Thread.Sleep(300);
 				await audioCapture.StopRecordAsync();
 #endif
 				#endregion
@@ -137,6 +139,7 @@ namespace BP.Shared.AudioRecorder
 				rec.Dispose();
 #endif
 				#endregion
+				Monitor.Exit(buffer);
 				isRecording = false;
 			}
 
@@ -147,12 +150,13 @@ namespace BP.Shared.AudioRecorder
 #if NETFX_CORE
 			if (buffer == null)
 				return new byte[0];
-
+			Monitor.Enter(buffer);
 			DataReader dataReader = new DataReader(buffer.GetInputStreamAt(0));
 			byte[] data = new byte[buffer.Size];
 
 			await dataReader.LoadAsync((uint)buffer.Size);
 			dataReader.ReadBytes(data);
+			Monitor.Exit(buffer);
 			return data;
 #else
 			return buffer;

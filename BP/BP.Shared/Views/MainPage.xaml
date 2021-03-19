@@ -193,6 +193,22 @@
 			Click="{x:Bind RecognizeBtn_Click}"
 			/>
 
+		<ProgressBar
+			x:Name="RecognizeProgressBar"
+			Grid.Row="1"
+			Grid.Column="1"
+			Width="100"
+			VerticalAlignment="Top"
+			HorizontalAlignment="Left"
+			Margin="0,70,0,0"
+			CornerRadius="5"
+			IsIndeterminate="True"
+			Foreground="{StaticResource SecondaryHighlightedColor}"
+			Visibility="Collapsed"
+			>
+			
+		</ProgressBar>
+		
 		<Button
 			x:Name="PlayBtn"
 			Style="{StaticResource IconStyle}"
@@ -200,7 +216,7 @@
 			Grid.Row="1"
 			Grid.Column="1"
 			VerticalAlignment="Top"
-			Margin="175,25,0,0"
+			Margin="150,25,0,0"
 			Visibility="Collapsed"
 			Click="{x:Bind playBtn_Click}"
 			/>
@@ -254,12 +270,18 @@
 			/>
 		
 		<StackPanel
+			x:Name="ResultStackPanel"
 			Orientation="Vertical"
 			Grid.Row="1"
 			Grid.Column="1"
-			HorizontalAlignment="Left"
+			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			>
+			<TextBlock
+				x:Name="InformationTextBlk"
+				FontSize="30"
+				Text="Info Text"
+				/>
 			<TextBlock
 				Text="RESULT SONG"
 				/>
@@ -275,13 +297,13 @@
 		<!-- THIRD ROW -->
 
 		<Button
-			x:Name="AddNewSongBtn"
+			x:Name="OpenNewSongFormBtn"
 			Grid.Row="2"
 			Grid.Column="1"
 			VerticalAlignment="Center"
 			Content="Add new song"
 			Visibility="Visible"
-			Click="{x:Bind AddNewSong_Click}"
+			Click="{x:Bind OpenNewSongForm_Click}"
 			/>
 
 		<Button
@@ -292,7 +314,7 @@
 			HorizontalAlignment="Right"
 			Content="List songs"
 			Visibility="Visible"
-			Click="{x:Bind ListSongs_Click}"
+			Click="{x:Bind ListSongsBtn_Click}"
 			/>
 
 		<Grid
@@ -306,7 +328,7 @@
 				<RowDefinition Height="1*"/>
 				<RowDefinition Height="1*"/>
 			</Grid.RowDefinitions>
-			
+
 			<TextBox
 				x:Name="NewSongNameTB"
 				PlaceholderText="Name"
@@ -334,6 +356,7 @@
 				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
 				Margin="390,0,0,0"
+				Click="{x:Bind UploadNewSongBtn_Click}"
 				/>
 			<TextBlock
 				x:Name="UploadedSongText"
@@ -350,6 +373,7 @@
 				HorizontalAlignment="Right"
 				Margin="0,0,90,0"
 				BorderBrush="{StaticResource SecondaryHighlightedColor}"
+				Click="{x:Bind AddNewSongBtn_Click}"
 				/>
 			<Button
 				x:Name="CancelNewSongBtn"
@@ -360,101 +384,7 @@
 				Click="{x:Bind CancelNewSong_Click}"
 				/>
 		</Grid>
-
-		<TextBlock x:Name ="textBlk" Grid.Row ="0" Text="Hello World"/>
 		
-		<!--
-		<not_wasm:Button 
-				Grid.Row="0"
-				x:Name="recordBtn" 
-				Content="Microphone" 
-				Click="recordBtn_Click" 
-				BorderBrush="Blue"
-				Margin="-150, 0, 0, 0"
-				HorizontalAlignment="Center"
-				/>
-		<not_wasm:Button 
-				Grid.Row="1"
-				x:Name="stopBtn" 
-				Content="Stop" 
-				Click="stopBtn_Click" 
-				BorderBrush="Blue"
-				HorizontalAlignment="Center"
-				/>
-		<not_wasm:Button 
-				Grid.Row="2"
-				x:Name="playBtn" 
-				Content="Play" 
-				Click="playBtn_Click" 
-				BorderBrush="Blue"
-				Margin="0, 0, 100, 0"
-				HorizontalAlignment="Center"
-				/>
-		<Button
-			Grid.Row="0"
-			x:Name="uploadNewSongBtn" 
-			Content="Upload new song" 
-			Click="uploadNewSongBtn_Click" 
-			BorderBrush="Red"
-			Margin="100, 0, 0, 0"
-			HorizontalAlignment="Center"
-			/>
-		<Button
-			Grid.Row="0"
-			x:Name="addNewSongBtn" 
-			Content="Add" 
-			Click="addNewSongBtn_Click" 
-			BorderBrush="Red"
-			Margin="300, 0, 0, 0"
-			HorizontalAlignment="Center"
-			/>
-		<TextBox
-			Grid.Row="0"
-			x:Name="nameTxtBox"
-			PlaceholderText="name"
-			Height="35"
-			Width="150"
-			Margin="0,0,0,160"
-			/>
-		<TextBox
-			Grid.Row="0"
-			x:Name="authorTxtBox"
-			PlaceholderText="author"
-			Height="35"
-			Width="150"
-			Margin="0,0,0,80"
-			/>
-		<wasm:Button 
-				Grid.Row="0"
-				x:Name="uploadBtn" 
-				Content="Upload"
-				Click="uploadBtn_Click"
-				BorderBrush="Blue"
-				Margin="0, 0, 0, 0"
-				HorizontalAlignment="Center"
-				/>
-		<Button
-			Grid.Row="2"
-			x:Name="recognizeBtn"
-			Content="Recognize"
-			Click="recognizeBtn_Click"
-			BorderBrush="Green"
-			Margin="100, 0, 0, 0"
-			HorizontalAlignment="Center"
-			/>
-
-		<Button 
-			Grid.Row="0"
-			x:Name="testButton"
-			Content="TEST"
-			Click="testBtn_Click"
-			BorderBrush="YellowGreen"
-			HorizontalAlignment="Right"
-			VerticalAlignment="Top"
-			/>
-		-->
-
-
 		<ListView 
 			not_wasm:Grid.Row="1" 
 			x:Name="songList" 
