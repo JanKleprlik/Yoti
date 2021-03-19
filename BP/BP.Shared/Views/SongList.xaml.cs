@@ -14,7 +14,6 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.ViewManagement;
 using Database;
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace BP.Shared.Views
 {
@@ -32,13 +31,13 @@ namespace BP.Shared.Views
 		{
 			if (e.Parameter is List<Song>)
 			{
-				UpdateSongList(e.Parameter as List<Song>);
+				updateSongList(e.Parameter as List<Song>);
 			}
 
 			base.OnNavigatedTo(e);
 		}
 
-		private void UpdateSongList(List<Song> songs)
+		private void updateSongList(List<Song> songs)
 		{
 			List<string> songNames = new List<string>();
 			foreach (Song song in songs)
@@ -48,7 +47,7 @@ namespace BP.Shared.Views
 			songList.ItemsSource = songNames;
 		}
 
-		private async void BackBtn_Click(object sender, RoutedEventArgs e)
+		private void BackBtn_Click(object sender, RoutedEventArgs e)
 		{
 			Frame.Navigate(typeof(MainPage));
 		}

@@ -47,12 +47,14 @@ namespace BP.Shared.Views
     public sealed partial class MainPage : Page
     {
 
-		private Shared.AudioRecorder.Recorder recorder;
-		private AudioProcessing.Recognizer.AudioRecognizer recognizer;
+		private AudioRecorder.Recorder recorder;
+		private AudioRecognizer recognizer;
 		private bool isRecording = false;
 		private bool wasRecording = false;
+
 		private byte[] uploadedSong;
 		private byte[] recordedSong;
+		
 		private Database.Database database;
 		private Dictionary<uint, List<ulong>> songValueDatabase;
 
@@ -74,7 +76,6 @@ namespace BP.Shared.Views
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
-			//storyboard.Duration = new Duration(TimeSpan.FromSeconds(1.0));
 			DoubleAnimation opacityAnimation = new DoubleAnimation()
 			{
 				From = 0.0,
@@ -96,13 +97,11 @@ namespace BP.Shared.Views
 			{
 				flickerIcon.Visibility = Visibility.Visible;
 				flickerAnimation.Begin();
-				//await Task.Run(() => recorder.StartRecording());
 				recorder.StartRecording();
 				isRecording = true;
 
 				await Task.Run(() => Thread.Sleep(3000));
 
-				//await Task.Run( ()=>recorder.StopRecording());
 				recorder.StopRecording();
 				
 				isRecording = false;
