@@ -299,6 +299,7 @@
 			<TextBlock
 				x:Name="InformationTextBlk"
 				not_android:FontSize="30"
+				TextWrapping="NoWrap"
 				Text="Info Text"
 				/>
 			<TextBlock
@@ -315,7 +316,7 @@
 
 		<!-- THIRD ROW -->
 
-		<Button
+		<not_wasm:Button
 			x:Name="OpenNewSongFormBtn"
 			Grid.Row="2"
 			Grid.Column="1"
@@ -336,11 +337,12 @@
 			Click="{x:Bind ListSongsBtn_Click}"
 			/>
 
-		<Grid
+		<not_wasm:Grid
 			x:Name="UploadGrid"
 			Grid.Row="2"
 			Grid.Column="1"
-			Visibility="Collapsed" Grid.RowSpan="2" 
+			Grid.RowSpan="2" 
+			Visibility="Collapsed" 
 			>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="1*"/>
@@ -402,6 +404,6 @@
 				BorderBrush="{StaticResource CancelColor}"
 				Click="{x:Bind CancelNewSong_Click}"
 				/>
-		</Grid>
+		</not_wasm:Grid>
 	</Grid>
 </Page>

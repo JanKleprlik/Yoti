@@ -63,46 +63,19 @@ namespace BP.Shared.Views
         {
             this.InitializeComponent();
 
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
 			recorder = new Shared.AudioRecorder.Recorder();
-			
-			sw.Stop();
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] RECORDER elapsed time {sw.ElapsedMilliseconds}");
-			sw.Reset();
-			sw.Start();
-
 			database = new Database.Database();
-
-			sw.Stop();
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] DATABASE elapsed time {sw.ElapsedMilliseconds}");
-			sw.Reset();
-			sw.Start();
-
 			recognizer = new AudioRecognizer();
-
-			sw.Stop();
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] RECOGNIZER elapsed time {sw.ElapsedMilliseconds}");
-			sw.Reset();
-			sw.Start();
-
 			songValueDatabase = database.GetSearchData();
 
-			sw.Stop();
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] GET SEARCH DATA elapsed time {sw.ElapsedMilliseconds}");
-			sw.Reset();
-			sw.Start();
-
 			setupFlickerAnimation();
-
-			sw.Stop();
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] FLICKER ANIMATON elapsed time {sw.ElapsedMilliseconds}");
 
 		}
 
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
+			#region UWP
 #if NETFX_CORE
 			DoubleAnimation opacityAnimation = new DoubleAnimation()
 			{
@@ -118,6 +91,8 @@ namespace BP.Shared.Views
 			flickerAnimation.Children.Add(opacityAnimation);
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 #endif
+			#endregion
+
 #if !NETFX_CORE
 			// Android nor WASM supports animations in Uno Platform yet
 			flickerIcon.Opacity = 1.0;
@@ -202,38 +177,10 @@ namespace BP.Shared.Views
 #if __ANDROID__
 			pickAndUploadFileANDROIDAsync();
 #endif
-#if __WASM__
-			FileSelectedEvent -= OnNewSongUploadedEvent;
-			FileSelectedEvent += OnNewSongUploadedEvent;
-			WebAssemblyRuntime.InvokeJS(@"
-				var input = document.createElement('input');
-				input.type = 'file';
-				input.accept = '.wav';
-				input.onchange = e => {
-					var file = e.target.files[0];
-					//size in MBs cannot be bigger than 50
-					if ((file.size / 1024 / 1024)>50){ 
-						alert('File size exceeds 50 MB');
-					}
-					else
-					{
-						var reader = new FileReader();
-						reader.readAsDataURL(file);
-						reader.onload = readerEvent => {
-							//this is the binary uploaded content
-							var content = readerEvent.target.result; 
-							//invoke C# method to get audio binary data
-							var selectFile = Module.mono_bind_static_method(" + "\"[BP.Wasm] BP.MainPage:SelectFile\"" + @");
-							selectFile(content);
-						}
-					};
-				};
-				input.click(); "
-			);
-#endif
 		}
 
-
+		#region Upload new song 
+#if !__WASM__
 		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
 			
@@ -285,92 +232,22 @@ namespace BP.Shared.Views
 			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
 		}
 
-
-#region WASM
-#if __WASM__
-		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
-		{
-            FileSelectedEvent -=OnSongToRecognizeUploadedEvent;
-            FileSelectedEvent += OnSongToRecognizeUploadedEvent;
-            WebAssemblyRuntime.InvokeJS(@"
-				console.log('calling javascript');
-				var input = document.createElement('input');
-				input.type = 'file';
-				input.accept = '.wav';
-				input.onchange = e => {
-					var file = e.target.files[0];
-					//size in MBs cannot be bigger than 5
-					if ((file.size / 1024 / 1024)>5){ 
-						alert('File size exceeds 5 MB');
-					}
-					else
-					{
-						var reader = new FileReader();
-						reader.readAsDataURL(file);
-						reader.onload = readerEvent => {
-							//this is the binary uploaded content
-							var content = readerEvent.target.result; 
-							//invoke C# method to get audio binary data
-							var selectFile = Module.mono_bind_static_method(" + "\"[BP.Wasm] BP.MainPage:SelectFile\""+@");
-							selectFile(content);
-						}
-					};
-				};
-				input.click(); "
-			);
-		}
-		public static void SelectFile(string fileAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(fileAsDataUrl));
-
-		private void OnSongToRecognizeUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
-		{
-			FileSelectedEvent -= OnSongToRecognizeUploadedEvent;
-			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-			var binData = Convert.FromBase64String(base64Data); //this is the data I want
-#if DEBUG
-			for (int i = 0; i < 10; i++)
-			{
-				Console.Out.Write((char)binData[i]);
-			}
-			Console.Out.WriteLine();
 #endif
-			recordedSong = binData;
-			Console.Out.WriteLine("Recognize song");
-		}
-
-		private void OnNewSongUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
-		{
-			FileSelectedEvent -= OnNewSongUploadedEvent;
-			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-			uploadedSong = Convert.FromBase64String(base64Data); //this is the data I want
-#if DEBUG
-			for (int i = 0; i < 10; i++)
-			{
-				Console.Out.Write((char)uploadedSong[i]);
-			}
-			Console.Out.WriteLine();
-#endif
-			Console.Out.WriteLine("New song");
-			//uploadedSong = binData;
-		}
-
-		private static event FileSelectedEventHandler FileSelectedEvent;
-
-		private delegate void FileSelectedEventHandler(object sender, FileSelectedEventHandlerArgs args);
-
-		private class FileSelectedEventHandlerArgs
-		{
-			public string FileAsDataUrl { get; }
-			public FileSelectedEventHandlerArgs(string fileAsDataUrl) => FileAsDataUrl = fileAsDataUrl;
-
-		}
-#endif
-#endregion
+		#endregion
 
 		// UI Navigation
+		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
+		{
+			settingsContentDialog.Visibility = Visibility.Visible;
+			ContentDialogResult result = await settingsContentDialog.ShowAsync();
+		}
 		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
 			Frame.Navigate(typeof(SongList), database.GetSongs());
 		}
+
+#region NOT WASM
+#if !__WASM__
 
 		private  void OpenNewSongForm_Click(object sender, RoutedEventArgs e)
 		{
@@ -381,15 +258,17 @@ namespace BP.Shared.Views
 		{
 			hideAddNewSongUI();
 		}
-
-		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			settingsContentDialog.Visibility = Visibility.Visible;
-			ContentDialogResult result = await settingsContentDialog.ShowAsync();
-		}
-
+#endif
+#endregion
 
 #region UI HELPERS
+		private void displayInfoText(string text)
+		{
+			InformationTextBlk.Text = text;
+		}
+
+#region NOT WASM
+#if !__WASM__
 		private void hideAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Collapsed;
@@ -403,11 +282,9 @@ namespace BP.Shared.Views
 			OpenNewSongFormBtn.Visibility = Visibility.Collapsed;
 			ListSongsBtn.Visibility = Visibility.Collapsed;
 		}
-		
-		private void displayInfoText(string text)
-		{
-			InformationTextBlk.Text = text;
-		}
+#endif
+#endregion
+
 
 #endregion
 	}

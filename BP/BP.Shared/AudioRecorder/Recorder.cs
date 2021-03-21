@@ -21,12 +21,6 @@ using System.IO;
 #endif
 
 
-#region ANDROID
-#if __ANDROID__
-#endif
-#endregion
-
-
 namespace BP.Shared.AudioRecorder
 {
 	public sealed partial class Recorder
@@ -299,7 +293,7 @@ namespace BP.Shared.AudioRecorder
 			}
 			catch(Exception e)
 			{
-				throw;
+				throw e;
 			}
 		}
 
