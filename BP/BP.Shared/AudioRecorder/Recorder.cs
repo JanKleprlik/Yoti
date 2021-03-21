@@ -200,7 +200,8 @@ namespace BP.Shared.AudioRecorder
 			if (audioBuffer == null)
 				throw new ArgumentNullException("buffer");
 
-			StorageFolder recordingFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+			//StorageFolder recordingFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
+			StorageFolder recordingFolder = ApplicationData.Current.TemporaryFolder;
 
 			//delete if not empty
 			if (!string.IsNullOrEmpty(filename))
@@ -212,7 +213,7 @@ namespace BP.Shared.AudioRecorder
 			//replay async
 			await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 			{
-				StorageFile recordingFile = await recordingFolder.CreateFileAsync(audioFile, CreationCollisionOption.GenerateUniqueName);
+				StorageFile recordingFile = await recordingFolder.CreateFileAsync(audioFile, CreationCollisionOption.ReplaceExisting);
 				filename = recordingFile.Name;
 
 				//save buffer into file
