@@ -158,7 +158,6 @@ namespace BP.Shared.AudioRecorder
 #endregion
 				isRecording = false;
 			}
-
 		}
 #if !__WASM__
 		public async Task<byte[]> GetDataFromStream()
@@ -200,7 +199,6 @@ namespace BP.Shared.AudioRecorder
 			if (audioBuffer == null)
 				throw new ArgumentNullException("buffer");
 
-			//StorageFolder recordingFolder = Windows.ApplicationModel.Package.Current.InstalledLocation;
 			StorageFolder recordingFolder = ApplicationData.Current.TemporaryFolder;
 
 			//delete if not empty
