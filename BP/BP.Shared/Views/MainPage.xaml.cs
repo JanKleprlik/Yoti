@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using Database;
 using AudioProcessing.Recognizer;
 using Windows.UI.Xaml.Media.Animation;
+using System.Diagnostics;
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -49,13 +50,11 @@ namespace BP.Shared.Views
 
 		private AudioRecorder.Recorder recorder;
 		private AudioRecognizer recognizer;
-		private bool isRecording = false;
-		private bool wasRecording = false;
 
-		private byte[] uploadedSong;
-		private byte[] recordedSong;
-		
-		private Database.Database database;
+		private object uploadedSongLock = new object();
+		private byte[] uploadedSong { get; set; }
+
+		private Database.Database database { get; set; }
 		private Dictionary<uint, List<ulong>> songValueDatabase;
 
 		private Storyboard flickerAnimation;
@@ -64,18 +63,47 @@ namespace BP.Shared.Views
         {
             this.InitializeComponent();
 
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
 			recorder = new Shared.AudioRecorder.Recorder();
+			
+			sw.Stop();
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] RECORDER elapsed time {sw.ElapsedMilliseconds}");
+			sw.Reset();
+			sw.Start();
+
 			database = new Database.Database();
+
+			sw.Stop();
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] DATABASE elapsed time {sw.ElapsedMilliseconds}");
+			sw.Reset();
+			sw.Start();
+
 			recognizer = new AudioRecognizer();
+
+			sw.Stop();
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] RECOGNIZER elapsed time {sw.ElapsedMilliseconds}");
+			sw.Reset();
+			sw.Start();
+
 			songValueDatabase = database.GetSearchData();
-			
+
+			sw.Stop();
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] GET SEARCH DATA elapsed time {sw.ElapsedMilliseconds}");
+			sw.Reset();
+			sw.Start();
+
 			setupFlickerAnimation();
-			
+
+			sw.Stop();
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] FLICKER ANIMATON elapsed time {sw.ElapsedMilliseconds}");
+
 		}
 
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
+#if NETXF_CORE
 			DoubleAnimation opacityAnimation = new DoubleAnimation()
 			{
 				From = 0.0,
@@ -89,108 +117,75 @@ namespace BP.Shared.Views
 			Storyboard.SetTargetProperty(flickerAnimation, "Opacity");
 			flickerAnimation.Children.Add(opacityAnimation);
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
+#endif
+#if !NETXF_CORE
+			// Android nor WASM supports animations in Uno Platform yet
+			flickerIcon.Opacity = 1.0;
+#endif
+
 		}
 
 		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
-			if (!isRecording)
-			{
-				flickerIcon.Visibility = Visibility.Visible;
-				flickerAnimation.Begin();
-				recorder.StartRecording();
-				isRecording = true;
+			//start UI recording response
+			flickerIcon.Visibility = Visibility.Visible;
+			flickerAnimation.Begin();
 
-				await Task.Run(() => Thread.Sleep(3000));
+			InformationTextBlk.Text = "BEFORE rec.";
+			await Task.Run(recorder.RecordAudio);
 
-				recorder.StopRecording();
-				
-				isRecording = false;
-				wasRecording = true;
-				flickerAnimation.Pause();
-				flickerIcon.Visibility = Visibility.Collapsed;
-				PlayBtn.Visibility = Visibility.Visible;
+			InformationTextBlk.Text = "AFTER rec.";
 
-				RecognizeProgressBar.Visibility = Visibility.Visible;
-				await Task.Run( () => recognizeBtn_Click(sender, e));
-				//recognizeBtn_Click(sender, e);
-				RecognizeProgressBar.Visibility = Visibility.Collapsed;
-			} 
+			//Stop UI recording response
+			flickerAnimation.Pause();
+			flickerIcon.Visibility = Visibility.Collapsed;
+
+			//set replay button visible
+			PlayBtn.Visibility = Visibility.Visible;
+			
+			//start UI recognition response
+			RecognizeProgressBar.Visibility = Visibility.Visible;
+
+			//recognize song
+			await Task.Run( () => recognizeBtn_Click(sender, e));
+			
+			//stop UI recognition response
+			RecognizeProgressBar.Visibility = Visibility.Collapsed;
 		}
 
-		/// <summary>
-		/// OBSOLETE
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private async void stopBtn_Click(object sender, RoutedEventArgs e)
+        private void playBtn_Click(object sender, RoutedEventArgs e)
         {
-			if (isRecording)
-			{
-				recorder.StopRecording();
-				isRecording = false;
-				wasRecording = true;
-			}
-        }
-
-        private async void playBtn_Click(object sender, RoutedEventArgs e)
-        {
-		#region UWP
 #if NETFX_CORE
-			if (await recorder.ReplayRecordingUWP(Dispatcher))
-			{
-			}
+			recorder.ReplayRecordingUWP(Dispatcher);
 #endif
-			#endregion
-		#region ANDROID
 #if __ANDROID__
-			if (wasRecording)
-			{
-				recorder.ReplayRecordingANDROID();
-			}
+			recorder.ReplayRecordingANDROID();
 #endif
-		#endregion
 		}
 
 		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
-			AudioProcessing.AudioFormats.WavFormat recordedAudioWav;
-			
-			#region GETTING recordedAudioWav
-#if !__WASM__
-			recordedSong = await recorder.GetDataFromStream();
-#endif
-			#region UWP
+			AudioProcessing.AudioFormats.IAudioFormat recordedAudioWav;
 #if NETFX_CORE
-			recordedAudioWav = new AudioProcessing.AudioFormats.WavFormat(recordedSong);
+			recordedAudioWav = await getAudioFormatFromRecodingUWP();
 #endif
-			#endregion
-			#region ANDROID
 #if __ANDROID__
-
-			//at android we only get raw data without metadata
-			// so I have to convert them manually to shorts and then use different constructor
-			short[] recordedDataShort = AudioProcessing.Tools.Converter.BytesToShorts(recordedSong);
-
-			recordedAudioWav = new AudioProcessing.AudioFormats.WavFormat(
-				Shared.AudioRecorder.Recorder.Parameters.SamplingRate,
-				Shared.AudioRecorder.Recorder.Parameters.Channels,
-				recordedDataShort.Length,
-				recordedDataShort);
+			recordedAudioWav = await getAudioFormatFromRecordingANDROID();
 #endif
-			#endregion
-			#region WASM
+
+#region WASM
 #if __WASM__
 			throw new NotImplementedException("Song recognition is not yet implemented in WASM");
 #endif
-			#endregion
-			#endregion
-			
+#endregion
+
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
 			System.Diagnostics.Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
 
-			uint? ID = recognizer.RecognizeSong(recordedAudioWav, songValueDatabase);
+
+			uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, songValueDatabase));
 
 			System.Diagnostics.Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
 
@@ -198,63 +193,12 @@ namespace BP.Shared.Views
 
 		private async void UploadNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
-			#region UWP
 #if NETFX_CORE
-			var picker = new Windows.Storage.Pickers.FileOpenPicker();
-			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
-			picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
-			picker.FileTypeFilter.Add(".wav");
-
-			StorageFile file = await picker.PickSingleFileAsync();
-			if (file != null)
-			{
-				var audioFileData = await file.OpenStreamForReadAsync();
-				uploadedSong = new byte[(int)audioFileData.Length];
-				audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
-				this.UploadedSongText.Text = file.Name;
-			}
-			else
-			{
-				this.UploadedSongText.Text = "No song uploaded.";
-			}
-
+			pickAndUploadFileUWPAsync();
 #endif
-			#endregion
-			#region ANDORID
 #if __ANDROID__
-			if (await getExternalStoragePermission())
-			{
-				PickOptions options = new PickOptions
-				{
-					PickerTitle = "Please select a wav song file",
-					FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-					{
-						{DevicePlatform.Android, new[]{"audio/x-wav"} }
-					})
-				};
-
-				FileResult result = await FilePicker.PickAsync(options);
-
-				if (result != null)
-				{
-					UploadedSongText.Text = $"File selected: {result.FileName}";
-					var audioFileData = await result.OpenReadAsync();
-					uploadedSong = new byte[(int)audioFileData.Length];
-					audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
-				}
-				else
-				{
-					UploadedSongText.Text = "No song uploaded";
-				}
-
-			}
-			else
-			{
-				UploadedSongText.Text = "Acces to read storage denied.";
-			}
+			pickAndUploadFileANDROIDAsync();
 #endif
-			#endregion
-			#region WASM
 #if __WASM__
 			FileSelectedEvent -= OnNewSongUploadedEvent;
 			FileSelectedEvent += OnNewSongUploadedEvent;
@@ -284,14 +228,9 @@ namespace BP.Shared.Views
 				input.click(); "
 			);
 #endif
-			#endregion
 		}
 
-		/// <summary>
-		/// TODO
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
+
 		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
 			
@@ -314,22 +253,37 @@ namespace BP.Shared.Views
 
 			if (uploadedSong != null && NewSongNameTB.Text != "" && NewSongAuthorTB.Text != "")
 			{
-				System.Diagnostics.Debug.WriteLine("[DEBUG] Adding new song into database.");
-				var audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
-				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-				uint songID = database.AddSong(NewSongNameTB.Text, NewSongAuthorTB.Text);
-				database.AddFingerprint(tfps);
-				System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
-				recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
-				database.UpdateSearchData(songValueDatabase);
-				System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
+				string songName = NewSongNameTB.Text;
+				string songAuthor = NewSongAuthorTB.Text;
+				
+				await Task.Run(() => addNewSong(songName, songAuthor));
 
-				displayInfoText($"Song \"{NewSongNameTB.Text}\" by \"{NewSongAuthorTB.Text}\" was added into the database.");
+				displayInfoText($"\"{songName}\" by \"{songAuthor}\" was added");
 			}
 			
 		}
 
-		#region WASM
+		private void addNewSong(string songName, string songAuthor)
+		{
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");
+			
+			AudioProcessing.AudioFormats.IAudioFormat audioWav;
+			lock (uploadedSongLock)
+			{
+				audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
+			}
+
+			var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+			uint songID = database.AddSong(songName, songAuthor);
+			database.AddFingerprint(tfps);
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
+			recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
+			database.UpdateSearchData(songValueDatabase);
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
+		}
+
+
+#region WASM
 #if __WASM__
 		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -407,19 +361,7 @@ namespace BP.Shared.Views
 
 		}
 #endif
-		#endregion
-
-		#region ANDROID - helper functions
-#if __ANDROID__
-		private async Task<bool> getExternalStoragePermission()
-		{
-			CancellationTokenSource source = new CancellationTokenSource();
-			CancellationToken token = source.Token;
-			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.ReadExternalStorage);
-		}
-#endif
-		#endregion
-
+#endregion
 
 		// UI Navigation
 		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
@@ -439,11 +381,12 @@ namespace BP.Shared.Views
 
 		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
 		{
+			settingsContentDialog.Visibility = Visibility.Visible;
 			ContentDialogResult result = await settingsContentDialog.ShowAsync();
 		}
 
 
-		#region UI HELPERS
+#region UI HELPERS
 		private void hideAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Collapsed;
@@ -463,6 +406,6 @@ namespace BP.Shared.Views
 			InformationTextBlk.Text = text;
 		}
 
-		#endregion
+#endregion
 	}
 }

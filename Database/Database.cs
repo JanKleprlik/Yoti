@@ -1,7 +1,9 @@
 ﻿using AudioProcessing;
+using Salar.Bois;
 using SQLite;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -20,6 +22,9 @@ namespace Database
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
 			bool exists = File.Exists(databasePath);
 			SQLiteConnection connection = new SQLiteConnection(databasePath);
+			
+			BoisSerializer.Initialize<Dictionary<uint, List<ulong>>>();
+
 #if DEBUG
 			//if (exists)
 			//{
@@ -82,20 +87,28 @@ namespace Database
 			connection.Insert(fp);
 		}
 
+
 		public void UpdateSearchData(Dictionary<uint, List<ulong>> newSearchData)
 		{
-			MemoryStream memStream = new MemoryStream();
-			BinaryFormatter binFormatter = new BinaryFormatter();
-			binFormatter.Serialize(memStream, newSearchData);
 
-			SearchData searchData = new SearchData
+			BoisSerializer serializer = new BoisSerializer();
+
+			using (MemoryStream memStream = new MemoryStream())
 			{
-				serializedData = memStream.ToArray()
-			};
-			//delete last version of searchData
-			connection.DeleteAll<SearchData>();
-			//create new 
-			connection.Insert(searchData);
+				serializer.Serialize(newSearchData, memStream);
+
+				SearchData searchData = new SearchData
+				{
+					serializedData = memStream.ToArray()
+				};
+
+				//delete last version of searchData
+				connection.DeleteAll<SearchData>();
+
+				//create new 
+				connection.Insert(searchData);
+
+			}
 		}
 
 		#endregion
@@ -112,14 +125,37 @@ namespace Database
 			var searchDataQueryRes = connection.Query<SearchData>("SELECT * FROM SearchData");
 			if (searchDataQueryRes.Count != 0)
 			{
+				Stopwatch sw = new Stopwatch();
+				sw.Start();
+
+
+
 				System.Diagnostics.Debug.WriteLine("[DEBUG] Database is NOT empty.");
 				var searchData = searchDataQueryRes[0];
 				var memStream = new MemoryStream();
-				var binFormatter = new BinaryFormatter();
+
+				sw.Stop();
+				System.Diagnostics.Debug.WriteLine($"[DEBUG] common: {sw.ElapsedMilliseconds}");
+				sw.Reset();
+				sw.Start();
+
 				memStream.Write(searchData.serializedData, 0, searchData.serializedData.Length);
 				memStream.Position = 0;
 
-				return binFormatter.Deserialize(memStream) as Dictionary<uint, List<ulong>>;
+				sw.Stop();
+				System.Diagnostics.Debug.WriteLine($"[DEBUG] SERIALIZATION: {sw.ElapsedMilliseconds}");
+				sw.Reset();
+				sw.Start();
+
+
+				var boisSerializer = new BoisSerializer();
+				var deserialized = boisSerializer.Deserialize<Dictionary<uint, List<ulong>>>(memStream);
+
+				sw.Stop();
+				System.Diagnostics.Debug.WriteLine($"[DEBUG] DESERIALIZATION: {sw.ElapsedMilliseconds}");
+
+
+				return deserialized;
 			}
 			else
 			{

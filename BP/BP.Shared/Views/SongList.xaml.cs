@@ -43,7 +43,9 @@ namespace BP.Shared.Views
 			foreach (Song song in songs)
 			{
 				songNames.Add(song.Name);
+				Console.Out.WriteLine($"[DEBUG] {song.Name}");
 			}
+
 			songList.ItemsSource = songNames;
 		}
 

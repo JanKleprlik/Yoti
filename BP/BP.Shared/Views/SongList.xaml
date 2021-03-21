@@ -30,9 +30,8 @@
 		<ListView 
 			Grid.Row="2"
 			x:Name="songList" 
-			HorizontalAlignment="Left"
+			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
-			Width="100" 
 			/>
 
 	</Grid>

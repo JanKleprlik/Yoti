@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:wasm="http://uno.ui/wasm"
 	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:not_android="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     mc:Ignorable="d wasm"
 	Background="{StaticResource PrimaryDarkColor}"
 	NavigationCacheMode="Required"
@@ -266,6 +267,9 @@
 		</Button>
 
 		<local:SettingsDialog
+			Grid.RowSpan="3"
+			Grid.ColumnSpan="3"
+			Visibility="Collapsed"
 			x:Name="settingsContentDialog"
 			/>
 		
@@ -277,9 +281,24 @@
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			>
+			<ProgressBar
+			x:Name="UploadProgressBar"
+			Grid.Row="1"
+			Grid.Column="1"
+			Width="100"
+			VerticalAlignment="Top"
+			HorizontalAlignment="Left"
+			Margin="0,70,0,0"
+			CornerRadius="5"
+			IsIndeterminate="True"
+			Foreground="{StaticResource SecondaryHighlightedColor}"
+			Visibility="Collapsed"
+			>
+
+			</ProgressBar>
 			<TextBlock
 				x:Name="InformationTextBlk"
-				FontSize="30"
+				not_android:FontSize="30"
 				Text="Info Text"
 				/>
 			<TextBlock
@@ -384,15 +403,5 @@
 				Click="{x:Bind CancelNewSong_Click}"
 				/>
 		</Grid>
-		
-		<ListView 
-			not_wasm:Grid.Row="1" 
-			x:Name="songList" 
-			HorizontalAlignment="Left"
-			VerticalAlignment="Center"
-			Width="100" 
-			Visibility="Collapsed"
-			/>
-
 	</Grid>
 </Page>
