@@ -1,6 +1,11 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:wasm="http://uno.ui/wasm"
+	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	mc:Ignorable="wasm"
+	>
 
 
 	<Style TargetType="Button">
@@ -146,10 +151,11 @@
 			</Rectangle>
 			<TextBlock 
 					x:Name="Text"
-					Padding="15,10,15,10"
+					not_wasm:Padding="15,10,15,10"
+					wasm:Padding="15,10,20,10"
 					Text="{TemplateBinding Content}"
 					FontFamily="{StaticResource Sansation}"
-					TextWrapping="Wrap"
+					TextWrapping="NoWrap"
 					Foreground="White"
 					HorizontalAlignment="Center"
 					VerticalAlignment="Center"/>
@@ -199,7 +205,8 @@
 			</Rectangle>
 			<TextBlock 
 					x:Name="Text"
-					Padding="15,10,15,10"
+					not_wasm:Padding="15,10,15,10"
+					wasm:Padding="15,10,20,10"
 					Text="{TemplateBinding Content}"
 					FontFamily="{StaticResource Sansation}"
 					TextWrapping="Wrap"
@@ -252,7 +259,8 @@
 			</Rectangle>
 			<TextBlock 
 					x:Name="Text"
-					Padding="15,10,15,10"
+					not_wasm:Padding="15,10,15,10"
+					wasm:Padding="15,10,20,10"
 					Text="{TemplateBinding Content}"
 					FontFamily="{StaticResource Sansation}"
 					TextWrapping="Wrap"
