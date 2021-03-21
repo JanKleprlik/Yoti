@@ -103,12 +103,12 @@ namespace BP.Shared.Views
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
-#if NETXF_CORE
+#if NETFX_CORE
 			DoubleAnimation opacityAnimation = new DoubleAnimation()
 			{
-				From = 0.0,
-				To = 1.0,
-				BeginTime = TimeSpan.FromSeconds(1.0),
+				From = 1.0,
+				To = 0.0,
+				BeginTime = TimeSpan.FromSeconds(0.5),
 				AutoReverse = true,
 				Duration = new Duration(TimeSpan.FromSeconds(0.18))
 			};
@@ -118,7 +118,7 @@ namespace BP.Shared.Views
 			flickerAnimation.Children.Add(opacityAnimation);
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 #endif
-#if !NETXF_CORE
+#if !NETFX_CORE
 			// Android nor WASM supports animations in Uno Platform yet
 			flickerIcon.Opacity = 1.0;
 #endif
@@ -130,7 +130,9 @@ namespace BP.Shared.Views
 			//start UI recording response
 			flickerIcon.Visibility = Visibility.Visible;
 			flickerAnimation.Begin();
+			RecognizeBtn.IsEnabled = false;
 
+			//record audio
 			InformationTextBlk.Text = "BEFORE rec.";
 			await Task.Run(recorder.RecordAudio);
 
@@ -148,8 +150,9 @@ namespace BP.Shared.Views
 
 			//recognize song
 			await Task.Run( () => recognizeBtn_Click(sender, e));
-			
+
 			//stop UI recognition response
+			RecognizeBtn.IsEnabled = true;
 			RecognizeProgressBar.Visibility = Visibility.Collapsed;
 		}
 

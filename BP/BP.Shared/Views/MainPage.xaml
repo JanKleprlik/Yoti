@@ -180,7 +180,7 @@
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
 			Visibility="Collapsed"
-			Opacity="0.2"
+			Opacity="1.0"
 			/>
 
 		<!-- SECOND ROW -->
