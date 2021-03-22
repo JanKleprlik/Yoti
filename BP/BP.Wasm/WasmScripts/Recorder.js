@@ -1,5 +1,5 @@
-﻿function test2() {
-    var testMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:Test");
+﻿function record_and_recognize() {
+    var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:Recognize");
 
     var audioCtx = new AudioContext({ sampleRate: 48000 });
     var microphone_stream;
@@ -48,7 +48,7 @@
 
                 reader.onloadend = function () {
                     var base64data = reader.result;
-                    testMethod(base64data);
+                    RecognizeMethod(base64data);
                 }
             }
 

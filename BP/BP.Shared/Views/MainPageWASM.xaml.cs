@@ -17,7 +17,7 @@ namespace BP.Shared.Views
 	{
 		#region WASM
 #if __WASM__
-		public async void Test(string data)
+		public async void Recognize(string data)
 		{
 			Debug.WriteLine("--------------C#--------------");
 			Debug.WriteLine($"data.length: {data.Length}");

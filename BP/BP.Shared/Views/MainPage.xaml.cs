@@ -153,24 +153,20 @@ namespace BP.Shared.Views
 
 #region WASM
 #if __WASM__
-			Debug.WriteLine("EXECUTE");
-			this.ExecuteJavascript("test2();");
-			//Debug.WriteLine("INVOKE");
-			//WebAssemblyRuntime.InvokeJS("test2();");
+			this.ExecuteJavascript("record_and_recognize();");
 			return;
-			//throw new NotImplementedException("Song recognition is not yet implemented in WASM");
 #endif
 #endregion
 
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
+			Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
+			Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
+			Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
+			Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
 
 
 			uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, songValueDatabase));
 
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
+			Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
 
 		}
 

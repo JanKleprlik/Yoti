@@ -12,7 +12,6 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="Assets\AudioDatabase.db" />
     <Content Include="Assets\SplashScreen.png" />
   </ItemGroup>
   <ItemGroup>
