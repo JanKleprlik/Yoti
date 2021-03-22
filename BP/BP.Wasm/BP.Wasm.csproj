@@ -12,28 +12,29 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Assets\AudioDatabase.db" />
     <Content Include="Assets\SplashScreen.png" />
   </ItemGroup>
   <ItemGroup>
     <UpToDateCheckInput Include="..\BP.Shared\**\*.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\AudioDatabase.db" />
+    <None Remove="WasmScripts\AudioRecorder.js" />
+    <None Remove="WasmScripts\Recorder.js" />
+    <None Remove="WasmScripts\Recorder2.js" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="WasmCSS\Fonts.css" />
     <EmbeddedResource Include="WasmScripts\AppManifest.js" />
+    <EmbeddedResource Include="WasmScripts\AudioRecorder.js" />
+    <EmbeddedResource Include="WasmScripts\Recorder.js" />
+
+		<UpToDateCheckInput Include="WasmScripts\AudioRecorder.js" />
+		<UpToDateCheckInput Include="WasmScripts\Recorder.js" />
   </ItemGroup>
   <ItemGroup>
     <LinkerDescriptor Include="LinkerConfig.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <!--
-    This item group is required by the project template because of the
-    new SDK-Style project, otherwise some files are not added automatically.
-
-    You can safely remove this ItemGroup completely.
-    -->
-    <None Include="Program.cs" />
-    <None Include="LinkerConfig.xml" />
-    <None Include="wwwroot\web.config" />
   </ItemGroup>
   <ItemGroup>
     <!-- Note that for WebAssembly version 1.1.1 of the console logger required -->

@@ -27,7 +27,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Views\MainPageUWP.xaml.cs">
-	      <DependentUpon>MainPage.xaml</DependentUpon>
+      <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Views\MainPageWASM.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

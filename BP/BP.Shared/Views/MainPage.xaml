@@ -158,6 +158,7 @@
 		
 		<!-- FIRST ROW -->
 		<TextBlock
+			x:Name="Loggo"
 			Text="Yöti"
 			FontSize="60"
 			HorizontalAlignment="Center"

@@ -75,7 +75,7 @@ namespace BP.Shared.Views
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
-			#region UWP
+#region UWP
 #if NETFX_CORE
 			DoubleAnimation opacityAnimation = new DoubleAnimation()
 			{
@@ -91,7 +91,7 @@ namespace BP.Shared.Views
 			flickerAnimation.Children.Add(opacityAnimation);
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 #endif
-			#endregion
+#endregion
 
 #if !NETFX_CORE
 			// Android nor WASM supports animations in Uno Platform yet
@@ -141,7 +141,7 @@ namespace BP.Shared.Views
 #endif
 		}
 
-		private async void recognizeBtn_Click(object sender, RoutedEventArgs e)
+		private async Task recognizeBtn_Click(object sender, RoutedEventArgs e)
 		{
 			AudioProcessing.AudioFormats.IAudioFormat recordedAudioWav;
 #if NETFX_CORE
@@ -153,7 +153,12 @@ namespace BP.Shared.Views
 
 #region WASM
 #if __WASM__
-			throw new NotImplementedException("Song recognition is not yet implemented in WASM");
+			Debug.WriteLine("EXECUTE");
+			this.ExecuteJavascript("test2();");
+			//Debug.WriteLine("INVOKE");
+			//WebAssemblyRuntime.InvokeJS("test2();");
+			return;
+			//throw new NotImplementedException("Song recognition is not yet implemented in WASM");
 #endif
 #endregion
 
@@ -179,7 +184,7 @@ namespace BP.Shared.Views
 #endif
 		}
 
-		#region Upload new song 
+#region Upload new song 
 #if !__WASM__
 		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -233,7 +238,7 @@ namespace BP.Shared.Views
 		}
 
 #endif
-		#endregion
+#endregion
 
 		// UI Navigation
 		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)

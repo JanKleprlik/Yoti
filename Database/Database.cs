@@ -45,6 +45,29 @@ namespace Database
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Leaving Database constructor");
 
 		}
+		
+		public Database(string fileName)
+		{
+			System.Diagnostics.Debug.WriteLine("[DEBUG] In Database constructor with fileName");
+			string databasePath = "./Assets/" + fileName;
+			Debug.WriteLine($"[DEBUG] current path: {Directory.GetCurrentDirectory()}");
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
+			bool exists = File.Exists(databasePath);
+			Debug.WriteLine(exists);
+			Debug.WriteLine(File.Exists("Assets/SplashScreen.png"));
+			Debug.WriteLine(File.Exists("Assets/AudioDatabase.db"));
+			Debug.WriteLine(File.Exists("/Assets/AudioDatabase.db"));
+			Debug.WriteLine(File.Exists(".Assets/AudioDatabase.db"));
+			Debug.WriteLine(File.Exists("./Assets/AudioDatabase.db"));
+
+			SQLiteConnection connection = new SQLiteConnection(databasePath);
+			BoisSerializer.Initialize<Dictionary<uint, List<ulong>>>();
+
+			this.connection = connection;
+			Debug.WriteLine("[DEBUG] Leaving Database constructor with fileName");
+		}
+		
+		
 		private void InitializeTables(SQLiteConnection connection)
 		{
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Creating tables");

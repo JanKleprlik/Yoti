@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Windows.UI.Xaml;
 
+using Windows.UI.Xaml.Controls;
+using AudioProcessing.AudioFormats;
 
 #if __WASM__
-using Windows.UI.Xaml.Controls;
 using System.Text.RegularExpressions;
 using Uno.Foundation;
+using System.Diagnostics;
 #endif
 
 
@@ -17,6 +17,39 @@ namespace BP.Shared.Views
 	{
 		#region WASM
 #if __WASM__
+		public async void Test(string data)
+		{
+			Debug.WriteLine("--------------C#--------------");
+			Debug.WriteLine($"data.length: {data.Length}");
+			//System.Diagnostics.Debug.WriteLine(data);
+
+			var base64Data = Regex.Match(data, @"data:application/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+			var binData = Convert.FromBase64String(base64Data); //this is the data I want
+			System.Diagnostics.Debug.WriteLine($"binData.length: {binData.Length}");
+
+			short[] recordedDataShort = AudioProcessing.Tools.Converter.BytesToShorts(binData);
+
+			var recordedAudioWav = new WavFormat(
+				AudioRecorder.Recorder.Parameters.SamplingRate,
+				AudioRecorder.Recorder.Parameters.Channels,
+				recordedDataShort.Length,
+				recordedDataShort);
+
+			Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
+			Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
+			Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
+			Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
+			
+			//TODO: test with working database
+			uint? ID = recognizer.RecognizeSong(recordedAudioWav, songValueDatabase);
+
+			//uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, songValueDatabase));
+
+			Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
+
+		}
+
+
 		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
 		{
 			FileSelectedEvent -= OnSongToRecognizeUploadedEvent;
@@ -48,6 +81,8 @@ namespace BP.Shared.Views
 				input.click(); "
 			);
 		}
+
+
 		public static void SelectFile(string fileAsDataUrl) => FileSelectedEvent?.Invoke(null, new FileSelectedEventHandlerArgs(fileAsDataUrl));
 
 		private void OnSongToRecognizeUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
@@ -94,6 +129,9 @@ namespace BP.Shared.Views
 		}
 #endif
 		#endregion
+
+
+
 
 	}
 }

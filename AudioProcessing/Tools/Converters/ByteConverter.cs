@@ -50,9 +50,13 @@ namespace AudioProcessing.Tools
 		/// <returns></returns>
 		public static short[] BytesToShorts(byte[] data)
 		{
-			short[] dataShorts = new short[data.Length / 2];
+			int dataLength = data.Length %2 == 0 ? data.Length : data.Length-1;
 
-			for (int i = 0; i < data.Length; i += 2)
+
+
+			short[] dataShorts = new short[dataLength / 2];
+
+			for (int i = 0; i < dataLength; i += 2)
 			{
 				dataShorts[i / 2] = Tools.Converter.BytesToShort(new byte[] { data[i], data[i + 1] });
 			}
