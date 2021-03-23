@@ -5,6 +5,7 @@ using Windows.UI.Xaml.Controls;
 using AudioProcessing.AudioFormats;
 
 #if __WASM__
+using System.Text;
 using System.Text.RegularExpressions;
 using Uno.Foundation;
 using System.Diagnostics;
@@ -17,6 +18,8 @@ namespace BP.Shared.Views
 	{
 		#region WASM
 #if __WASM__
+		private static StringBuilder stringBuilder;
+
 		public async void Recognize(string data)
 		{
 			Debug.WriteLine("--------------C#--------------");
@@ -48,6 +51,39 @@ namespace BP.Shared.Views
 			Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
 
 		}
+
+		public async void UploadFileByParts(object sender, RoutedEventArgs e)
+		{
+			FileSelectedEvent -= OnNewSongUploadedEvent;
+			FileSelectedEvent += OnNewSongUploadedEvent;
+			Debug.WriteLine("Setting up stringBuilder");
+			stringBuilder = new StringBuilder();
+			Debug.WriteLine($"Is null: {stringBuilder == null}");
+			WebAssemblyRuntime.InvokeJS("pick_and_upload_file_by_parts(); ");
+			//this.ExecuteJavascript("pick_and_upload_file_by_parts();");
+		}
+
+
+		public static void ProcessUploadedPart(string data)
+		{
+			Debug.WriteLine("In ProcessUploadedPart");
+			Debug.WriteLine($"Is null: {stringBuilder == null}");
+			if (stringBuilder == null)
+			{
+				Debug.WriteLine("ITS FKIN NULL???");
+				stringBuilder = new StringBuilder();
+			}
+
+			stringBuilder.Append(data);
+		}
+		
+		public static void ProcessFullSong()
+		{
+			Debug.WriteLine(stringBuilder.ToString());
+		}
+
+
+		#region OLD
 
 
 		private async void uploadBtn_Click(object sender, RoutedEventArgs e)
@@ -103,17 +139,27 @@ namespace BP.Shared.Views
 
 		private void OnNewSongUploadedEvent(object sender, FileSelectedEventHandlerArgs e)
 		{
-			FileSelectedEvent -= OnNewSongUploadedEvent;
-			var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-			uploadedSong = Convert.FromBase64String(base64Data); //this is the data I want
-#if DEBUG
-			for (int i = 0; i < 10; i++)
+			//FileSelectedEvent -= OnNewSongUploadedEvent;
+			//var base64Data = Regex.Match(e.FileAsDataUrl, @"data:audio/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+			//uploadedSong = Convert.FromBase64String(base64Data); //this is the data I want
+			if (e.FileAsDataUrl == null)
 			{
-				Console.Out.Write((char)uploadedSong[i]);
+				Debug.WriteLine("IS NULL");
+				return;
 			}
-			Console.Out.WriteLine();
-#endif
-			Console.Out.WriteLine("New song");
+
+			//uploadedSong = Convert.FromBase64String(e.FileAsDataUrl); //this is the data I want
+			//Debug.WriteLine($"uploadedSong.Length : {uploadedSong.Length}");
+//#if DEBUG
+//			for (int i = 0; i < 1; i++)
+//			{
+//				Console.Out.Write((char)uploadedSong[i]);
+//			}
+//			Console.Out.WriteLine();
+//#endif
+			//Debug.WriteLine($"Is null: {stringBuilder == null}");
+			stringBuilder.Append(e.FileAsDataUrl);
+			Debug.WriteLine(stringBuilder.Length);
 			//uploadedSong = binData;
 		}
 
@@ -127,9 +173,9 @@ namespace BP.Shared.Views
 			public FileSelectedEventHandlerArgs(string fileAsDataUrl) => FileAsDataUrl = fileAsDataUrl;
 
 		}
+		#endregion
 #endif
 		#endregion
-
 
 
 

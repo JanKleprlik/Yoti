@@ -183,7 +183,15 @@
 			Visibility="Collapsed"
 			Opacity="1.0"
 			/>
-
+		<wasm:Button
+			x:Name="tst"
+			Grid.Row="0"
+			Grid.Column="0"
+			Content="TEST"
+			VerticalAlignment="Top"
+			Click="{x:Bind UploadFileByParts}"
+			/>
+		
 		<!-- SECOND ROW -->
 		<Button
 			x:Name="RecognizeBtn"
