@@ -151,8 +151,10 @@ namespace BP.Shared.Views
 			recordedAudioWav = await getAudioFormatFromRecordingANDROID();
 #endif
 
-#region WASM
+			#region WASM
 #if __WASM__
+			FileSelectedEvent -= OnSongToRecognizeEvent;
+			FileSelectedEvent += OnSongToRecognizeEvent;
 			this.ExecuteJavascript("record_and_recognize();");
 			return;
 #endif

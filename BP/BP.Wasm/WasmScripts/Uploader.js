@@ -16,21 +16,24 @@
                 //this is the binary uploaded content
                 var data = readerEvent.target.result;
                 //invoke C# method to get audio binary data
-                //var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessUploadedPart");
-                var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:SelectFile");
-                let start = 100;
-                let step = 100000;
+                var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessFileByParts");
+
+                if (!data.startsWith('data:audio/wav;base64,')) {
+                    alert('Unsupported format.');
+                    return;
+                }
+
+                let start = 22; //audio metadata of uploaded file
+                let step = 500000;
                 let part = data.substring(start, start + step);
                 while (part !== "") {
-                    console.log(start);
-
-                    processPartFile(part);
+                    processPartFile(part, false);
                     start = start + step;
                     part = data.substring(start, start + step);
                 }
 
-                var processFullFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessFullSong");
-                processFullFile();
+                //full file uploaded -> process it
+                processPartFile("", true);
             }
         };
     };

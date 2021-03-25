@@ -1,8 +1,5 @@
 ﻿function record_and_recognize() {
-    var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:Recognize");
-
-    var audioCtx = new AudioContext({ sampleRate: 48000 });
-    var microphone_stream;
+    var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessFileByParts");
 
     // get microphone access
     if (navigator.getUserMedia) {
@@ -61,7 +58,7 @@
 
         }
 
-        mediaRecorder.start(2000);
+        mediaRecorder.start(4000);
         console.log('start recording');
     }
 
