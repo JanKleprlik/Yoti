@@ -20,6 +20,7 @@ using Database;
 using AudioProcessing.Recognizer;
 using Windows.UI.Xaml.Media.Animation;
 using System.Diagnostics;
+using System.Text;
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -153,9 +154,7 @@ namespace BP.Shared.Views
 
 			#region WASM
 #if __WASM__
-			FileSelectedEvent -= OnSongToRecognizeEvent;
-			FileSelectedEvent += OnSongToRecognizeEvent;
-			this.ExecuteJavascript("record_and_recognize();");
+			recognizeWASM();
 			return;
 #endif
 #endregion
@@ -180,10 +179,13 @@ namespace BP.Shared.Views
 #if __ANDROID__
 			pickAndUploadFileANDROIDAsync();
 #endif
+#if __WASM__
+			pickAndUploadFileWASM();
+#endif
 		}
 
-#region Upload new song 
-#if !__WASM__
+		#region Upload new song 
+
 		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
 			
@@ -197,12 +199,12 @@ namespace BP.Shared.Views
 				displayInfoText("Please enter song author.");
 				return;
 			}
+
 			if (uploadedSong == null)
 			{
 				displayInfoText("Please upload song file.");
 				return;
 			}
-
 
 			if (uploadedSong != null && NewSongNameTB.Text != "" && NewSongAuthorTB.Text != "")
 			{
@@ -218,7 +220,7 @@ namespace BP.Shared.Views
 
 		private void addNewSong(string songName, string songAuthor)
 		{
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");
+			Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");
 			
 			AudioProcessing.AudioFormats.IAudioFormat audioWav;
 			lock (uploadedSongLock)
@@ -229,13 +231,13 @@ namespace BP.Shared.Views
 			var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
 			uint songID = database.AddSong(songName, songAuthor);
 			database.AddFingerprint(tfps);
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
+			Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
 			recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
 			database.UpdateSearchData(songValueDatabase);
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
+			Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
 		}
 
-#endif
+
 #endregion
 
 		// UI Navigation
@@ -250,7 +252,6 @@ namespace BP.Shared.Views
 		}
 
 #region NOT WASM
-#if !__WASM__
 
 		private  void OpenNewSongForm_Click(object sender, RoutedEventArgs e)
 		{
@@ -261,7 +262,7 @@ namespace BP.Shared.Views
 		{
 			hideAddNewSongUI();
 		}
-#endif
+
 #endregion
 
 #region UI HELPERS
@@ -271,7 +272,6 @@ namespace BP.Shared.Views
 		}
 
 #region NOT WASM
-#if !__WASM__
 		private void hideAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Collapsed;
@@ -285,7 +285,7 @@ namespace BP.Shared.Views
 			OpenNewSongFormBtn.Visibility = Visibility.Collapsed;
 			ListSongsBtn.Visibility = Visibility.Collapsed;
 		}
-#endif
+
 #endregion
 
 

@@ -1,5 +1,5 @@
 ﻿function record_and_recognize() {
-    var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessFileByParts");
+    var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessEvent ");
 
     // get microphone access
     if (navigator.getUserMedia) {
@@ -19,7 +19,9 @@
         streamTrack.applyConstraints({
             channelCount: 1,
             sampleRate: 48000,
-            sampleSize: 16
+            sampleSize: 16,
+            noiseSuppression: false,
+            latency: 0.1
         });
         console.log(streamTrack);
         console.log(streamTrack.getSettings());
@@ -33,7 +35,6 @@
 
         mediaRecorder.ondataavailable = function (e) {
             if (e.data.size > 0) {
-                console.log('data available');
                 recordedChunks.push(e.data);
                 shouldStop = true;
             }
@@ -45,20 +46,20 @@
 
                 reader.onloadend = function () {
                     var base64data = reader.result;
-                    RecognizeMethod(base64data);
+                    RecognizeMethod(base64data, true);
                 }
             }
 
             //stop recording and give one more round to process last data collected
             if (shouldStop === true && stopped === false) {
-                console.log('stopping recording');
                 mediaRecorder.stop();
                 stopped = true;
+                console.log('stopped recording');
             }
 
         }
 
-        mediaRecorder.start(4000);
+        mediaRecorder.start(3000);
         console.log('start recording');
     }
 

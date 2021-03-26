@@ -183,15 +183,7 @@
 			Visibility="Collapsed"
 			Opacity="1.0"
 			/>
-		<wasm:Button
-			x:Name="tst"
-			Grid.Row="0"
-			Grid.Column="0"
-			Content="TEST"
-			VerticalAlignment="Top"
-			Click="{x:Bind UploadFileByParts}"
-			/>
-		
+
 		<!-- SECOND ROW -->
 		<Button
 			x:Name="RecognizeBtn"
@@ -244,35 +236,6 @@
 			Width="30"
 			Click="{x:Bind SettingsBtn_Click}"
 		>
-			<!--
-			<Button.Triggers>
-				<EventTrigger RoutedEvent="Loaded">
-					<BeginStoryboard>
-						<Storyboard x:Key="AnimateFlicker" RepeatBehavior="Forever">
-							<DoubleAnimation 
-								Storyboard.TargetProperty="Opacity"
-								From="0"
-								To="1"
-								AutoReverse="True"
-								BeginTime="0:0:1"
-								Duration="0:0:0.08" />
-							<DoubleAnimation 
-								Storyboard.TargetProperty="Opacity"
-								From="1"
-								To="1"
-								AutoReverse="True"
-								Duration="0:0:0.4" />
-							<DoubleAnimation 
-								Storyboard.TargetProperty="Opacity"
-								From="1"
-								To="0"
-								AutoReverse="True"
-								Duration="0:0:0.08" />
-						</Storyboard>
-					</BeginStoryboard>
-				</EventTrigger>
-			</Button.Triggers>
-			-->
 		</Button>
 
 		<local:SettingsDialog
@@ -325,7 +288,7 @@
 
 		<!-- THIRD ROW -->
 
-		<not_wasm:Button
+		<Button
 			x:Name="OpenNewSongFormBtn"
 			Grid.Row="2"
 			Grid.Column="1"
@@ -346,7 +309,7 @@
 			Click="{x:Bind ListSongsBtn_Click}"
 			/>
 
-		<not_wasm:Grid
+		<Grid
 			x:Name="UploadGrid"
 			Grid.Row="2"
 			Grid.Column="1"
@@ -413,6 +376,6 @@
 				BorderBrush="{StaticResource CancelColor}"
 				Click="{x:Bind CancelNewSong_Click}"
 				/>
-		</not_wasm:Grid>
+		</Grid>
 	</Grid>
 </Page>
