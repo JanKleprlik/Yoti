@@ -43,14 +43,14 @@ namespace BP.Shared.Views
 		}
 
 
-		private void OnSongToRecognizeEvent(object sender, WasmSongEventHandlerArgs e)
+		private async void OnSongToRecognizeEvent(object sender, WasmSongEventHandlerArgs e)
 		{
 			if (e.isDone)
 			{
 				WasmSongEvent -= OnSongToRecognizeEvent;
 				
 				var binData = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want
-				var recordedAudioWav = new WavFormat(binData);
+				IAudioFormat recordedAudioWav = new WavFormat(binData);
 
 				Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
 				Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
@@ -59,6 +59,8 @@ namespace BP.Shared.Views
 
 				uint? ID = recognizer.RecognizeSong(recordedAudioWav, songValueDatabase);
 				Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
+				await WriteRecognitionResults(ID);
+
 				WasmSongEvent -= OnSongToRecognizeEvent;
 			}
 			else

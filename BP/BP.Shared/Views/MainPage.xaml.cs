@@ -169,6 +169,8 @@ namespace BP.Shared.Views
 
 			Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
 
+			await WriteRecognitionResults(ID);
+
 		}
 
 		private async void UploadNewSongBtn_Click(object sender, RoutedEventArgs e)
@@ -217,6 +219,15 @@ namespace BP.Shared.Views
 			}
 			
 		}
+
+		private async Task WriteRecognitionResults(uint? ID)
+		{
+			await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+			{
+				displayInfoText($"Song ID: {ID}");
+			});
+		}
+
 
 		private void addNewSong(string songName, string songAuthor)
 		{
