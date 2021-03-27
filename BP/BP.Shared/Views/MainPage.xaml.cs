@@ -32,6 +32,7 @@ using Windows.UI.Core;
 #endif
 
 #if __ANDROID__
+using System.Diagnostics;
 using Android.Media;
 using Android.Content.PM;
 using Xamarin.Essentials;
@@ -159,15 +160,15 @@ namespace BP.Shared.Views
 #endif
 #endregion
 
-			Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
-			Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
-			Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
-			Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
+			System.Diagnostics.Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
 
 
 			uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, songValueDatabase));
 
-			Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
 
 			await WriteRecognitionResults(ID);
 
@@ -231,7 +232,7 @@ namespace BP.Shared.Views
 
 		private void addNewSong(string songName, string songAuthor)
 		{
-			Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");
 			
 			AudioProcessing.AudioFormats.IAudioFormat audioWav;
 			lock (uploadedSongLock)
@@ -242,10 +243,10 @@ namespace BP.Shared.Views
 			var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
 			uint songID = database.AddSong(songName, songAuthor);
 			database.AddFingerprint(tfps);
-			Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
 			recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
 			database.UpdateSearchData(songValueDatabase);
-			Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
 		}
 
 
