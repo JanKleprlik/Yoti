@@ -8,10 +8,7 @@ namespace BP.Shared.Models
 	{
 		public Settings()
 		{
-			ConstQAlgorithm = false;
-			DetailedInfo = false;
-			UseMicrophone = false;
-			RecordingLength = 3;
+			SetToDefault();
 		}
 
 		/// <summary>
@@ -38,16 +35,40 @@ namespace BP.Shared.Models
 
 		/// <summary>
 		/// The time for which the recording will be recorded.<br/>
+		/// Minimum 3 sec <br/>
+		/// Maximum 10 sec <br/>
 		/// Default: 3 sec
 		/// </summary>
 		public int RecordingLength { 
 			get	{
-				return RecordingLength * 1000;
+				return this.recordingLength;
 			}
 			set
 			{
-				RecordingLength = value;
+				this.recordingLength = Math.Max(Math.Min(value, 10), 3); //set min 3, max 10 secs
 			}
+		}
+		/// <summary>
+		/// Backing field
+		/// </summary>
+		private int recordingLength;
+
+		public void SetToDefault()
+		{
+			ConstQAlgorithm = false;
+			DetailedInfo = false;
+			UseMicrophone = false;
+			RecordingLength = 3;
+		}
+
+		public override string ToString()
+		{
+			string text = "SETTINGS: \n" +
+				$"ConstQAlgorithm: {ConstQAlgorithm}\n" +
+				$"DetailedInfo: {DetailedInfo}\n" +
+				$"UseMicrophone: {UseMicrophone}\n" +
+				$"RecordingLength: {RecordingLength}";
+			return text;
 		}
 	}
 }
