@@ -21,6 +21,7 @@ using AudioProcessing.Recognizer;
 using Windows.UI.Xaml.Media.Animation;
 using System.Diagnostics;
 using System.Text;
+using BP.Shared.Models;
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -52,6 +53,7 @@ namespace BP.Shared.Views
 
 		private AudioRecorder.Recorder recorder;
 		private AudioRecognizer recognizer;
+		private Settings settings;
 
 		private object uploadedSongLock = new object();
 		private byte[] uploadedSong { get; set; }
@@ -60,18 +62,27 @@ namespace BP.Shared.Views
 		private Dictionary<uint, List<ulong>> songValueDatabase;
 
 		private Storyboard flickerAnimation;
-
+		private SettingsDialog settingsDialog;
 		public MainPage()
         {
             this.InitializeComponent();
 
-			recorder = new Shared.AudioRecorder.Recorder();
+			recorder = new AudioRecorder.Recorder();
 			database = new Database.Database();
 			recognizer = new AudioRecognizer();
+			settings = new Settings();
+
 			songValueDatabase = database.GetSearchData();
+			
 
 			setupFlickerAnimation();
+			setupSettingsDialog(settings);
 
+		}
+
+		public void TestMethod(object sender, RoutedEventArgs e)
+		{
+			Debug.WriteLine(settings.ToString());
 		}
 
 		private void setupFlickerAnimation()
@@ -101,19 +112,25 @@ namespace BP.Shared.Views
 #endif
 
 		}
+		private void setupSettingsDialog(Settings settings)
+		{
+			settingsDialog = new SettingsDialog(settings);
+			settingsDialog.Visibility = Visibility.Collapsed;
+			Grid.SetRowSpan(settingsDialog, 3);
+			Grid.SetColumnSpan(settingsDialog, 3);			
+		}
 
 		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
+#if !__WASM__
 			//start UI recording response
 			flickerIcon.Visibility = Visibility.Visible;
 			flickerAnimation.Begin();
 			RecognizeBtn.IsEnabled = false;
 
 			//record audio
-			InformationTextBlk.Text = "BEFORE rec.";
+			displayInfoText("Recording...");
 			await Task.Run(recorder.RecordAudio);
-
-			InformationTextBlk.Text = "AFTER rec.";
 
 			//Stop UI recording response
 			flickerAnimation.Pause();
@@ -124,13 +141,14 @@ namespace BP.Shared.Views
 			
 			//start UI recognition response
 			RecognizeProgressBar.Visibility = Visibility.Visible;
-
+#endif
 			//recognize song
-			await Task.Run( () => recognizeBtn_Click(sender, e));
-
+			await Task.Run( () => RecognizeFromRecording());
+#if !__WASM__
 			//stop UI recognition response
 			RecognizeBtn.IsEnabled = true;
 			RecognizeProgressBar.Visibility = Visibility.Collapsed;
+#endif
 		}
 
         private void playBtn_Click(object sender, RoutedEventArgs e)
@@ -143,7 +161,7 @@ namespace BP.Shared.Views
 #endif
 		}
 
-		private async Task recognizeBtn_Click(object sender, RoutedEventArgs e)
+		private async Task RecognizeFromRecording()
 		{
 			AudioProcessing.AudioFormats.IAudioFormat recordedAudioWav;
 #if NETFX_CORE
@@ -153,23 +171,14 @@ namespace BP.Shared.Views
 			recordedAudioWav = await getAudioFormatFromRecordingANDROID();
 #endif
 
-			#region WASM
+#region WASM
 #if __WASM__
 			recognizeWASM();
 			return;
 #endif
 #endregion
 
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Channels: " + recordedAudioWav.Channels);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
-			System.Diagnostics.Debug.WriteLine("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
-
-
 			uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, songValueDatabase));
-
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] ID of recognized song is { ID }");
-
 			await WriteRecognitionResults(ID);
 
 		}
@@ -187,7 +196,7 @@ namespace BP.Shared.Views
 #endif
 		}
 
-		#region Upload new song 
+#region Upload new song 
 
 		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -255,8 +264,8 @@ namespace BP.Shared.Views
 		// UI Navigation
 		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
 		{
-			settingsContentDialog.Visibility = Visibility.Visible;
-			ContentDialogResult result = await settingsContentDialog.ShowAsync();
+			settingsDialog.Visibility = Visibility.Visible;
+			ContentDialogResult result = await settingsDialog.ShowAsync();
 		}
 		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{

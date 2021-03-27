@@ -20,7 +20,6 @@ namespace BP.Shared.Views
 		#region WASM
 #if __WASM__
 		private static StringBuilder stringBuilder;
-
 		private void recognizeWASM()
 		{
 			//can add if to swithc to recording if its set in settings
@@ -31,7 +30,7 @@ namespace BP.Shared.Views
 			WasmSongEvent -= OnSongToRecognizeEvent;
 			WasmSongEvent += OnSongToRecognizeEvent;
 			stringBuilder = new StringBuilder();
-			WebAssemblyRuntime.InvokeJS("pick_and_upload_file_by_parts(5, 22);");
+			WebAssemblyRuntime.InvokeJS("pick_and_upload_file_by_parts(5, 22);"); //(size_limit, js metadata offset)
 		}
 
 		private async Task pickAndUploadFileWASM()
@@ -39,7 +38,7 @@ namespace BP.Shared.Views
 			WasmSongEvent -= OnNewSongUploadedEvent;
 			WasmSongEvent += OnNewSongUploadedEvent;
 			stringBuilder = new StringBuilder();
-			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);");
+			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);"); //(size_limit, js metadata offset)
 		}
 
 
@@ -75,14 +74,11 @@ namespace BP.Shared.Views
 		{
 			if (e.isDone)
 			{
-				Stopwatch sw = new Stopwatch();
 				WasmSongEvent -= OnNewSongUploadedEvent;
 
-				Debug.WriteLine($"Full song uploaded:");
-				sw.Start();
+				Debug.WriteLine($"Full song uploaded, now processing uploaded data...");
 				uploadedSong = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want
-				sw.Stop();
-				Debug.WriteLine($"str->byte : {sw.ElapsedMilliseconds}");
+
 			}
 			else
 			{

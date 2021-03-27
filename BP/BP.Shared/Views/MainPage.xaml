@@ -183,7 +183,12 @@
 			Visibility="Collapsed"
 			Opacity="1.0"
 			/>
-
+		<Button
+			x:Name="TestButton"
+			Content="TEST"
+			Click="{x:Bind TestMethod}"
+			/>
+		
 		<!-- SECOND ROW -->
 		<Button
 			x:Name="RecognizeBtn"
@@ -238,12 +243,12 @@
 		>
 		</Button>
 
-		<local:SettingsDialog
+		<!--<local:SettingsDialog
 			Grid.RowSpan="3"
 			Grid.ColumnSpan="3"
 			Visibility="Collapsed"
 			x:Name="settingsContentDialog"
-			/>
+			/>-->
 		
 		<StackPanel
 			x:Name="ResultStackPanel"

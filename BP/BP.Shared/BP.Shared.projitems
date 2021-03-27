@@ -20,6 +20,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Parameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Recorder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\SettingsModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BaseViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\SettingsViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>

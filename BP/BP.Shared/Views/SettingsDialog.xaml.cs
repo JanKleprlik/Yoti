@@ -12,34 +12,89 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
+using BP.Shared.Models;
+using BP.Shared.ViewModels;
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace BP.Shared.Views
 {
 	public sealed partial class SettingsDialog : ContentDialog
 	{
-		public SettingsDialog()
+		private Settings settings;
+		private SettingsViewModel ViewModel;
+		public SettingsDialog(Settings settings)
 		{
 			this.InitializeComponent();
+			ViewModel = new SettingsViewModel(settings);
+			this.settings = settings;
 		}
 
 		private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
+			//do nothing
 		}
 
 		private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
+			//reset settins to default
+			settings.SetToDefault();
+			ViewModel.Settings = settings;
+
 		}
 
-		private void DebugPrint_Checked(object sender, RoutedEventArgs e)
+		#region WITHOUT MVVM
+		/*
+		private void ConstQAlg_Switched(object sender, RoutedEventArgs e)
 		{
-
+			ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+			if (toggleSwitch != null)
+			{
+				settings.ConstQAlgorithm = toggleSwitch.IsOn;
+				System.Diagnostics.Debug.WriteLine($"Const Q alg: {settings.ConstQAlgorithm}");
+				
+			}
 		}
 
-		private void DebugPrint_Unchecked(object sender, RoutedEventArgs e)
+		private void DetailedInfo_Switched(object sender, RoutedEventArgs e)
 		{
-
+			ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+			if (toggleSwitch != null)
+			{
+				settings.DetailedInfo = toggleSwitch.IsOn;
+				System.Diagnostics.Debug.WriteLine($"Detailed info: {settings.DetailedInfo}");
+			}
 		}
+
+		private void RecordingLength_Changed(object sender, RangeBaseValueChangedEventArgs e)
+		{
+			Slider slider = sender as Slider;
+			if (slider != null)
+			{
+				//settings.RecordingLength = Convert.ToInt32(slider.Value);
+				//System.Diagnostics.Debug.WriteLine($"Recording length: {settings.RecordingLength}");
+				System.Diagnostics.Debug.WriteLine($"Recording length: {slider.Value}");
+			}
+		}
+
+		private void setConstQAlgorithm(bool value) => settings.ConstQAlgorithm= value;
+		private void setDetailedInfo(bool value) => settings.DetailedInfo = value;
+		private void setMicrophoneUse(bool value) => settings.UseMicrophone = value;
+		private void setRecordingLength(double value) => settings.RecordingLength = Convert.ToInt32(value);
+
+		#region WASM
+#if __WASM__
+		private void MicrophoneUse_Switched(object sender, RoutedEventArgs e)
+		{
+			ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+			if (toggleSwitch != null)
+			{	
+				settings.UseMicrophone = toggleSwitch.IsOn;
+				System.Diagnostics.Debug.WriteLine($"Use microphone: {toggleSwitch.IsOn}");
+			}
+		}
+#endif
+		#endregion
+		*/
+		#endregion
 	}
 }

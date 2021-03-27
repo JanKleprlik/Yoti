@@ -5,13 +5,14 @@
     xmlns:local="using:BP.Shared.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
+	xmlns:wasm="http://uno.ui/wasm"
+    mc:Ignorable="d wasm"
 	
     Title="Settings"
     PrimaryButtonText="Done"
     SecondaryButtonText="Default"
-    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick"
+    PrimaryButtonClick="{x:Bind ContentDialog_PrimaryButtonClick}"
+    SecondaryButtonClick="{x:Bind ContentDialog_SecondaryButtonClick}"
 	
 	CornerRadius="25"
 	BorderBrush="{StaticResource PrimaryLightColor}"
@@ -41,13 +42,27 @@
 			x:Name="ConstQAlg"
 			OnContent="Constant Q algorithm"
 			OffContent="Constant Q algorithm"
-			IsOn="False"
+			IsOn="{x:Bind ViewModel.ConstQAlg, Mode=TwoWay}"
 			/>
 		<ToggleSwitch 
-			x:Name="DebugPrint"
-			OnContent="Debug printing"
-			OffContent="Debug printing"
-			IsOn="False"
+			x:Name="DetailedInfo"
+			OnContent="Detailed info"
+			OffContent="Detailed info"
+			IsOn="{x:Bind ViewModel.DetailedInfo, Mode=TwoWay}"
 			/>
+		<Slider
+			x:Name="RecordingLength"
+			Minimum="3"
+			Maximum="10"
+			Header="Length of recording"
+			Value="{x:Bind ViewModel.RecordingLength, Mode=TwoWay}"
+			/>
+		<wasm:ToggleSwitch
+			x:Name="MicrophoneUse"
+			OnContent="Use microphone"
+			OffContent="Use microphone"
+			IsOn="{x:Bind ViewModel.UseMicrophone, Mode=TwoWay}"
+			/>
+
 	</StackPanel>
 </ContentDialog>
