@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using SQLite;
+using Windows.UI.Xaml.Data;
 
 namespace Database
 {
+	[Bindable]
 	[Table("Songs")]
 	public class Song
 	{

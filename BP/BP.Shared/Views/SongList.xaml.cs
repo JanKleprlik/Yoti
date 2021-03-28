@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.ViewManagement;
 using Database;
+using System.Collections.ObjectModel;
 
 namespace BP.Shared.Views
 {
@@ -22,31 +23,30 @@ namespace BP.Shared.Views
 	/// </summary>
 	public sealed partial class SongList : Page
 	{
+		private ObservableCollection<Song> songsList;
 		public SongList()
 		{
 			this.InitializeComponent();
+			songsList = new ObservableCollection<Song>();
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			if (e.Parameter is List<Song>)
 			{
-				updateSongList(e.Parameter as List<Song>);
+				var songs = e.Parameter as List<Song>;
+
+#if __WASM__ || __ANDROID__
+				foreach (var song in songs)
+				{
+					songsList.Add(song);
+				}
+#else
+				songsList = new ObservableCollection<Song>(songs);
+#endif
 			}
 
 			base.OnNavigatedTo(e);
-		}
-
-		private void updateSongList(List<Song> songs)
-		{
-			List<string> songNames = new List<string>();
-			foreach (Song song in songs)
-			{
-				songNames.Add(song.Name);
-				Console.Out.WriteLine($"[DEBUG] {song.Name}");
-			}
-
-			songList.ItemsSource = songNames;
 		}
 
 		private void BackBtn_Click(object sender, RoutedEventArgs e)

@@ -271,7 +271,7 @@ namespace BP.Shared.Views
 			Frame.Navigate(typeof(SongList), database.GetSongs());
 		}
 
-#region NOT WASM
+
 
 		private  void OpenNewSongForm_Click(object sender, RoutedEventArgs e)
 		{
@@ -283,15 +283,14 @@ namespace BP.Shared.Views
 			hideAddNewSongUI();
 		}
 
-#endregion
 
 #region UI HELPERS
+
 		private void displayInfoText(string text)
 		{
 			InformationTextBlk.Text = text;
 		}
 
-#region NOT WASM
 		private void hideAddNewSongUI()
 		{
 			UploadGrid.Visibility = Visibility.Collapsed;
@@ -306,7 +305,6 @@ namespace BP.Shared.Views
 			ListSongsBtn.Visibility = Visibility.Collapsed;
 		}
 
-#endregion
 
 
 #endregion
