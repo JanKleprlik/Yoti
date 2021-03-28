@@ -41,17 +41,21 @@ namespace BP.Shared.AudioRecorder
 #if __ANDROID__
 		private byte[] buffer;
 		private AudioRecord rec;
-		private const int bufferLimit = 480000;
+		private int bufferLimit = 480000;
 #endif
 		#endregion
 
-		public async Task RecordAudio()
+		public async Task RecordAudio(int recordingLength = 3)
 		{
+#if __ANDROID__
+			bufferLimit = getBufferLimitFromTime(recordingLength);
+#endif
+
 			await StartRecording();
 
 #if NETFX_CORE
-			//record audio for 3000 seconds
-			await Task.Delay(3000);
+			//record audio for recordingLength seconds
+			await Task.Delay(recordingLength * 1000);
 #endif
 
 			await StopRecording();
@@ -251,11 +255,11 @@ namespace BP.Shared.AudioRecorder
 			}
 		}
 #endif
-#endregion
+		#endregion
 
 
 		// helper functons
-#region UWP - helper functions
+		#region UWP - helper functions
 #if NETFX_CORE
 
 		private async Task setupRecording()
@@ -298,10 +302,16 @@ namespace BP.Shared.AudioRecorder
 		}
 
 #endif
-#endregion
+		#endregion
 
-#region ANDROID - helper functions
+		#region ANDROID - helper functions
 #if __ANDROID__
+		private int getBufferLimitFromTime(int recordingLength)
+		{
+			//seconds * (2 bytes per 1 sample) * samplingRate
+			return recordingLength * 2 * 48000;
+		}
+
 		private async Task<bool> getMicPermission()
 		{
 			CancellationTokenSource source = new CancellationTokenSource();

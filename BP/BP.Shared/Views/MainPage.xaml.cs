@@ -129,7 +129,7 @@ namespace BP.Shared.Views
 
 			//record audio
 			displayInfoText("Recording...");
-			await Task.Run(recorder.RecordAudio);
+			await Task.Run( () => recorder.RecordAudio(settings.RecordingLength));
 
 			//Stop UI recording response
 			flickerAnimation.Pause();
