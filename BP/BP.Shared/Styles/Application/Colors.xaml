@@ -16,5 +16,6 @@
 	<Color x:Key="SecondaryHighlightedColor">#00e676</Color>
 	<Color x:Key="SecondaryHighlightedDarkColor">#00b85e</Color>
 	<Color x:Key="CancelColor">red</Color>
+	<Color x:Key="White">white</Color>
 
 </ResourceDictionary>
