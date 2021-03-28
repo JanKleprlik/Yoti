@@ -12,7 +12,7 @@
 	Background="{StaticResource PrimaryDarkColor}"
 	NavigationCacheMode="Required"
 	>
-
+	
 	<Grid x:Name="MainGrid">
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup>
@@ -155,7 +155,7 @@
 			<ColumnDefinition Width="6*"/>
 			<ColumnDefinition Width="1*"/>
 		</Grid.ColumnDefinitions>
-		
+
 		<!-- FIRST ROW -->
 		<TextBlock
 			x:Name="Loggo"
@@ -188,7 +188,7 @@
 			Content="TEST"
 			Click="{x:Bind TestMethod}"
 			/>
-		
+
 		<!-- SECOND ROW -->
 		<Button
 			x:Name="RecognizeBtn"
@@ -213,9 +213,9 @@
 			Foreground="{StaticResource SecondaryHighlightedColor}"
 			Visibility="Collapsed"
 			>
-			
+
 		</ProgressBar>
-		
+
 		<Button
 			x:Name="PlayBtn"
 			Style="{StaticResource IconStyle}"
@@ -240,16 +240,9 @@
 			Height="30"
 			Width="30"
 			Click="{x:Bind SettingsBtn_Click}"
-		>
-		</Button>
+		/>
 
-		<!--<local:SettingsDialog
-			Grid.RowSpan="3"
-			Grid.ColumnSpan="3"
-			Visibility="Collapsed"
-			x:Name="settingsContentDialog"
-			/>-->
-		
+
 		<StackPanel
 			x:Name="ResultStackPanel"
 			Orientation="Vertical"
@@ -383,4 +376,6 @@
 				/>
 		</Grid>
 	</Grid>
+
+
 </Page>

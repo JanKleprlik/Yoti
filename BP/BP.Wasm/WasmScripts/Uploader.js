@@ -3,7 +3,9 @@
     var input = document.createElement('input');
     input.type = 'file';
     input.accept = '.wav';
-    input.onchange = e => {
+    //on file selected
+    input.oninput = e => {
+
         var file = e.target.files[0];
         //size cannot be bigger than 50  Mbs
         if ((file.size / 1024 / 1024) > limit) {
@@ -28,7 +30,6 @@
                 let start = initial_start;
                 let step = 500000;
                 let part = data.substring(start, start + step);
-                console.log(data.substring(start, 200));
                 while (part !== "") {
                     processPartFile(part, false);
                     start = start + step;
@@ -41,5 +42,10 @@
             }
         };
     };
+
+    //on canceled
+    input.oncancel = e => {
+        htmlElement.dispatchEvent(new Event("CancelEvent"));
+    }
     input.click();
 }

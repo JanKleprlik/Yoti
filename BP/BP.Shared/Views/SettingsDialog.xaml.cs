@@ -29,11 +29,6 @@ namespace BP.Shared.Views
 			this.settings = settings;
 		}
 
-		private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-		{
-			//do nothing
-		}
-
 		private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
 			//reset settins to default

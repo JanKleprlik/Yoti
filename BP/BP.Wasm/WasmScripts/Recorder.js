@@ -1,4 +1,4 @@
-﻿function record_and_recognize() {
+﻿function record_and_recognize(recordingLength) {
     var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessEvent ");
 
     // get microphone access
@@ -46,7 +46,8 @@
 
                 reader.onloadend = function () {
                     var base64data = reader.result;
-                    RecognizeMethod(base64data, true);
+                    RecognizeMethod(base64data, false); //send data
+                    RecognizeMethod(base64data, true); //process data
                 }
             }
 
@@ -59,7 +60,7 @@
 
         }
 
-        mediaRecorder.start(3000);
+        mediaRecorder.start(recordingLength);
         console.log('start recording');
     }
 

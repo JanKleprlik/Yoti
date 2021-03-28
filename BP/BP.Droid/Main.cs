@@ -25,6 +25,7 @@ namespace BP.Droid
 		public Application(IntPtr javaReference, JniHandleOwnership transfer)
 			: base(() => new App(), javaReference, transfer)
 		{
+			Uno.UI.FeatureConfiguration.Popup.UseNativePopup = false;
 			ConfigureUniversalImageLoader();
 		}
 

@@ -36,7 +36,7 @@ namespace BP.Shared.Models
 		/// <summary>
 		/// The time for which the recording will be recorded.<br/>
 		/// Minimum 3 sec <br/>
-		/// Maximum 10 sec <br/>
+		/// Maximum 8 sec <br/>
 		/// Default: 3 sec
 		/// </summary>
 		public int RecordingLength { 
@@ -45,7 +45,7 @@ namespace BP.Shared.Models
 			}
 			set
 			{
-				this.recordingLength = Math.Max(Math.Min(value, 10), 3); //set min 3, max 10 secs
+				this.recordingLength = Math.Max(Math.Min(value, 8), 3); //set min 3, max 10 secs
 			}
 		}
 		/// <summary>

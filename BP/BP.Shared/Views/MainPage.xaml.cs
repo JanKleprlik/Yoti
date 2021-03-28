@@ -77,7 +77,6 @@ namespace BP.Shared.Views
 
 			setupFlickerAnimation();
 			setupSettingsDialog(settings);
-
 		}
 
 		public void TestMethod(object sender, RoutedEventArgs e)

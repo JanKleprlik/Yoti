@@ -46,8 +46,12 @@ namespace BP.Shared.ViewModels
 			{
 				Settings.RecordingLength = value;
 				OnPropertyChanged();
+				OnPropertyChanged(nameof(RecordingLengthText));
 			}
 		}
+
+		public string RecordingLengthText => $"Recording length: {RecordingLength} sec";
+
 
 		public bool UseMicrophone
 		{

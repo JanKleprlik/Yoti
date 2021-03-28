@@ -6,16 +6,17 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:wasm="http://uno.ui/wasm"
-    mc:Ignorable="d wasm"
+	xmlns:android="http://uno.ui/android"
+    mc:Ignorable="d wasm android"
 	
     Title="Settings"
     PrimaryButtonText="Done"
     SecondaryButtonText="Default"
-    PrimaryButtonClick="{x:Bind ContentDialog_PrimaryButtonClick}"
     SecondaryButtonClick="{x:Bind ContentDialog_SecondaryButtonClick}"
-	
 	CornerRadius="25"
 	BorderBrush="{StaticResource PrimaryLightColor}"
+	BorderThickness="5"
+	
 	>
 	<ContentDialog.Resources>
 		<Style x:Name="DialogOKButtonStyle" TargetType="Button">
@@ -27,6 +28,9 @@
 			<Setter Property="Template" Value="{StaticResource NonexpandingCancelButton}"/>
 			<Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
 			<Setter Property="Margin" Value="10"/>
+		</Style>
+		<Style TargetType="ToggleSwitch">
+			<Setter Property="Foreground" Value="{StaticResource White}"/>
 		</Style>
 	</ContentDialog.Resources>
 
@@ -53,16 +57,9 @@
 		<Slider
 			x:Name="RecordingLength"
 			Minimum="3"
-			Maximum="10"
-			Header="Length of recording"
+			Maximum="8"
+			Header="{x:Bind SettingsViewModel.RecordingLengthText, Mode=OneWay}"
 			Value="{x:Bind SettingsViewModel.RecordingLength, Mode=TwoWay}"
 			/>
-		<wasm:ToggleSwitch
-			x:Name="MicrophoneUse"
-			OnContent="Use microphone"
-			OffContent="Use microphone"
-			IsOn="{x:Bind SettingsViewModel.UseMicrophone, Mode=TwoWay}"
-			/>
-
 	</StackPanel>
 </ContentDialog>
