@@ -82,7 +82,7 @@ namespace BP.Shared.Views
 
 		public void TestMethod(object sender, RoutedEventArgs e)
 		{
-			Debug.WriteLine(settings.ToString());
+			System.Diagnostics.Debug.WriteLine(settings.ToString());
 		}
 
 		private void setupFlickerAnimation()

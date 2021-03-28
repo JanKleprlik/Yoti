@@ -21,11 +21,11 @@ namespace BP.Shared.Views
 	public sealed partial class SettingsDialog : ContentDialog
 	{
 		private Settings settings;
-		private SettingsViewModel ViewModel;
+		private SettingsViewModel SettingsViewModel;
 		public SettingsDialog(Settings settings)
 		{
 			this.InitializeComponent();
-			ViewModel = new SettingsViewModel(settings);
+			SettingsViewModel = new SettingsViewModel(settings);
 			this.settings = settings;
 		}
 
@@ -38,7 +38,7 @@ namespace BP.Shared.Views
 		{
 			//reset settins to default
 			settings.SetToDefault();
-			ViewModel.Settings = settings;
+			SettingsViewModel.Settings = settings;
 
 		}
 

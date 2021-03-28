@@ -22,15 +22,19 @@ namespace BP.Shared.Views
 		private static StringBuilder stringBuilder;
 		private void recognizeWASM()
 		{
-			//can add if to swithc to recording if its set in settings
-			//WasmSongEvent -= OnSongToRecognizeEvent;
-			//WasmSongEvent += OnSongToRecognizeEvent;
-			//WebAssemblyRuntime.InvokeJS("record_and_recognize();");
-
-			WasmSongEvent -= OnSongToRecognizeEvent;
-			WasmSongEvent += OnSongToRecognizeEvent;
-			stringBuilder = new StringBuilder();
-			WebAssemblyRuntime.InvokeJS("pick_and_upload_file_by_parts(5, 22);"); //(size_limit, js metadata offset)
+			if (settings.UseMicrophone)
+			{
+				WasmSongEvent -= OnSongToRecognizeEvent;
+				WasmSongEvent += OnSongToRecognizeEvent;
+				WebAssemblyRuntime.InvokeJS("record_and_recognize();");
+			}
+			else
+			{
+				WasmSongEvent -= OnSongToRecognizeEvent;
+				WasmSongEvent += OnSongToRecognizeEvent;
+				stringBuilder = new StringBuilder();
+				WebAssemblyRuntime.InvokeJS("pick_and_upload_file_by_parts(5, 22);"); //(size_limit, js metadata offset)
+			}
 		}
 
 		private async Task pickAndUploadFileWASM()
