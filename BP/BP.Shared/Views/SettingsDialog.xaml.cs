@@ -20,21 +20,16 @@ namespace BP.Shared.Views
 {
 	public sealed partial class SettingsDialog : ContentDialog
 	{
-		private Settings settings;
 		private SettingsViewModel SettingsViewModel;
-		public SettingsDialog(Settings settings)
+		public SettingsDialog(SettingsViewModel settingsVM)
 		{
 			this.InitializeComponent();
-			SettingsViewModel = new SettingsViewModel(settings);
-			this.settings = settings;
+			SettingsViewModel = settingsVM;
 		}
 
 		private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
 		{
-			//reset settins to default
-			settings.SetToDefault();
-			SettingsViewModel.Settings = settings;
-
+			SettingsViewModel.Reset();
 		}
 
 		#region WITHOUT MVVM

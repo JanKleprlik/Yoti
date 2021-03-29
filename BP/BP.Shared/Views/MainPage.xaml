@@ -8,7 +8,8 @@
 	xmlns:wasm="http://uno.ui/wasm"
 	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:not_android="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    mc:Ignorable="d wasm"
+	xmlns:android="http://uno.ui/android"
+    mc:Ignorable="d wasm android"
 	Background="{StaticResource PrimaryDarkColor}"
 	NavigationCacheMode="Required"
 	>
@@ -241,13 +242,17 @@
 			Width="30"
 			Click="{x:Bind SettingsBtn_Click}"
 		/>
-
-
+		<ScrollViewer
+			Grid.Row="1"
+			Grid.Column="1"
+			HorizontalAlignment="Center"
+			VerticalAlignment="Center"
+			VerticalScrollBarVisibility="Auto"
+			Margin="0,100,0,0"
+			>
 		<StackPanel
 			x:Name="ResultStackPanel"
 			Orientation="Vertical"
-			Grid.Row="1"
-			Grid.Column="1"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			>
@@ -266,24 +271,23 @@
 			>
 
 			</ProgressBar>
-			<TextBlock
+				<TextBlock
 				x:Name="InformationTextBlk"
 				not_android:FontSize="30"
 				TextWrapping="NoWrap"
-				Text="Info Text"
+				Text="You can start recording"
 				/>
-			<TextBlock
-				Text="RESULT SONG"
-				/>
-			<TextBlock
-				Text="DEBUG INFO"
-				/>
-			<TextBlock
-				Text="RESULT SONG"
-				/>
-
+				<TextBlock
+					x:Name="outputTextBox"
+					Width="Auto"
+					Height="Auto"
+					android:FontSize="10"
+					TextWrapping="Wrap"
+					Visibility="{x:Bind settingsViewModel.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+					
+					/>
 		</StackPanel>
-
+		</ScrollViewer>
 		<!-- THIRD ROW -->
 
 		<Button

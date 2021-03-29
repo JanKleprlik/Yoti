@@ -10,6 +10,13 @@ namespace AudioProcessing.Recognizer
 {
 	public partial class AudioRecognizer
 	{
+		private TextWriter output;
+
+		public AudioRecognizer(TextWriter textWriter)
+		{
+			output = textWriter;
+		}
+
 		public List<TimeFrequencyPoint> GetTimeFrequencyPoints(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
@@ -88,7 +95,7 @@ namespace AudioProcessing.Recognizer
 			}
 		}
 
-		public static uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints)
+		public uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints)
 		{
 			//[address;(AbsAnchorTimes)]
 			Dictionary<uint, List<uint>> recordAddresses = CreateRecordAddresses(timeFrequencyPoints);
@@ -112,7 +119,7 @@ namespace AudioProcessing.Recognizer
 		/// <param name="deltas">[songID, num of time coherent notes]</param>
 		/// <param name="totalNotes">total number of notes in recording</param>
 		/// <returns></returns>
-		private static uint? MaximizeTimeCoherency(Dictionary<uint, int> deltas, int totalNotes)
+		private uint? MaximizeTimeCoherency(Dictionary<uint, int> deltas, int totalNotes)
 		{
 			uint? songID = null;
 			int longestCoherency = 0;
@@ -120,6 +127,7 @@ namespace AudioProcessing.Recognizer
 			foreach (var pair in deltas)
 			{
 				System.Diagnostics.Debug.WriteLine($"   Song ID: {pair.Key} has {pair.Value} coherent notes which is {(double)pair.Value / totalNotes * 100:##.###} %");
+				output.WriteLineAsync($"   Song ID: {pair.Key} has {pair.Value} coherent notes which is {(double)pair.Value / totalNotes * 100:##.###} %");
 				if (pair.Value > longestCoherency && pair.Value > Parameters.CoherentNotesCoef * totalNotes)
 				{
 					longestCoherency = pair.Value;
@@ -128,6 +136,7 @@ namespace AudioProcessing.Recognizer
 			}
 			if (songID != null)
 				System.Diagnostics.Debug.WriteLine($"\n   Song ID: {songID} has {longestCoherency} coherent notes which is {(double)longestCoherency / totalNotes * 100:##.###} %");
+				output.WriteLineAsync($"\n   Song ID: {songID} has {longestCoherency} coherent notes which is {(double)longestCoherency / totalNotes * 100:##.###} %");
 			return songID;
 		}
 
@@ -228,7 +237,7 @@ namespace AudioProcessing.Recognizer
 		/// <param name="recordAddresses">Addresses in recording</param>
 		/// <param name="quantities">occurrences of songvalues common with recording</param>
 		/// <returns>[songID, [address, (absSongAnchorTime)]]</returns>
-		private static Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordAddresses, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
+		private Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordAddresses, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
 		{
 			//[songID, [address, (absSongAnchorTime)]]
 			Dictionary<uint, Dictionary<uint, List<uint>>> res = new Dictionary<uint, Dictionary<uint, List<uint>>>();
@@ -278,6 +287,7 @@ namespace AudioProcessing.Recognizer
 				int TGZs = commonTGZAmount[songID];
 				//NOTE: result can be more than 100% (some parts of the songs may repeat - refrains)
 				System.Diagnostics.Debug.WriteLine($"   Song ID: {songID} has {couples} couples where {TGZs} are in target zones: {(double)TGZs / couples * 100:##.###} %");
+				output.WriteLineAsync($"   Song ID: {songID} has {couples} couples where {TGZs} are in target zones: {(double)TGZs / couples * 100:##.###} %");
 
 			}
 			Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();

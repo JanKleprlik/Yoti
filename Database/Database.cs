@@ -44,29 +44,7 @@ namespace Database
 			this.connection = connection;
 			System.Diagnostics.Debug.WriteLine("[DEBUG] Leaving Database constructor");
 
-		}
-		
-		public Database(string fileName)
-		{
-			System.Diagnostics.Debug.WriteLine("[DEBUG] In Database constructor with fileName");
-			string databasePath = "./Assets/" + fileName;
-			Debug.WriteLine($"[DEBUG] current path: {Directory.GetCurrentDirectory()}");
-			System.Diagnostics.Debug.WriteLine("[DEBUG] Path: " + databasePath);
-			bool exists = File.Exists(databasePath);
-			Debug.WriteLine(exists);
-			Debug.WriteLine(File.Exists("Assets/SplashScreen.png"));
-			Debug.WriteLine(File.Exists("Assets/AudioDatabase.db"));
-			Debug.WriteLine(File.Exists("/Assets/AudioDatabase.db"));
-			Debug.WriteLine(File.Exists(".Assets/AudioDatabase.db"));
-			Debug.WriteLine(File.Exists("./Assets/AudioDatabase.db"));
-
-			SQLiteConnection connection = new SQLiteConnection(databasePath);
-			BoisSerializer.Initialize<Dictionary<uint, List<ulong>>>();
-
-			this.connection = connection;
-			Debug.WriteLine("[DEBUG] Leaving Database constructor with fileName");
-		}
-		
+		}	
 		
 		private void InitializeTables(SQLiteConnection connection)
 		{
@@ -187,6 +165,19 @@ namespace Database
 				return new Dictionary<uint, List<ulong>>();
 			}
 
+		}
+
+		public Song GetSongByID(uint ID)
+		{
+			var songs = connection.Table<Song>().Select(s => s).Where(s => s.ID == ID).ToList();
+			if (songs.Count > 1 || songs.Count < 1)
+			{
+				throw new ArgumentException($"Found: {songs.Count} songs with ID {ID}. Exactly one should be found.");
+			}
+			else
+			{
+				return songs[0];
+			}
 		}
 
 		#endregion

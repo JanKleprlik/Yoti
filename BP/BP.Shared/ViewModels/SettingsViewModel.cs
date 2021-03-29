@@ -62,5 +62,11 @@ namespace BP.Shared.ViewModels
 				OnPropertyChanged();
 			}
 		}
+	
+		public void Reset()
+		{
+			settings.SetToDefault();
+			Settings = settings;
+		}
 	}
 }

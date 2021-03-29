@@ -22,6 +22,7 @@ using Windows.UI.Xaml.Media.Animation;
 using System.Diagnostics;
 using System.Text;
 using BP.Shared.Models;
+using BP.Shared.ViewModels;
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -63,15 +64,21 @@ namespace BP.Shared.Views
 
 		private Storyboard flickerAnimation;
 		private SettingsDialog settingsDialog;
+		private CustomTextWriter textWriter;
+
+		private SettingsViewModel settingsViewModel;
+
 		public MainPage()
         {
             this.InitializeComponent();
 
+			textWriter = new CustomTextWriter(outputTextBox);
+
 			recorder = new AudioRecorder.Recorder();
 			database = new Database.Database();
-			recognizer = new AudioRecognizer();
+			recognizer = new AudioRecognizer(textWriter);
 			settings = new Settings();
-
+			settingsViewModel = new SettingsViewModel(settings);
 			songValueDatabase = database.GetSearchData();
 			
 
@@ -82,6 +89,13 @@ namespace BP.Shared.Views
 		public void TestMethod(object sender, RoutedEventArgs e)
 		{
 			System.Diagnostics.Debug.WriteLine(settings.ToString());
+			System.Diagnostics.Debug.WriteLine(outputTextBox.Text);
+			System.Diagnostics.Debug.WriteLine(outputTextBox.Visibility);
+			System.Diagnostics.Debug.WriteLine(textWriter.ToString());
+			string text = outputTextBox.Text;
+			outputTextBox.Text = "NEW TEXT\n" + text;
+
+
 		}
 
 		private void setupFlickerAnimation()
@@ -113,7 +127,7 @@ namespace BP.Shared.Views
 		}
 		private void setupSettingsDialog(Settings settings)
 		{
-			settingsDialog = new SettingsDialog(settings);
+			settingsDialog = new SettingsDialog(settingsViewModel);
 			settingsDialog.Visibility = Visibility.Collapsed;
 			Grid.SetRowSpan(settingsDialog, 3);
 			Grid.SetColumnSpan(settingsDialog, 3);			
@@ -121,6 +135,10 @@ namespace BP.Shared.Views
 
 		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
+			outputTextBox.Text = "";
+#if __ANDROID__
+			outputTextBox.Visibility = settings.DetailedInfo ? Visibility.Visible : Visibility.Collapsed;
+#endif
 #if !__WASM__
 			//start UI recording response
 			flickerIcon.Visibility = Visibility.Visible;
@@ -231,10 +249,31 @@ namespace BP.Shared.Views
 
 		private async Task WriteRecognitionResults(uint? ID)
 		{
-			await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+			if (ID == null)
 			{
-				displayInfoText($"Song ID: {ID}");
-			});
+				await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+				{
+					displayInfoText($"Song was not recognized.");
+				});
+				return;
+			}
+
+			Song song;
+			try
+			{
+				song = database.GetSongByID((uint)ID);
+				await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+				{
+					displayInfoText($"\"{song.Name}\"\tby\t{song.Author}");
+				});
+			}
+			catch(ArgumentException e)
+			{
+				await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
+				{
+					displayInfoText(e.Message);
+				});
+			}
 		}
 
 

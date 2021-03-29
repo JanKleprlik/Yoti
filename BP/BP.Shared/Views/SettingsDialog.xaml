@@ -29,9 +29,6 @@
 			<Setter Property="BorderBrush" Value="{StaticResource SecondaryColor}"/>
 			<Setter Property="Margin" Value="10"/>
 		</Style>
-		<Style TargetType="ToggleSwitch">
-			<Setter Property="Foreground" Value="{StaticResource White}"/>
-		</Style>
 	</ContentDialog.Resources>
 
 	<ContentDialog.PrimaryButtonStyle>
