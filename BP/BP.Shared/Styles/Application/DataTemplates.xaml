@@ -1,0 +1,36 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:models="using:Database">
+	<DataTemplate
+		x:Key="SongDataTemplate"
+		>
+		<Grid
+			HorizontalAlignment="Stretch"
+			>
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="20"/>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="*"/>
+			</Grid.ColumnDefinitions>
+			<TextBlock
+				x:Name="SongID"
+				Grid.Column="0"
+				Text="{Binding ID}"
+				/>
+			<TextBlock
+				x:Name="SongName"
+				Grid.Column="1"
+				Text="{Binding Name}"
+				Margin="20,0,0,0"
+				/>
+			<TextBlock
+				x:Name="SongAuthor"
+				Grid.Column="2"
+				Text="{Binding Author}"
+				/>
+		</Grid>
+	</DataTemplate>
+	
+	
+</ResourceDictionary>

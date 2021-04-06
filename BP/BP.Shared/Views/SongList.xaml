@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:BP.Shared.Views"
-	xmlns:controls="using:BP.Shared.Styles.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:models="using:Database"
@@ -38,38 +37,8 @@
 			VerticalAlignment="Stretch"
 			ItemsSource="{x:Bind songsList}"
 			Padding="50"
+			ItemTemplate="{StaticResource SongDataTemplate}"
 			>
-			<ListView.ItemTemplate>
-				<DataTemplate
-					x:DataType="models:Song"
-					>	
-					<Grid
-						HorizontalAlignment="Stretch"
-						>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="20"/>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="*"/>
-						</Grid.ColumnDefinitions>
-						<TextBlock
-							x:Name="SongID"
-							Grid.Column="0"
-							Text="{x:Bind ID}"
-							/>
-						<TextBlock
-							x:Name="SongName"
-							Grid.Column="1"
-							Text="{x:Bind Name}"
-							Margin="20,0,0,0"
-							/>	
-						<TextBlock
-							x:Name="SongAuthor"
-							Grid.Column="2"
-							Text="{x:Bind Author}"
-							/>
-					</Grid>
-				</DataTemplate>
-			</ListView.ItemTemplate>
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
 					<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
