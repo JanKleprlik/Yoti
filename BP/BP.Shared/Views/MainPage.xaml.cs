@@ -54,21 +54,10 @@ namespace BP.Shared.Views
     /// </summary>
     public sealed partial class MainPage : Page
     {
-
-		private AudioRecorder.Recorder recorder;
-		private AudioRecognizer recognizer;
-		private Settings settings;
-
-		private object uploadedSongLock = new object();
-		private byte[] uploadedSong { get; set; }
-
-		private DatabaseSQLite database { get; set; }
-		private Dictionary<uint, List<ulong>> songValueDatabase;
-
 		private Storyboard flickerAnimation;
 		private SettingsDialog settingsDialog;
-		private TextBlockTextWriter textWriter { get; set; }
 
+		private Settings settings;
 		private SettingsViewModel SettingsVM;
 		private MainPageViewModel MainPageVM;
 
@@ -76,15 +65,8 @@ namespace BP.Shared.Views
         {
             this.InitializeComponent();
 
-			//textWriter = new TextBlockTextWriter(outputTextBox);
-
-			//recorder = new AudioRecorder.Recorder();
-			database = new DatabaseSQLite();
-			//recognizer = new AudioRecognizer(textWriter);
 			settings = new Settings();
 			SettingsVM = new SettingsViewModel(settings);
-			//songValueDatabase = database.GetSearchData();
-
 			MainPageVM = new MainPageViewModel(outputTextBox, settings, Dispatcher);
 
 			setupFlickerAnimation();
@@ -109,11 +91,6 @@ namespace BP.Shared.Views
 			flickerAnimation.Children.Add(opacityAnimation);
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 			flickerAnimation.Begin();
-
-
-
-
-
 		}
 		private void setupSettingsDialog(Settings settings)
 		{
@@ -122,44 +99,6 @@ namespace BP.Shared.Views
 			Grid.SetColumnSpan(settingsDialog, 3);			
 		}
 
-
-#region Upload new song 
-
-
-		//PORTED
-		private async Task WriteRecognitionResults(uint? ID)
-		{
-			if (ID == null)
-			{
-				await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-				{
-					displayInfoText($"Song was not recognized.");
-				});
-				return;
-			}
-
-			Song song;
-			try
-			{
-				song = database.GetSongByID((uint)ID);
-				await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-				{
-					displayInfoText($"\"{song.Name}\"\tby\t{song.Author}");
-				});
-			}
-			catch(ArgumentException e)
-			{
-				await Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () =>
-				{
-					displayInfoText(e.Message);
-				});
-			}
-		}
-
-
-
-#endregion
-
 		// THIS WILL STAY
 		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
 		{
@@ -167,15 +106,7 @@ namespace BP.Shared.Views
 		}
 		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
-			Frame.Navigate(typeof(SongList), database.GetSongs());
+			Frame.Navigate(typeof(SongList), MainPageVM.Database.GetSongs());
 		}
-
-#region UI HELPERS
-
-		private void displayInfoText(string text)
-		{
-			InformationTextBlk.Text = text;
-		}
-#endregion
 	}
 }

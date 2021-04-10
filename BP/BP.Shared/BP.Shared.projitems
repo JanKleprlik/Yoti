@@ -32,15 +32,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Views\MainPageANDROID.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Views\MainPageUWP.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Views\MainPageWASM.xaml.cs">
-      <DependentUpon>MainPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Views\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
     </Compile>

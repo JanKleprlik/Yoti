@@ -19,14 +19,13 @@ namespace BP.Shared.ViewModels
 
 		private Recorder audioRecorder { get; set; }
 		private AudioRecognizer recognizer { get; set; }
-		private DatabaseSQLite database { get; set; }
 		private TextBlockTextWriter textWriter { get; set; }
 		private Settings settings { get; set; }
+		private CoreDispatcher UIDispatcher { get; set; }
 		/// <summary>
 		/// TODO: pořádně popsat co to je !!!
 		/// </summary>
 		private Dictionary<uint, List<ulong>> savedSongs { get; set; }
-		private CoreDispatcher UIDispatcher { get; set; }
 
 		private byte[] uploadedSong { get; set; }
 		private object uploadedSongLock = new object();
@@ -34,6 +33,7 @@ namespace BP.Shared.ViewModels
 
 		
 		#endregion
+		public DatabaseSQLite Database { get; private set; }
 
 		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
 		{
@@ -43,11 +43,11 @@ namespace BP.Shared.ViewModels
 			this.UIDispatcher = UIDispatcher; 
 			
 			audioRecorder = new Recorder();
-			database = new DatabaseSQLite();
+			Database = new DatabaseSQLite();
 			recognizer = new AudioRecognizer(textWriter);
 
 			//Popsat proč to tady dělám
-			savedSongs = database.GetSearchData();
+			savedSongs = Database.GetSearchData();
 
 		}
 
@@ -55,6 +55,8 @@ namespace BP.Shared.ViewModels
 
 		public async void RecognizeSong()
 		{
+			textWriter.Clear();
+
 			IsRecording = true;
 			InformationText = "Recording ...";
 			await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
@@ -288,7 +290,7 @@ namespace BP.Shared.ViewModels
 
 			try
 			{
-				Song song = database.GetSongByID((uint)ID);
+				Song song = Database.GetSongByID((uint)ID);
 				InformationText = $"\"{song.Name}\" by {song.Author}";
 			}
 			catch (ArgumentException e)
@@ -309,9 +311,9 @@ namespace BP.Shared.ViewModels
 
 			//TODO: popsat!!!
 			var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-			uint songID = database.AddSong(songName, songAuthor);
+			uint songID = Database.AddSong(songName, songAuthor);
 			recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
-			database.UpdateSearchData(savedSongs);
+			Database.UpdateSearchData(savedSongs);
 
 			this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
 		}

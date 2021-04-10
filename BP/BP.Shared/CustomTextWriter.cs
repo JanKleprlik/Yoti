@@ -55,6 +55,11 @@ namespace BP.Shared
 			outputTextControl.Text += "\n";
 		}
 
+		public void Clear()
+		{
+			outputTextControl.Text = "";
+		}
+
 		public override Encoding Encoding => Encoding.Unicode;
 	}
 }
