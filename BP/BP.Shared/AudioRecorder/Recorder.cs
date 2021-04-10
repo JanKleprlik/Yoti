@@ -162,7 +162,7 @@ namespace BP.Shared.AudioRecorder
 		{
 #if NETFX_CORE
 			if (buffer == null)
-				return new byte[0];
+				throw new InvalidOperationException("Buffer should not be null");
 
 			byte[] data = new byte[buffer.Size];
 			DataReader dataReader = new DataReader(buffer.GetInputStreamAt(0));

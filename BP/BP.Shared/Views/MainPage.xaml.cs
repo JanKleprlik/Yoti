@@ -1,51 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
-using System.Threading.Tasks;
-
-using System.Threading;
-using System.Text.RegularExpressions;
-using Database;
-using AudioProcessing.Recognizer;
 using Windows.UI.Xaml.Media.Animation;
-using System.Diagnostics;
-using System.Text;
 using BP.Shared.Models;
 using BP.Shared.ViewModels;
-using Microsoft.Extensions.Logging;
-using Uno.Extensions;
 
-
-#if NETFX_CORE
-using Windows.Media.Capture;
-using Windows.Media.MediaProperties;
-using Windows.Media.Playback;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.UI.Core;
-#endif
-
-#if __ANDROID__
-using System.Diagnostics;
-using Android.Media;
-using Android.Content.PM;
-using Xamarin.Essentials;
-#endif
-
-#if __WASM__
-using Uno.Foundation;
-#endif
 
 namespace BP.Shared.Views
 {
@@ -54,12 +13,12 @@ namespace BP.Shared.Views
     /// </summary>
     public sealed partial class MainPage : Page
     {
-		private Storyboard flickerAnimation;
-		private SettingsDialog settingsDialog;
-
 		private Settings settings;
 		private SettingsViewModel SettingsVM;
 		private MainPageViewModel MainPageVM;
+
+		private Storyboard flickerAnimation;
+		private SettingsDialog settingsDialog;
 
 		public MainPage()
         {
@@ -73,6 +32,14 @@ namespace BP.Shared.Views
 			setupSettingsDialog(settings);
 		}
 
+		public async void SettingsBtn_Click(object sender, RoutedEventArgs e)
+		{
+			ContentDialogResult result = await settingsDialog.ShowAsync();
+		}
+		public void ListSongsBtn_Click(object sender, RoutedEventArgs e)
+		{
+			Frame.Navigate(typeof(SongList), MainPageVM.Database.GetSongs());
+		}
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
@@ -99,14 +66,5 @@ namespace BP.Shared.Views
 			Grid.SetColumnSpan(settingsDialog, 3);			
 		}
 
-		// THIS WILL STAY
-		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			ContentDialogResult result = await settingsDialog.ShowAsync();
-		}
-		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			Frame.Navigate(typeof(SongList), MainPageVM.Database.GetSongs());
-		}
 	}
 }

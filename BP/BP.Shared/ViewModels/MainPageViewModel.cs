@@ -30,9 +30,9 @@ namespace BP.Shared.ViewModels
 		private byte[] uploadedSong { get; set; }
 		private object uploadedSongLock = new object();
 
-
-		
 		#endregion
+
+
 		public DatabaseSQLite Database { get; private set; }
 
 		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
@@ -64,10 +64,12 @@ namespace BP.Shared.ViewModels
 
 			FinishedRecording = true;
 
-
 			IsRecognizing = true;
 			InformationText = "Looking for a match ...";
 			uint? recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
+
+			//Display result only on Windows and Android
+			//WASM is handled in event see MainPageViewModelWASM.cs
 #if __ANDROID__ || NETFX_CORE
 			WriteRecognitionResults(recognizedSongID);
 #endif
@@ -119,12 +121,16 @@ namespace BP.Shared.ViewModels
 			{
 				string songName = NewSongName;
 				string songAuthor = NewSongAuthor;
-				
-				IsUploading = true;
-				await Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
-				IsUploading = false;
 
-				InformationText = $"\"{songName}\" by {songAuthor} added";
+				IsUploading = true;
+				Task adderTask = Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
+				await adderTask;
+				
+				IsUploading = false;
+				if (adderTask.Status == TaskStatus.Faulted)
+					InformationText = "Something went wrong...\nSong could not be uploaded.";
+				else
+					InformationText = $"\"{songName}\" by {songAuthor} added";
 			}
 		}
 
@@ -144,7 +150,6 @@ namespace BP.Shared.ViewModels
 			this.Log().LogDebug(settings.ToString());
 		}
 		#endregion
-
 
 		#region Properties
 
@@ -265,25 +270,33 @@ namespace BP.Shared.ViewModels
 		private async Task<uint?> RecognizeSongFromRecording()
 		{
 			IAudioFormat recordedAudioWav;
+			try
+			{
 #if NETFX_CORE
-			recordedAudioWav = await getAudioFormatFromRecodingUWP();
+				recordedAudioWav = await getAudioFormatFromRecodingUWP();
 #elif __ANDROID__
-			recordedAudioWav = await getAudioFormatFromRecordingANDROID();
+				recordedAudioWav = await getAudioFormatFromRecordingANDROID();
 #elif __WASM__
-			recognizeWASM();
-			return 0; //Return 0 just to comply with method (recognition handling is done in recognizeWASM();
+				recognizeWASM();
+				//Return 0 just to comply with method (recognition handling is done in recognizeWASM();
+				return 0; 
 #else
-			throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
+				throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
 #endif
-
-			return await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
+				return await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
+			}
+			catch(InvalidOperationException e)
+			{
+				this.Log().LogError(e.Message);
+				//null as not recognized
+				return null;
+			}
 		}
 
 		private void WriteRecognitionResults(uint? ID)
 		{
 			if (ID == null)
 			{
-
 				InformationText = $"Song was not recognized.";
 				return;
 			}
@@ -295,7 +308,8 @@ namespace BP.Shared.ViewModels
 			}
 			catch (ArgumentException e)
 			{
-				InformationText = e.Message;
+				this.Log().LogError(e.Message);
+				InformationText = "Song was not recognized.";
 			}
 		}
 
@@ -304,18 +318,26 @@ namespace BP.Shared.ViewModels
 			this.Log().LogDebug($"[DEBUG] Adding {songName} by {songAuthor} into database.");
 
 			IAudioFormat audioWav;
-			lock (uploadedSongLock)
+			try
 			{
-				audioWav = new WavFormat(uploadedSong);
+				lock (uploadedSongLock)
+				{
+					audioWav = new WavFormat(uploadedSong);
+				}
+
+				//TODO: popsat!!!
+				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+				uint songID = Database.AddSong(songName, songAuthor);
+				recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
+				Database.UpdateSearchData(savedSongs);
+				this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
+
 			}
-
-			//TODO: popsat!!!
-			var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-			uint songID = Database.AddSong(songName, songAuthor);
-			recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
-			Database.UpdateSearchData(savedSongs);
-
-			this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
+			catch(Exception e)
+			{
+				this.Log().LogError(e.Message);
+				throw e;
+			}
 		}
 
 #endregion

@@ -38,7 +38,7 @@ namespace BP.Shared.ViewModels
 
 		private async Task<IAudioFormat> getAudioFormatFromRecodingUWP()
 		{
-			byte[] recordedSong = await audioRecorder.GetDataFromStream();
+			byte[] recordedSong = await audioRecorder.GetDataFromStream(); //exception can be propagated
 			// Metadata about recording are included
 			return new WavFormat(recordedSong);
 		}

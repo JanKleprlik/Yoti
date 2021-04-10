@@ -39,11 +39,13 @@
 	</ContentDialog.SecondaryButtonStyle>
 
 	<StackPanel x:Name="Options">
+		<!-- ConstQTransform feature is not supported -->
 		<ToggleSwitch 
 			x:Name="ConstQAlg"
 			OnContent="Constant Q algorithm"
 			OffContent="Constant Q algorithm"
 			IsOn="{x:Bind SettingsViewModel.ConstQAlg, Mode=TwoWay}"
+			Visibility="Collapsed" 
 			/>
 		<ToggleSwitch 
 			x:Name="DetailedInfo"
