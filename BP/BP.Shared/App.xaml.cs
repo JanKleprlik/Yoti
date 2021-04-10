@@ -164,7 +164,8 @@ namespace BP
 					}
 				)
 #if DEBUG
-				.AddConsole(LogLevel.Debug);
+				.AddConsole(LogLevel.Debug)
+				.AddDebug(LogLevel.Debug);
 #else
 				.AddConsole(LogLevel.Information);
 #endif

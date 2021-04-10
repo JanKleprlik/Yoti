@@ -23,6 +23,9 @@ using System.Diagnostics;
 using System.Text;
 using BP.Shared.Models;
 using BP.Shared.ViewModels;
+using Microsoft.Extensions.Logging;
+using Uno.Extensions;
+
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -88,14 +91,8 @@ namespace BP.Shared.Views
 
 		public void TestMethod(object sender, RoutedEventArgs e)
 		{
-			System.Diagnostics.Debug.WriteLine(settings.ToString());
-			System.Diagnostics.Debug.WriteLine(outputTextBox.Text);
-			System.Diagnostics.Debug.WriteLine(outputTextBox.Visibility);
-			System.Diagnostics.Debug.WriteLine(textWriter.ToString());
-			string text = outputTextBox.Text;
-			outputTextBox.Text = "NEW TEXT\n" + text;
-
-
+			this.Log().LogInformation("INFORMATION");
+			this.Log().LogDebug("DEBUG");
 		}
 
 		private void setupFlickerAnimation()
