@@ -89,14 +89,12 @@ namespace BP.Shared.Views
 
 			setupFlickerAnimation();
 			setupSettingsDialog(settings);
-			flickerAnimation.Begin();
 		}
 
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
-#region UWP
-#if NETFX_CORE
+
 			DoubleAnimation opacityAnimation = new DoubleAnimation()
 			{
 				From = 1.0,
@@ -110,13 +108,11 @@ namespace BP.Shared.Views
 			Storyboard.SetTargetProperty(flickerAnimation, "Opacity");
 			flickerAnimation.Children.Add(opacityAnimation);
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
-#endif
-#endregion
+			flickerAnimation.Begin();
 
-#if !NETFX_CORE
-			// Android nor WASM supports animations in Uno Platform yet
-			flickerIcon.Opacity = 1.0;
-#endif
+
+
+
 
 		}
 		private void setupSettingsDialog(Settings settings)
@@ -126,39 +122,6 @@ namespace BP.Shared.Views
 			Grid.SetColumnSpan(settingsDialog, 3);			
 		}
 
-		//PORTED
-		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
-        {
-			outputTextBox.Text = "";
-
-#if !__WASM__
-			//start UI recording response
-			flickerIcon.Visibility = Visibility.Visible;
-			flickerAnimation.Begin();
-			RecognizeBtn.IsEnabled = false;
-
-			//record audio
-			displayInfoText("Recording...");
-			await Task.Run( () => recorder.RecordAudio(settings.RecordingLength));
-
-			//Stop UI recording response
-			flickerAnimation.Pause();
-			flickerIcon.Visibility = Visibility.Collapsed;
-
-			//set replay button visible
-			PlayBtn.Visibility = Visibility.Visible;
-			
-			//start UI recognition response
-			RecognizeProgressBar.Visibility = Visibility.Visible;
-#endif
-			//recognize song
-			//await Task.Run( () => RecognizeFromRecording());
-#if !__WASM__
-			//stop UI recognition response
-			RecognizeBtn.IsEnabled = true;
-			RecognizeProgressBar.Visibility = Visibility.Collapsed;
-#endif
-		}
 
 #region Upload new song 
 

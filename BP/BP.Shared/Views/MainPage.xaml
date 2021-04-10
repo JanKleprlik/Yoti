@@ -184,7 +184,8 @@
 			Margin="110,32,0,0"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
-			Visibility="{x:Bind MainPageVM.IsRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+			not_wasm:Visibility="{x:Bind MainPageVM.IsRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+			wasm:Visibility="Collapsed"
 			Opacity="1.0"
 			/>
 
@@ -204,7 +205,9 @@
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
 			Click="{x:Bind MainPageVM.RecognizeSong}"
+			IsEnabled="{x:Bind MainPageVM.IsProcessingRecognition, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
+
 
 		<ProgressBar
 			x:Name="RecognizeProgressBar"
@@ -230,7 +233,8 @@
 			Grid.Column="1"
 			VerticalAlignment="Top"
 			Margin="150,25,0,0"
-			Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+			not_wasm:Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+			wasm:Visibility="Collapsed"
 			Click="{x:Bind MainPageVM.ReplayRecording}"
 			/>
 

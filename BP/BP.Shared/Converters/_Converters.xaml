@@ -5,5 +5,6 @@
 
 	<local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 	<local:BooleanToVisibilityInvertedConverter x:Key="BooleanToVisibilityInvertedConverter"/>
+	<local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
 
 </ResourceDictionary>

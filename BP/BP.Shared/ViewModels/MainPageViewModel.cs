@@ -62,8 +62,8 @@ namespace BP.Shared.ViewModels
 
 			FinishedRecording = true;
 
-			IsRecognizing = true;
 
+			IsRecognizing = true;
 			InformationText = "Looking for a match ...";
 			uint? recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
 #if __ANDROID__ || NETFX_CORE
@@ -71,7 +71,6 @@ namespace BP.Shared.ViewModels
 #endif
 			IsRecognizing = false;
 		}
-
 
 		public void ReplayRecording()
 		{
@@ -218,6 +217,7 @@ namespace BP.Shared.ViewModels
 			{
 				_isRecording = value;
 				OnPropertyChanged();
+				OnPropertyChanged(nameof(IsProcessingRecognition));
 			}
 		}
 
@@ -229,6 +229,7 @@ namespace BP.Shared.ViewModels
 			{
 				_isRecognizing = value;
 				OnPropertyChanged();
+				OnPropertyChanged(nameof(IsProcessingRecognition));
 			}
 		}
 
@@ -253,6 +254,8 @@ namespace BP.Shared.ViewModels
 				OnPropertyChanged();
 			}
 		}
+
+		public bool IsProcessingRecognition => IsRecognizing || IsRecording;
 		#endregion
 
 		#region private Methods
