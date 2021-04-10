@@ -10,12 +10,12 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Database
 {
-	public class DatabaseSQLite
+	public class SQLDatabase
 	{
 		private SQLiteConnection connection;
 		#region INITIALIZATION
 
-		public DatabaseSQLite()
+		public SQLDatabase()
 		{
 			System.Diagnostics.Debug.WriteLine("[DEBUG] In Database constructor");
 			string databasePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "AudioDatabase.db");
