@@ -4,5 +4,6 @@
 	xmlns:local="using:BP.Shared.Converters">
 
 	<local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+	<local:BooleanToVisibilityInvertedConverter x:Key="BooleanToVisibilityInvertedConverter"/>
 
 </ResourceDictionary>

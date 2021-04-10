@@ -10,8 +10,6 @@ namespace BP.Shared.Converters
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{
-			System.Diagnostics.Debug.WriteLine("IN HERE");
-			System.Diagnostics.Debug.WriteLine((bool)value);
 			if (value is Boolean && (bool)value)
 			{
 				return Visibility.Visible;
@@ -21,7 +19,6 @@ namespace BP.Shared.Converters
 
 		public object ConvertBack(object value, Type targetType, object parameter, string language)
 		{
-			System.Diagnostics.Debug.WriteLine("IN HERE2");
 			if (value is Visibility && (Visibility)value == Visibility.Visible)
 			{
 				return true;
@@ -30,4 +27,24 @@ namespace BP.Shared.Converters
 		}
 	}
 
+	class BooleanToVisibilityInvertedConverter : IValueConverter
+	{
+		public object Convert(object value, Type targetType, object parameter, string language)
+		{
+			if (value is Boolean && (bool)value)
+			{
+				return Visibility.Collapsed;
+			}
+			return Visibility.Visible;
+		}
+
+		public object ConvertBack(object value, Type targetType, object parameter, string language)
+		{
+			if (value is Visibility && (Visibility)value == Visibility.Visible)
+			{
+				return false;
+			}
+			return true;
+		}
+	}
 }
