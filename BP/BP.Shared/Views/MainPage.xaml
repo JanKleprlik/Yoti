@@ -15,7 +15,7 @@
 	
 	DataContext="{x:Bind MainPageVM}"
 	>
-	
+
 	<Grid x:Name="MainGrid"
 		  >
 		<VisualStateManager.VisualStateGroups>
@@ -184,9 +184,11 @@
 			Margin="110,32,0,0"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
-			Visibility="Collapsed"
+			Visibility="{x:Bind MainPageVM.IsRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			Opacity="1.0"
 			/>
+
+
 		<Button
 			x:Name="TestButton"
 			Content="TEST"
@@ -201,7 +203,7 @@
 			Content="Recognize"
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
-			Click="{x:Bind RecognizeBtn_Click}"
+			Click="{x:Bind MainPageVM.RecognizeSong}"
 			/>
 
 		<ProgressBar
@@ -229,7 +231,7 @@
 			VerticalAlignment="Top"
 			Margin="150,25,0,0"
 			Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-			Click="{x:Bind playBtn_Click}"
+			Click="{x:Bind MainPageVM.ReplayRecording}"
 			/>
 
 		<Button
@@ -263,7 +265,6 @@
 			x:Name="UploadProgressBar"
 			Grid.Row="1"
 			Grid.Column="1"
-			Width="100"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
 			Margin="0,70,0,0"

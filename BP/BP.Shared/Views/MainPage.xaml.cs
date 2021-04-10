@@ -76,28 +76,22 @@ namespace BP.Shared.Views
         {
             this.InitializeComponent();
 
-			textWriter = new TextBlockTextWriter(outputTextBox);
+			//textWriter = new TextBlockTextWriter(outputTextBox);
 
-			recorder = new AudioRecorder.Recorder();
+			//recorder = new AudioRecorder.Recorder();
 			database = new DatabaseSQLite();
-			recognizer = new AudioRecognizer(textWriter);
+			//recognizer = new AudioRecognizer(textWriter);
 			settings = new Settings();
 			SettingsVM = new SettingsViewModel(settings);
-			songValueDatabase = database.GetSearchData();
+			//songValueDatabase = database.GetSearchData();
 
-			MainPageVM = new MainPageViewModel(outputTextBox, settings);
+			MainPageVM = new MainPageViewModel(outputTextBox, settings, Dispatcher);
 
 			setupFlickerAnimation();
 			setupSettingsDialog(settings);
+			flickerAnimation.Begin();
 		}
 
-		/*
-		public void TestMethod(object sender, RoutedEventArgs e)
-		{
-			this.Log().LogInformation("INFORMATION");
-			this.Log().LogDebug("DEBUG");
-		}
-		*/
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
@@ -136,9 +130,7 @@ namespace BP.Shared.Views
 		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
 			outputTextBox.Text = "";
-#if __ANDROID__
-			outputTextBox.Visibility = settings.DetailedInfo ? Visibility.Visible : Visibility.Collapsed;
-#endif
+
 #if !__WASM__
 			//start UI recording response
 			flickerIcon.Visibility = Visibility.Visible;
@@ -160,45 +152,12 @@ namespace BP.Shared.Views
 			RecognizeProgressBar.Visibility = Visibility.Visible;
 #endif
 			//recognize song
-			await Task.Run( () => RecognizeFromRecording());
+			//await Task.Run( () => RecognizeFromRecording());
 #if !__WASM__
 			//stop UI recognition response
 			RecognizeBtn.IsEnabled = true;
 			RecognizeProgressBar.Visibility = Visibility.Collapsed;
 #endif
-		}
-		//PORTED
-        private void playBtn_Click(object sender, RoutedEventArgs e)
-        {
-#if NETFX_CORE
-			
-			recorder.ReplayRecordingUWP(Dispatcher);
-#endif
-#if __ANDROID__
-			recorder.ReplayRecordingANDROID();
-#endif
-		}
-		//PORTED
-		private async Task RecognizeFromRecording()
-		{
-			AudioProcessing.AudioFormats.IAudioFormat recordedAudioWav;
-#if NETFX_CORE
-			recordedAudioWav = await getAudioFormatFromRecodingUWP();
-#endif
-#if __ANDROID__
-			recordedAudioWav = await getAudioFormatFromRecordingANDROID();
-#endif
-
-#region WASM
-#if __WASM__
-			recognizeWASM();
-			return;
-#endif
-#endregion
-
-			uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, songValueDatabase));
-			await WriteRecognitionResults(ID);
-
 		}
 
 #region Upload new song 

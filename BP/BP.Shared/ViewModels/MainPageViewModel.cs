@@ -35,12 +35,13 @@ namespace BP.Shared.ViewModels
 		
 		#endregion
 
-		public MainPageViewModel(TextBlock outputTextBlock, Settings settings)
+		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
 		{
 			//Text writer to write recognition info into
 			textWriter = new TextBlockTextWriter(outputTextBlock);
 			this.settings = settings;
-
+			this.UIDispatcher = UIDispatcher; 
+			
 			audioRecorder = new Recorder();
 			database = new DatabaseSQLite();
 			recognizer = new AudioRecognizer(textWriter);
@@ -62,10 +63,13 @@ namespace BP.Shared.ViewModels
 			FinishedRecording = true;
 
 			IsRecognizing = true;
-			InformationText = "Looking for a match ...";
-			await Task.Run(() => RecognizeSongFromRecording());			
-			IsRecognizing = false;
 
+			InformationText = "Looking for a match ...";
+			uint? recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
+#if __ANDROID__ || NETFX_CORE
+			WriteRecognitionResults(recognizedSongID);
+#endif
+			IsRecognizing = false;
 		}
 
 
@@ -91,7 +95,6 @@ namespace BP.Shared.ViewModels
 			await pickAndUploadFileWASM();
 #endif
 		}
-
 
 		public async void AddNewSong()
 		{
@@ -120,10 +123,9 @@ namespace BP.Shared.ViewModels
 				await Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
 				IsUploading = false;
 
-				InformationText = $"\"{songName}\" by \"{songAuthor}\" was added";
+				InformationText = $"\"{songName}\" by {songAuthor} added";
 			}
 		}
-
 
 		public void OpenNewSongForm()
 		{
@@ -255,25 +257,21 @@ namespace BP.Shared.ViewModels
 
 		#region private Methods
 
-		private async Task RecognizeSongFromRecording()
+		private async Task<uint?> RecognizeSongFromRecording()
 		{
 			IAudioFormat recordedAudioWav;
 #if NETFX_CORE
 			recordedAudioWav = await getAudioFormatFromRecodingUWP();
-#endif
-#if __ANDROID__
+#elif __ANDROID__
 			recordedAudioWav = await getAudioFormatFromRecordingANDROID();
-#endif
-
-			#region WASM
-#if __WASM__
+#elif __WASM__
 			recognizeWASM();
-			return;
+			return 0; //Return 0 just to comply with method (recognition handling is done in recognizeWASM();
+#else
+			throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
 #endif
-			#endregion
 
-			uint? ID = await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
-			WriteRecognitionResults(ID);
+			return await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
 		}
 
 		private void WriteRecognitionResults(uint? ID)
@@ -315,7 +313,7 @@ namespace BP.Shared.ViewModels
 			this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
 		}
 
-		#endregion
+#endregion
 	}
 
 

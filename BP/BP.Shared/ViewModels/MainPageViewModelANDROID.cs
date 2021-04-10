@@ -27,7 +27,7 @@ namespace BP.Shared.ViewModels
 
 				if (result != null)
 				{
-					UploadedSongText = $"File selected: {result.FileName}";
+					UploadedSongText = result.FileName;
 					var audioFileData = await result.OpenReadAsync();
 					lock (uploadedSongLock)
 					{
