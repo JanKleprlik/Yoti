@@ -8,13 +8,13 @@ namespace BP.Shared.ViewModels
 	public class SettingsViewModel : BaseViewModel
 	{
 		public SettingsViewModel(Settings settings = null) => Settings = settings ?? new Settings();
-		private Settings settings;
+		private Settings _settings;
 		public Settings Settings
 		{
-			get => settings;
+			get => _settings;
 			set
 			{
-				settings = value;
+				_settings = value;
 				OnPropertyChanged(string.Empty);
 			}
 		}
@@ -65,8 +65,8 @@ namespace BP.Shared.ViewModels
 	
 		public void Reset()
 		{
-			settings.SetToDefault();
-			Settings = settings;
+			_settings.SetToDefault();
+			Settings = _settings;
 		}
 	}
 }
