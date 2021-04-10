@@ -56,16 +56,14 @@ namespace BP.Shared.ViewModels
 		{
 			IsRecording = true;
 			InformationText = "Recording ...";
-
 			await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
-
 			IsRecording = false;
+
 			FinishedRecording = true;
 
 			IsRecognizing = true;
-
-			await Task.Run(() => RecognizeSongFromRecording());
-			
+			InformationText = "Looking for a match ...";
+			await Task.Run(() => RecognizeSongFromRecording());			
 			IsRecognizing = false;
 
 		}
@@ -83,7 +81,6 @@ namespace BP.Shared.ViewModels
 
 		public async void UploadNewSong()
 		{
-			IsUploading = true;
 #if NETFX_CORE
 			await pickAndUploadFileUWPAsync();
 #endif
@@ -91,9 +88,8 @@ namespace BP.Shared.ViewModels
 			pickAndUploadFileANDROIDAsync();
 #endif
 #if __WASM__
-			pickAndUploadFileWASM();
+			await pickAndUploadFileWASM();
 #endif
-			IsUploading = false;
 		}
 
 
@@ -119,8 +115,10 @@ namespace BP.Shared.ViewModels
 			{
 				string songName = NewSongName;
 				string songAuthor = NewSongAuthor;
-
-				//await Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
+				
+				IsUploading = true;
+				await Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
+				IsUploading = false;
 
 				InformationText = $"\"{songName}\" by \"{songAuthor}\" was added";
 			}

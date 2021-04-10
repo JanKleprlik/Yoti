@@ -329,7 +329,7 @@
 
 			<TextBox
 				x:Name="NewSongNameTB"
-				Text="{x:Bind MainPageVM.NewSongName, Mode=OneWay}"
+				Text="{x:Bind MainPageVM.NewSongName, Mode=TwoWay}"
 				PlaceholderText="Name"
 				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
@@ -340,7 +340,7 @@
 				/>
 			<TextBox
 				x:Name="NewSongAuthorTB"
-				Text="{x:Bind MainPageVM.NewSongAuthor, Mode=OneWay}"
+				Text="{x:Bind MainPageVM.NewSongAuthor, Mode=TwoWay}"
 				PlaceholderText="Author"
 				Grid.RowSpan="3"
 				HorizontalAlignment="Left"

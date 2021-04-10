@@ -36,6 +36,9 @@ namespace BP.Shared.ViewModels
 			DeleteDelegates();
 			WasmSongEvent += OnNewSongUploadedEvent;
 			stringBuilder = new StringBuilder();
+			//Update UI
+			//In WASM UI Thread will be blocked while uploading
+			InformationText = "Processing uploaded file\n Please wait ...";
 			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);"); //(size_limit, js metadata offset)
 		}
 
@@ -79,16 +82,21 @@ namespace BP.Shared.ViewModels
 				WasmSongEvent += OnSongToRecognizeEvent;
 			}
 		}
-		private void OnNewSongUploadedEvent(object sender, WasmSongEventHandlerArgs e)
+		private async void OnNewSongUploadedEvent(object sender, WasmSongEventHandlerArgs e)
 		{
 			WasmSongEvent -= OnNewSongUploadedEvent;
 
 			if (e.isDone)
 			{
-
-				this.Log().LogDebug($"Full song uploaded, now processing uploaded data...");
+				this.Log().LogDebug($"Full song uploaded, now converting uploaded data...");
+				
 				uploadedSong = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want
+				
+				//Update UI
+				UploadedSongText = e.FileAsDataUrl;
+				InformationText = "File uploaded";
 
+				this.Log().LogDebug($"Uploaded song converted to byte[].");
 			}
 			else
 			{

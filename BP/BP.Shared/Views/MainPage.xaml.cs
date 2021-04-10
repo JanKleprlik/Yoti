@@ -201,55 +201,8 @@ namespace BP.Shared.Views
 
 		}
 
-		//PORTED
-		private async void UploadNewSongBtn_Click(object sender, RoutedEventArgs e)
-		{
-			UploadProgressBar.Visibility = Visibility.Visible;
-#if NETFX_CORE
-			await pickAndUploadFileUWPAsync();
-#endif
-#if __ANDROID__
-			pickAndUploadFileANDROIDAsync();
-#endif
-#if __WASM__
-			pickAndUploadFileWASM();
-#endif
-			UploadProgressBar.Visibility = Visibility.Collapsed;
-		}
-
 #region Upload new song 
-		//PORTED
-		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
-		{
-			
-			if (NewSongNameTB.Text == "")
-			{
-				displayInfoText("Please enter song name.");
-				return;
-			}
-			if (NewSongAuthorTB.Text == "")
-			{
-				displayInfoText("Please enter song author.");
-				return;
-			}
 
-			if (uploadedSong == null)
-			{
-				displayInfoText("Please upload song file.");
-				return;
-			}
-
-			if (uploadedSong != null && NewSongNameTB.Text != "" && NewSongAuthorTB.Text != "")
-			{
-				string songName = NewSongNameTB.Text;
-				string songAuthor = NewSongAuthorTB.Text;
-				
-				await Task.Run(() => addNewSong(songName, songAuthor));
-
-				displayInfoText($"\"{songName}\" by \"{songAuthor}\" was added");
-			}
-			
-		}
 
 		//PORTED
 		private async Task WriteRecognitionResults(uint? ID)
@@ -281,25 +234,6 @@ namespace BP.Shared.Views
 			}
 		}
 
-		//PORTED
-		private void addNewSong(string songName, string songAuthor)
-		{
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");
-			
-			AudioProcessing.AudioFormats.IAudioFormat audioWav;
-			lock (uploadedSongLock)
-			{
-				audioWav = new AudioProcessing.AudioFormats.WavFormat(uploadedSong);
-			}
-
-			var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-			uint songID = database.AddSong(songName, songAuthor);
-			database.AddFingerprint(tfps);
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count BEFORE:{songValueDatabase.Count}");
-			recognizer.AddTFPToDataStructure(tfps, songID, songValueDatabase);
-			database.UpdateSearchData(songValueDatabase);
-			System.Diagnostics.Debug.WriteLine($"[DEBUG] DS.Count AFTER :{songValueDatabase.Count}");
-		}
 
 
 #endregion

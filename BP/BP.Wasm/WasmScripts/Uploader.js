@@ -18,7 +18,7 @@
                 //this is the binary uploaded content
                 var data = readerEvent.target.result;
                 //invoke C# method to get audio binary data
-                var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessEvent");
+                var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.ViewModels.MainPageViewModel:ProcessEvent");
 
                 if (!data.startsWith('data:audio/wav;base64,')) {
                     console.log('Unsupported format.');
@@ -38,7 +38,7 @@
 
                 //full file uploaded -> process it
                 console.log('Done uploading file');
-                processPartFile("", true);
+                processPartFile(file.name, true);
             }
         };
     };
