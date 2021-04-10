@@ -62,39 +62,42 @@ namespace BP.Shared.Views
 		private object uploadedSongLock = new object();
 		private byte[] uploadedSong { get; set; }
 
-		private Database.Database database { get; set; }
+		private DatabaseSQLite database { get; set; }
 		private Dictionary<uint, List<ulong>> songValueDatabase;
 
 		private Storyboard flickerAnimation;
 		private SettingsDialog settingsDialog;
-		private CustomTextWriter textWriter;
+		private TextBlockTextWriter textWriter { get; set; }
 
-		private SettingsViewModel settingsViewModel;
+		private SettingsViewModel SettingsVM;
+		private MainPageViewModel MainPageVM;
 
 		public MainPage()
         {
             this.InitializeComponent();
 
-			textWriter = new CustomTextWriter(outputTextBox);
+			textWriter = new TextBlockTextWriter(outputTextBox);
 
 			recorder = new AudioRecorder.Recorder();
-			database = new Database.Database();
+			database = new DatabaseSQLite();
 			recognizer = new AudioRecognizer(textWriter);
 			settings = new Settings();
-			settingsViewModel = new SettingsViewModel(settings);
+			SettingsVM = new SettingsViewModel(settings);
 			songValueDatabase = database.GetSearchData();
-			
+
+			MainPageVM = new MainPageViewModel(outputTextBox, settings);
 
 			setupFlickerAnimation();
 			setupSettingsDialog(settings);
 		}
 
+		/*
 		public void TestMethod(object sender, RoutedEventArgs e)
 		{
 			this.Log().LogInformation("INFORMATION");
 			this.Log().LogDebug("DEBUG");
 		}
-
+		*/
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
@@ -124,12 +127,13 @@ namespace BP.Shared.Views
 		}
 		private void setupSettingsDialog(Settings settings)
 		{
-			settingsDialog = new SettingsDialog(settingsViewModel);
+			settingsDialog = new SettingsDialog(SettingsVM);
 			settingsDialog.Visibility = Visibility.Collapsed;
 			Grid.SetRowSpan(settingsDialog, 3);
 			Grid.SetColumnSpan(settingsDialog, 3);			
 		}
 
+		//PORTED
 		private async void RecognizeBtn_Click(object sender, RoutedEventArgs e)
         {
 			outputTextBox.Text = "";
@@ -164,17 +168,18 @@ namespace BP.Shared.Views
 			RecognizeProgressBar.Visibility = Visibility.Collapsed;
 #endif
 		}
-
+		//PORTED
         private void playBtn_Click(object sender, RoutedEventArgs e)
         {
 #if NETFX_CORE
+			
 			recorder.ReplayRecordingUWP(Dispatcher);
 #endif
 #if __ANDROID__
 			recorder.ReplayRecordingANDROID();
 #endif
 		}
-
+		//PORTED
 		private async Task RecognizeFromRecording()
 		{
 			AudioProcessing.AudioFormats.IAudioFormat recordedAudioWav;
@@ -197,6 +202,7 @@ namespace BP.Shared.Views
 
 		}
 
+		//PORTED
 		private async void UploadNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
 #if NETFX_CORE
@@ -211,7 +217,7 @@ namespace BP.Shared.Views
 		}
 
 #region Upload new song 
-
+		//PORTED
 		private async void AddNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
 			
@@ -244,6 +250,7 @@ namespace BP.Shared.Views
 			
 		}
 
+		//PORTED
 		private async Task WriteRecognitionResults(uint? ID)
 		{
 			if (ID == null)
@@ -273,7 +280,7 @@ namespace BP.Shared.Views
 			}
 		}
 
-
+		//PORTED
 		private void addNewSong(string songName, string songAuthor)
 		{
 			System.Diagnostics.Debug.WriteLine($"[DEBUG] Adding {songName} by {songAuthor} into database.");

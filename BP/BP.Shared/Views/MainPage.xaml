@@ -12,9 +12,12 @@
     mc:Ignorable="d wasm android"
 	Background="{StaticResource PrimaryDarkColor}"
 	NavigationCacheMode="Required"
+	
+	DataContext="{x:Bind MainPageVM}"
 	>
 	
-	<Grid x:Name="MainGrid">
+	<Grid x:Name="MainGrid"
+		  >
 		<VisualStateManager.VisualStateGroups>
 			<VisualStateGroup>
 				<VisualState x:Name="WideState">
@@ -187,7 +190,7 @@
 		<Button
 			x:Name="TestButton"
 			Content="TEST"
-			Click="{x:Bind TestMethod}"
+			Click="{x:Bind MainPageVM.TestMethod}"
 			/>
 
 		<!-- SECOND ROW -->
@@ -283,7 +286,7 @@
 					Height="Auto"
 					android:FontSize="10"
 					TextWrapping="Wrap"
-					Visibility="{x:Bind settingsViewModel.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+					Visibility="{x:Bind SettingsVM.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 					
 					/>
 		</StackPanel>
@@ -296,8 +299,8 @@
 			Grid.Column="1"
 			VerticalAlignment="Center"
 			Content="Add new song"
-			Visibility="Visible"
-			Click="{x:Bind OpenNewSongForm_Click}"
+			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
+			Click="{x:Bind MainPageVM.OpenNewSongForm}"
 			/>
 
 		<Button
@@ -307,7 +310,7 @@
 			VerticalAlignment="Center"
 			HorizontalAlignment="Right"
 			Content="List songs"
-			Visibility="Visible"
+			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
 			Click="{x:Bind ListSongsBtn_Click}"
 			/>
 
@@ -316,7 +319,7 @@
 			Grid.Row="2"
 			Grid.Column="1"
 			Grid.RowSpan="2" 
-			Visibility="Collapsed" 
+			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" 
 			>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="1*"/>
@@ -376,7 +379,7 @@
 				Grid.RowSpan="3"
 				HorizontalAlignment="Right"
 				BorderBrush="{StaticResource CancelColor}"
-				Click="{x:Bind CancelNewSong_Click}"
+				Click="{x:Bind MainPageVM.CloseNewSongForm}"
 				/>
 		</Grid>
 	</Grid>

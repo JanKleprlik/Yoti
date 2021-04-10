@@ -24,7 +24,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)CustomTextWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\SettingsModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BaseViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelANDROID.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelWASM.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelUWP.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\SettingsViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>

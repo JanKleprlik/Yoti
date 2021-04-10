@@ -8,11 +8,11 @@ using Windows.UI.Xaml.Controls;
 namespace BP.Shared
 {
 
-	public class CustomTextWriter : TextWriter
+	public class TextBlockTextWriter : TextWriter
 	{
 		private TextBlock outputTextControl;
 
-		public CustomTextWriter(TextBlock outputTextControl)
+		public TextBlockTextWriter(TextBlock outputTextControl)
 		{
 			this.outputTextControl = outputTextControl;
 		}
