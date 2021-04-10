@@ -17,7 +17,7 @@ namespace BP.Shared.Views
 	{
 #if NETFX_CORE
 
-		private async void pickAndUploadFileUWPAsync()
+		private async Task pickAndUploadFileUWPAsync()
 		{
 			var picker = new Windows.Storage.Pickers.FileOpenPicker();
 			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;

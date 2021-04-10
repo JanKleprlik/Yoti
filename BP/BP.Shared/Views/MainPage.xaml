@@ -215,7 +215,7 @@
 			CornerRadius="5"
 			IsIndeterminate="True"
 			Foreground="{StaticResource SecondaryHighlightedColor}"
-			Visibility="Collapsed"
+			Visibility="{x:Bind MainPageVM.IsRecognizing, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			>
 
 		</ProgressBar>
@@ -228,7 +228,7 @@
 			Grid.Column="1"
 			VerticalAlignment="Top"
 			Margin="150,25,0,0"
-			Visibility="Collapsed"
+			Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			Click="{x:Bind playBtn_Click}"
 			/>
 
@@ -270,7 +270,7 @@
 			CornerRadius="5"
 			IsIndeterminate="True"
 			Foreground="{StaticResource SecondaryHighlightedColor}"
-			Visibility="Collapsed"
+			Visibility="{x:Bind MainPageVM.IsUploading, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			>
 
 			</ProgressBar>
@@ -278,7 +278,7 @@
 				x:Name="InformationTextBlk"
 				not_android:FontSize="30"
 				TextWrapping="NoWrap"
-				Text="You can start recording"
+				Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
 				/>
 				<TextBlock
 					x:Name="outputTextBox"
@@ -329,6 +329,7 @@
 
 			<TextBox
 				x:Name="NewSongNameTB"
+				Text="{x:Bind MainPageVM.NewSongName, Mode=OneWay}"
 				PlaceholderText="Name"
 				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
@@ -339,6 +340,7 @@
 				/>
 			<TextBox
 				x:Name="NewSongAuthorTB"
+				Text="{x:Bind MainPageVM.NewSongAuthor, Mode=OneWay}"
 				PlaceholderText="Author"
 				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
@@ -354,11 +356,11 @@
 				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
 				Margin="390,0,0,0"
-				Click="{x:Bind UploadNewSongBtn_Click}"
+				Click="{x:Bind MainPageVM.UploadNewSong}"
 				/>
 			<TextBlock
 				x:Name="UploadedSongText"
-				Text="Please upload audio file"
+				Text="{x:Bind MainPageVM.UploadedSongText, Mode=OneWay}"
 				HorizontalAlignment="Left"
 				VerticalAlignment="Center"
 				Grid.RowSpan="3"
@@ -371,7 +373,7 @@
 				HorizontalAlignment="Right"
 				Margin="0,0,90,0"
 				BorderBrush="{StaticResource SecondaryHighlightedColor}"
-				Click="{x:Bind AddNewSongBtn_Click}"
+				Click="{x:Bind MainPageVM.AddNewSong}"
 				/>
 			<Button
 				x:Name="CancelNewSongBtn"

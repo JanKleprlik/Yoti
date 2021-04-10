@@ -55,7 +55,7 @@ namespace BP.Shared.ViewModels
 		public async void RecognizeSong()
 		{
 			IsRecording = true;
-			RecognitionInfoText = "Recording ...";
+			InformationText = "Recording ...";
 
 			await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
 
@@ -83,8 +83,9 @@ namespace BP.Shared.ViewModels
 
 		public async void UploadNewSong()
 		{
+			IsUploading = true;
 #if NETFX_CORE
-			pickAndUploadFileUWPAsync();
+			await pickAndUploadFileUWPAsync();
 #endif
 #if __ANDROID__
 			pickAndUploadFileANDROIDAsync();
@@ -92,6 +93,7 @@ namespace BP.Shared.ViewModels
 #if __WASM__
 			pickAndUploadFileWASM();
 #endif
+			IsUploading = false;
 		}
 
 
@@ -99,17 +101,17 @@ namespace BP.Shared.ViewModels
 		{
 			if (NewSongName == "")
 			{
-				RecognitionInfoText = "Please enter song name.";
+				InformationText = "Please enter song name.";
 				return;
 			}
 			if (NewSongAuthor == "")
 			{
-				RecognitionInfoText = "Please enter song author.";
+				InformationText = "Please enter song author.";
 				return;
 			}
 			if (uploadedSong == null)
 			{
-				RecognitionInfoText = "Please upload song file.";
+				InformationText = "Please upload song file.";
 				return;
 			}
 
@@ -118,9 +120,9 @@ namespace BP.Shared.ViewModels
 				string songName = NewSongName;
 				string songAuthor = NewSongAuthor;
 
-				await Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
+				//await Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
 
-				RecognitionInfoText = $"\"{songName}\" by \"{songAuthor}\" was added";
+				InformationText = $"\"{songName}\" by \"{songAuthor}\" was added";
 			}
 		}
 
@@ -145,20 +147,20 @@ namespace BP.Shared.ViewModels
 
 		#region Properties
 
-		private string _recognitionInfoText;
-		public string RecognitionInfoText
+		private string _informationText = "You can start recording";
+		public string InformationText
 		{
-			get => _recognitionInfoText;
+			get => _informationText;
 
 			set
 			{
-				_recognitionInfoText = value;
+				_informationText = value;
 				OnPropertyChanged();
 			}
 
 		}
 
-		private string _uploadedSongText;
+		private string _uploadedSongText = "Please upload audio file";
 		public string UploadedSongText
 		{
 			get => _uploadedSongText;
@@ -197,8 +199,6 @@ namespace BP.Shared.ViewModels
 
 		}
 
-
-
 		private bool _showUploadUI;
 		public bool ShowUploadUI
 		{
@@ -228,6 +228,17 @@ namespace BP.Shared.ViewModels
 			set
 			{
 				_isRecognizing = value;
+				OnPropertyChanged();
+			}
+		}
+
+		private bool _isUploading;
+		public bool IsUploading
+		{
+			get => _isUploading;
+			set
+			{
+				_isUploading = value;
 				OnPropertyChanged();
 			}
 		}
@@ -272,18 +283,18 @@ namespace BP.Shared.ViewModels
 			if (ID == null)
 			{
 
-				RecognitionInfoText = $"Song was not recognized.";
+				InformationText = $"Song was not recognized.";
 				return;
 			}
 
 			try
 			{
 				Song song = database.GetSongByID((uint)ID);
-				RecognitionInfoText = $"\"{song.Name}\" by {song.Author}";
+				InformationText = $"\"{song.Name}\" by {song.Author}";
 			}
 			catch (ArgumentException e)
 			{
-				RecognitionInfoText = e.Message;
+				InformationText = e.Message;
 			}
 		}
 

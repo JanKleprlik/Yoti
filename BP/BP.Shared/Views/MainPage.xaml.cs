@@ -128,7 +128,6 @@ namespace BP.Shared.Views
 		private void setupSettingsDialog(Settings settings)
 		{
 			settingsDialog = new SettingsDialog(SettingsVM);
-			settingsDialog.Visibility = Visibility.Collapsed;
 			Grid.SetRowSpan(settingsDialog, 3);
 			Grid.SetColumnSpan(settingsDialog, 3);			
 		}
@@ -205,8 +204,9 @@ namespace BP.Shared.Views
 		//PORTED
 		private async void UploadNewSongBtn_Click(object sender, RoutedEventArgs e)
 		{
+			UploadProgressBar.Visibility = Visibility.Visible;
 #if NETFX_CORE
-			pickAndUploadFileUWPAsync();
+			await pickAndUploadFileUWPAsync();
 #endif
 #if __ANDROID__
 			pickAndUploadFileANDROIDAsync();
@@ -214,6 +214,7 @@ namespace BP.Shared.Views
 #if __WASM__
 			pickAndUploadFileWASM();
 #endif
+			UploadProgressBar.Visibility = Visibility.Collapsed;
 		}
 
 #region Upload new song 
@@ -303,10 +304,9 @@ namespace BP.Shared.Views
 
 #endregion
 
-		// UI Navigation
+		// THIS WILL STAY
 		private async void SettingsBtn_Click(object sender, RoutedEventArgs e)
 		{
-			settingsDialog.Visibility = Visibility.Visible;
 			ContentDialogResult result = await settingsDialog.ShowAsync();
 		}
 		private void ListSongsBtn_Click(object sender, RoutedEventArgs e)
@@ -314,42 +314,12 @@ namespace BP.Shared.Views
 			Frame.Navigate(typeof(SongList), database.GetSongs());
 		}
 
-
-
-		private  void OpenNewSongForm_Click(object sender, RoutedEventArgs e)
-		{
-			showAddNewSongUI();
-		}
-		
-		private void CancelNewSong_Click(object sender, RoutedEventArgs e)
-		{
-			hideAddNewSongUI();
-		}
-
-
 #region UI HELPERS
 
 		private void displayInfoText(string text)
 		{
 			InformationTextBlk.Text = text;
 		}
-
-		private void hideAddNewSongUI()
-		{
-			UploadGrid.Visibility = Visibility.Collapsed;
-			OpenNewSongFormBtn.Visibility = Visibility.Visible;
-			ListSongsBtn.Visibility = Visibility.Visible;
-		}
-
-		private void showAddNewSongUI()
-		{
-			UploadGrid.Visibility = Visibility.Visible;
-			OpenNewSongFormBtn.Visibility = Visibility.Collapsed;
-			ListSongsBtn.Visibility = Visibility.Collapsed;
-		}
-
-
-
 #endregion
 	}
 }

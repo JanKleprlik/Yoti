@@ -10,7 +10,7 @@ namespace BP.Shared.ViewModels
 	public partial class MainPageViewModel : BaseViewModel
 	{
 
-		private async void pickAndUploadFileUWPAsync()
+		private async Task pickAndUploadFileUWPAsync()
 		{
 			var picker = new Windows.Storage.Pickers.FileOpenPicker();
 			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
