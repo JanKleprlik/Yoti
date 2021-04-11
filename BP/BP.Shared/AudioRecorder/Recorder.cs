@@ -300,19 +300,18 @@ namespace BP.Shared.AudioRecorder
 			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
 			lock (bufferLock)
 			{
-				AudioTrack audioTrack = new AudioTrack(
-					// Stream type
-					Android.Media.Stream.Music,
-					// Frequency
-					(int)Parameters.SamplingRate,
-					// Mono or stereo
-					channels,
-					// Audio encoding
-					Android.Media.Encoding.Pcm16bit,
-					// Length of the audio clip.
-					buffer.Length,
-					// Mode. Stream or static.
-					AudioTrackMode.Stream);
+				AudioTrack audioTrack = new AudioTrack.Builder()
+					.SetAudioAttributes(new AudioAttributes.Builder()
+						.SetUsage(AudioUsageKind.Media)
+						.SetContentType(AudioContentType.Music)
+						.Build())
+					.SetAudioFormat(new AudioFormat.Builder()
+						.SetEncoding(Encoding.Pcm16bit)
+						.SetSampleRate((int) Parameters.SamplingRate)
+						.SetChannelMask(channels)
+						.Build())
+					.SetBufferSizeInBytes(buffer.Length)
+					.Build();
 
 				audioTrack.Play();
 				audioTrack.Write(buffer, 0, buffer.Length);
