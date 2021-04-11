@@ -10,7 +10,7 @@ namespace BP.Shared.ViewModels
 	public partial class MainPageViewModel : BaseViewModel
 	{
 
-		private async Task pickAndUploadFileUWPAsync()
+		private async Task pickAndUploadFileUWPAsync(Action<string> writeResult)
 		{
 			var picker = new Windows.Storage.Pickers.FileOpenPicker();
 			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
@@ -27,11 +27,13 @@ namespace BP.Shared.ViewModels
 					uploadedSong = new byte[(int)audioFileData.Length];
 					audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
 				}
-				UploadedSongText = file.Name;
+				writeResult(file.Name);
+				//UploadedSongText = file.Name;
 			}
 			else
 			{
-				UploadedSongText= "No song uploaded.";
+				writeResult("No song uploaded.");
+				//UploadedSongText= "No song uploaded.";
 			}
 		}
 

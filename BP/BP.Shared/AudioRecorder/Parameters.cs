@@ -11,6 +11,8 @@ namespace BP.Shared.AudioRecorder
 			public static uint SamplingRate = 48000;
 
 			public static uint Channels = 1;
+
+			public static ulong MaxRecordingUploadSize_Mb = 5;
 		}
 
 	}

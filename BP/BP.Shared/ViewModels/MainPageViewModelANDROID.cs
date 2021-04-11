@@ -1,6 +1,7 @@
 ﻿#if __ANDROID__
 
 using AudioProcessing.AudioFormats;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace BP.Shared.ViewModels
 {
 	public partial class MainPageViewModel : BaseViewModel
 	{
-		private async void pickAndUploadFileANDROIDAsync()
+		private async Task pickAndUploadFileANDROIDAsync(Action<string> writeResult)
 		{
 			if (await getExternalStoragePermission())
 			{
@@ -27,23 +28,23 @@ namespace BP.Shared.ViewModels
 
 				if (result != null)
 				{
-					UploadedSongText = result.FileName;
 					var audioFileData = await result.OpenReadAsync();
 					lock (uploadedSongLock)
 					{
 						uploadedSong = new byte[(int)audioFileData.Length];
 						audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
 					}
+					writeResult(result.FileName);
 				}
 				else
 				{
-					UploadedSongText = "No song uploaded";
+					writeResult("No song uploaded");
 				}
 
 			}
 			else
 			{
-				UploadedSongText = "Acces to read storage denied.";
+				writeResult("Acces to read storage denied.");
 			}
 		}
 

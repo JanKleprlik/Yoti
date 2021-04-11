@@ -27,7 +27,7 @@ namespace BP.Shared.ViewModels
 			else
 			{
 				stringBuilder = new StringBuilder();
-				await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(5, 0);"); //(size_limit, js metadata offset)
+				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioRecorder.Recorder.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
 			}
 		}
 

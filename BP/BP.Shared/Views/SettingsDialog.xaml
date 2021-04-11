@@ -53,6 +53,13 @@
 			OffContent="Detailed info"
 			IsOn="{x:Bind SettingsViewModel.DetailedInfo, Mode=TwoWay}"
 			/>
+		<ToggleSwitch 
+			x:Name="UseMicrophone"
+			OnContent="Use microphone"
+			OffContent="Use microphone"
+			IsOn="{x:Bind SettingsViewModel.UseMicrophone, Mode=TwoWay}"
+			/>
+
 		<Slider
 			x:Name="RecordingLength"
 			Minimum="3"

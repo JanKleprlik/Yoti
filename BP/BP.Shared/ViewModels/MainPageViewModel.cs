@@ -55,25 +55,41 @@ namespace BP.Shared.ViewModels
 
 		public async void RecognizeSong()
 		{
+			bool sucessfullUpload = true;
+
 			textWriter.Clear();
+			InformationText = settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
 
-			IsRecording = true;
-			InformationText = "Recording ...";
-			await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
-			IsRecording = false;
+			if (settings.UseMicrophone)
+			{
+				IsRecording = true;
+				await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
+				IsRecording = false;
+				FinishedRecording = true;
+			}
+			else
+			{
+				sucessfullUpload = await audioRecorder.UploadRecording(value => InformationText = value);
+				if (sucessfullUpload)
+					FinishedRecording = true;
+			}
 
-			FinishedRecording = true;
 
-			IsRecognizing = true;
-			InformationText = "Looking for a match ...";
-			uint? recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
 
-			//Display result only on Windows and Android
-			//WASM is handled in event see MainPageViewModelWASM.cs
-#if __ANDROID__ || NETFX_CORE
-			WriteRecognitionResults(recognizedSongID);
-#endif
-			IsRecognizing = false;
+			if (sucessfullUpload)
+			{
+				IsRecognizing = true;
+				InformationText = "Looking for a match ...";
+
+				uint? recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
+
+				//Display result only on Windows and Android
+				//WASM is handled in event see MainPageViewModelWASM.cs
+	#if __ANDROID__ || NETFX_CORE
+				WriteRecognitionResults(recognizedSongID);
+	#endif
+				IsRecognizing = false;
+			}
 		}
 
 		public void ReplayRecording()
@@ -89,10 +105,10 @@ namespace BP.Shared.ViewModels
 		public async void UploadNewSong()
 		{
 #if NETFX_CORE
-			await pickAndUploadFileUWPAsync();
+			await pickAndUploadFileUWPAsync(value => UploadedSongText = value);
 #endif
 #if __ANDROID__
-			pickAndUploadFileANDROIDAsync();
+			await pickAndUploadFileANDROIDAsync(value => UploadedSongText = value);
 #endif
 #if __WASM__
 			await pickAndUploadFileWASM();

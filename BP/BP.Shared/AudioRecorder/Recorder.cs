@@ -30,7 +30,7 @@ namespace BP.Shared.AudioRecorder
 		#region UWP
 #if NETFX_CORE
 		MediaCapture audioCapture;
-		InMemoryRandomAccessStream buffer;
+		IRandomAccessStream buffer;
 		string filename;
 		string audioFile = "recording.wav";
 #endif
@@ -42,6 +42,55 @@ namespace BP.Shared.AudioRecorder
 		private int bufferLimit = 480000;
 #endif
 		#endregion
+
+		public async Task<bool> UploadRecording(Action<string> writeResult)
+		{
+			#region UWP
+#if NETFX_CORE
+			var picker = new Windows.Storage.Pickers.FileOpenPicker();
+			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+			picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
+			picker.FileTypeFilter.Add(".wav");
+
+			StorageFile file = await picker.PickSingleFileAsync();
+			
+			if (file == null)
+			{
+				writeResult("No song uploaded.");
+				return false;
+			}
+			
+			var fileProperties = await file.GetBasicPropertiesAsync();
+			if (fileProperties.Size > Parameters.MaxRecordingUploadSize_Mb * 1024 * 1024)
+			{
+				writeResult($"Selected file is too big.\nMaximum allowed size is {Parameters.MaxRecordingUploadSize_Mb} Mb.");
+				return false;
+			}
+			else 
+			{
+				buffer = await file.OpenAsync(FileAccessMode.ReadWrite);
+				writeResult(file.Name);
+				return true;
+			}
+
+#endif
+			#endregion
+
+			#region ANDROID
+#if __ANDROID__
+
+			return true;
+#endif
+			#endregion
+			#region
+#if __WASM__
+			return true;
+#endif
+			#endregion
+
+			//fallback return value for unsupported platforms
+			return false;
+		}
 
 		public async Task RecordAudio(int recordingLength = 3)
 		{
@@ -253,11 +302,11 @@ namespace BP.Shared.AudioRecorder
 			}
 		}
 #endif
-		#endregion
+#endregion
 
 
 		// helper functons
-		#region UWP - helper functions
+#region UWP - helper functions
 #if NETFX_CORE
 
 		private async Task setupRecording()
@@ -300,9 +349,9 @@ namespace BP.Shared.AudioRecorder
 		}
 
 #endif
-		#endregion
+#endregion
 
-		#region ANDROID - helper functions
+#region ANDROID - helper functions
 #if __ANDROID__
 		private int getBufferLimitFromTime(int recordingLength)
 		{
