@@ -9,7 +9,8 @@
 			HorizontalAlignment="Stretch"
 			>
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="20"/>
+				<ColumnDefinition Width="50"/>
+				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 				<ColumnDefinition Width="*"/>
 			</Grid.ColumnDefinitions>
@@ -28,6 +29,13 @@
 				x:Name="SongAuthor"
 				Grid.Column="2"
 				Text="{Binding Author}"
+				/>
+			<Button
+				Style="{StaticResource IconStyle}"
+				Content="Cancel"
+				Tag="{Binding}"
+				Click="SongBtn_Click"
+				Grid.Column="3"
 				/>
 		</Grid>
 	</DataTemplate>

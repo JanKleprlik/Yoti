@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.ViewManagement;
 using Database;
 using System.Collections.ObjectModel;
+using Uno.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace BP.Shared.Views
 {
@@ -54,5 +56,12 @@ namespace BP.Shared.Views
 			Frame.Navigate(typeof(MainPage));
 		}
 
+
+		private void SongBtn_Click(object sender, RoutedEventArgs e)
+		{
+			var song = (sender as FrameworkElement).Tag as Song;
+			this.Log().LogInformation(song.Name);
+
+		}
 	}
 }

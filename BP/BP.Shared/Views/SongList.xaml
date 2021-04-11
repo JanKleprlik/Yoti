@@ -37,13 +37,101 @@
 			VerticalAlignment="Stretch"
 			ItemsSource="{x:Bind songsList}"
 			Padding="50"
-			ItemTemplate="{StaticResource SongDataTemplate}"
 			>
 			<ListView.ItemContainerStyle>
 				<Style TargetType="ListViewItem">
 					<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
 				</Style>
 			</ListView.ItemContainerStyle>
+			<ListView.ItemTemplate>
+				<DataTemplate>
+					<Grid
+						HorizontalAlignment="Stretch"
+						>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="30"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="50"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock
+							x:Name="SongID"
+							Grid.Column="0"
+							Text="{Binding ID}"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Left"
+							Style="{StaticResource DefaultTextBlock}"
+							/>
+						<TextBlock
+							x:Name="SongName"
+							Grid.Column="1"
+							Text="{Binding Name}"
+							Margin="20,0,0,0"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Left"
+							Style="{StaticResource DefaultTextBlock}"
+							/>
+						<TextBlock
+							x:Name="SongAuthor"
+							Grid.Column="2"
+							Text="{Binding Author}"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Left"
+							Style="{StaticResource DefaultTextBlock}"
+							/>
+						<Button
+							Style="{StaticResource IconStyle}"
+							Content="Delete"
+							Foreground="{StaticResource CancelColor}"
+							Tag="{Binding}"
+							Click="SongBtn_Click"
+							Grid.Column="3"
+							/>
+					</Grid>
+				</DataTemplate>
+			</ListView.ItemTemplate>
+			<ListView.HeaderTemplate>
+				<DataTemplate>
+					<Grid
+						HorizontalAlignment="Stretch"
+						>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="30"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="50"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock
+							Grid.Column="0"
+							Text="ID"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Left"
+							Style="{StaticResource DefaultTextBlock}"
+							Foreground="{StaticResource SecondaryDarkColor}"
+							FontSize="20"
+							/>
+						<TextBlock
+							Grid.Column="1"
+							Text="Name"
+							Margin="30,0,0,0"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Left"
+							Style="{StaticResource DefaultTextBlock}"							
+							FontSize="20"
+							Foreground="{StaticResource SecondaryHighlightedDarkColor}"
+							/>
+						<TextBlock
+							Grid.Column="2"
+							Text="Author"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Left"
+							Style="{StaticResource DefaultTextBlock}"
+							Foreground="{StaticResource SecondaryHighlightedDarkColor}"
+							FontSize="20"
+							/>
+					</Grid>
+				</DataTemplate>
+			</ListView.HeaderTemplate>
 		</ListView>
 
 	</Grid>
