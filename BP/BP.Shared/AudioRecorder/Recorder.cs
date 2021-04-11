@@ -16,6 +16,8 @@ using Windows.UI.Xaml.Controls;
 using Android.Media;
 using System.IO;
 using System.Threading;
+using Xamarin.Essentials;
+using System.Collections.Generic;
 #endif
 
 
@@ -79,10 +81,12 @@ namespace BP.Shared.AudioRecorder
 			#region ANDROID
 #if __ANDROID__
 
-			return true;
+			buffer = await Utils.FileUpload.pickAndUploadFileAsync(writeResult, bufferLock, Recorder.Parameters.MaxRecordingUploadSize_Mb);
+			return buffer != null;
 #endif
 			#endregion
-			#region
+
+			#region WASM
 #if __WASM__
 			return true;
 #endif
@@ -92,9 +96,17 @@ namespace BP.Shared.AudioRecorder
 			return false;
 		}
 
-		public async Task RecordAudio(int recordingLength = 3)
+
+		#region RECORDING
+		public async Task<bool> RecordAudio(int recordingLength = 3)
 		{
 #if __ANDROID__
+			if (!await Utils.Permissions.Droid.GetMicPermission())
+			{
+				System.Diagnostics.Debug.WriteLine("[DEBUG] microphone acecss denied.");
+				return false;
+			}
+
 			bufferLimit = getBufferLimitFromTime(recordingLength);
 #endif
 
@@ -106,6 +118,7 @@ namespace BP.Shared.AudioRecorder
 #endif
 
 			await StopRecording();
+			return true;
 		}
 
 		public async Task StartRecording()
@@ -117,7 +130,7 @@ namespace BP.Shared.AudioRecorder
 			}
 			else
 			{
-#region UWP
+				#region UWP
 #if NETFX_CORE
 				await setupRecording();
 				var profile = MediaEncodingProfile.CreateWav(AudioEncodingQuality.Auto);
@@ -128,12 +141,9 @@ namespace BP.Shared.AudioRecorder
 				await audioCapture.StartRecordToStreamAsync(profile, buffer);
 				return;
 #endif
-#endregion
-#region ANDROID
+				#endregion
+				#region ANDROID
 #if __ANDROID__
-				if (!await getMicPermission())
-					return;
-
 
 				ChannelIn channels = Parameters.Channels == 1 ? ChannelIn.Mono : ChannelIn.Stereo;
 
@@ -145,7 +155,8 @@ namespace BP.Shared.AudioRecorder
 					bufferLimit
 					);
 
-				Console.Out.WriteLine("[DEBUG] starting to record ...");
+				System.Diagnostics.Debug.WriteLine("[DEBUG] starting to record ...");
+				//Console.Out.WriteLine("[DEBUG] starting to record ...");
 				isRecording = true;
 				int totalBytesRead = 0;
 
@@ -169,11 +180,13 @@ namespace BP.Shared.AudioRecorder
 						}
 						catch(Exception e)
 						{
+							System.Diagnostics.Debug.WriteLine("[DEBUG] " + e.Message);
 							Console.Out.WriteLine("[DEBUG] " + e.Message);
 							break;
 						}
 					}
 				}
+				System.Diagnostics.Debug.WriteLine("[DEBUG] finished recording");
 				Console.Out.WriteLine("[DEBUG] finished recording");
 
 #endif
@@ -204,6 +217,10 @@ namespace BP.Shared.AudioRecorder
 				isRecording = false;
 			}
 		}
+
+		#endregion
+
+
 #if !__WASM__
 		public async Task<byte[]> GetDataFromStream()
 		{
@@ -357,13 +374,6 @@ namespace BP.Shared.AudioRecorder
 		{
 			//seconds * (2 bytes per 1 sample) * samplingRate
 			return recordingLength * 2 * 48000;
-		}
-
-		private async Task<bool> getMicPermission()
-		{
-			CancellationTokenSource source = new CancellationTokenSource();
-			CancellationToken token = source.Token;
-			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.RecordAudio);
 		}
 #endif
 #endregion

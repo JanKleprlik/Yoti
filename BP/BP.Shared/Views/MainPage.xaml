@@ -253,7 +253,7 @@
 			<TextBlock
 				x:Name="InformationTextBlk"
 				not_android:FontSize="30"
-				TextWrapping="NoWrap"
+				TextWrapping="Wrap"
 				Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
 				/>
 			<ProgressBar

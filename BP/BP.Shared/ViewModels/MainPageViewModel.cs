@@ -1,4 +1,5 @@
 ﻿using BP.Shared.AudioRecorder;
+using BP.Shared.Utils;
 using AudioProcessing.Recognizer;
 using Database;
 using Windows.UI.Xaml.Controls;
@@ -55,7 +56,7 @@ namespace BP.Shared.ViewModels
 
 		public async void RecognizeSong()
 		{
-			bool sucessfullUpload = true;
+			bool sucessfullRecordingUpload = true;
 
 			textWriter.Clear();
 			InformationText = settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
@@ -63,20 +64,31 @@ namespace BP.Shared.ViewModels
 			if (settings.UseMicrophone)
 			{
 				IsRecording = true;
-				await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
+				sucessfullRecordingUpload = await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
 				IsRecording = false;
-				FinishedRecording = true;
+
+
+				//Inform user about fail
+				if (!sucessfullRecordingUpload)
+				{
+					InformationText = " Recording failed.";
+				}
+				//Allow recording replay
+				else
+				{
+					FinishedRecording = true;
+				}
 			}
 			else
 			{
-				sucessfullUpload = await audioRecorder.UploadRecording(value => InformationText = value);
-				if (sucessfullUpload)
-					FinishedRecording = true;
+				sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value);
 			}
 
+			if (sucessfullRecordingUpload)
+				FinishedRecording = true;
 
 
-			if (sucessfullUpload)
+			if (sucessfullRecordingUpload)
 			{
 				IsRecognizing = true;
 				InformationText = "Looking for a match ...";
@@ -104,14 +116,12 @@ namespace BP.Shared.ViewModels
 
 		public async void UploadNewSong()
 		{
-#if NETFX_CORE
-			await pickAndUploadFileUWPAsync(value => UploadedSongText = value);
-#endif
-#if __ANDROID__
-			await pickAndUploadFileANDROIDAsync(value => UploadedSongText = value);
-#endif
-#if __WASM__
+#if NETFX_CORE || __ANDROID__
+			uploadedSong = await FileUpload.pickAndUploadFileAsync(value => UploadedSongText = value, uploadedSongLock, maxSize_Mb:50);
+#elif __WASM__
 			await pickAndUploadFileWASM();
+#else
+			throw new NotImplementedException();
 #endif
 		}
 
@@ -139,6 +149,7 @@ namespace BP.Shared.ViewModels
 				string songAuthor = NewSongAuthor;
 
 				IsUploading = true;
+				InformationText = "Processing song";
 				Task adderTask = Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
 				await adderTask;
 				

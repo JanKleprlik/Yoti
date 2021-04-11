@@ -11,52 +11,6 @@ namespace BP.Shared.ViewModels
 {
 	public partial class MainPageViewModel : BaseViewModel
 	{
-		private async Task pickAndUploadFileANDROIDAsync(Action<string> writeResult)
-		{
-			if (await getExternalStoragePermission())
-			{
-				PickOptions options = new PickOptions
-				{
-					PickerTitle = "Please select a wav song file",
-					FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-					{
-						{DevicePlatform.Android, new[]{"audio/x-wav"} }
-					})
-				};
-
-				FileResult result = await FilePicker.PickAsync(options);
-
-				if (result != null)
-				{
-					var audioFileData = await result.OpenReadAsync();
-					lock (uploadedSongLock)
-					{
-						uploadedSong = new byte[(int)audioFileData.Length];
-						audioFileData.Read(uploadedSong, 0, (int)audioFileData.Length);
-					}
-					writeResult(result.FileName);
-				}
-				else
-				{
-					writeResult("No song uploaded");
-				}
-
-			}
-			else
-			{
-				writeResult("Acces to read storage denied.");
-			}
-		}
-
-
-		private async Task<bool> getExternalStoragePermission()
-		{
-			CancellationTokenSource source = new CancellationTokenSource();
-			CancellationToken token = source.Token;
-			return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.ReadExternalStorage);
-		}
-
-
 		private async Task<IAudioFormat> getAudioFormatFromRecordingANDROID()
 		{
 			byte[] recordedSong = await audioRecorder.GetDataFromStream();

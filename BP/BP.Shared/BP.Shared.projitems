@@ -21,8 +21,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Parameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Recorder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BooleanConverters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)CustomTextWriter.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\CustomTextWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\SettingsModel.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\FileUpload.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Permissions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BaseViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelANDROID.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelWASM.cs" />

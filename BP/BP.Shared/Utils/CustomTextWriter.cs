@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
-namespace BP.Shared
+namespace BP.Shared.Utils
 {
 
 	public class TextBlockTextWriter : TextWriter
