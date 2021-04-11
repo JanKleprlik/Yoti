@@ -63,7 +63,7 @@ namespace BP.Shared.Utils
 					PickerTitle = "Please select a wav song file",
 					FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
 					{
-						{DevicePlatform.Android, new[]{"audio/x-wav"} }
+						{DevicePlatform.Android, new[]{"audio/x-wav", "audio/wav"} }
 					})
 				};
 

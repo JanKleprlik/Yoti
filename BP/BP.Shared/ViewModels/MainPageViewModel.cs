@@ -158,6 +158,8 @@ namespace BP.Shared.ViewModels
 					InformationText = "Something went wrong...\nSong could not be uploaded.";
 				else
 					InformationText = $"\"{songName}\" by {songAuthor} added";
+
+				GC.Collect();
 			}
 		}
 
