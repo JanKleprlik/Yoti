@@ -252,6 +252,7 @@ namespace BP.Shared.ViewModels
 				_isRecording = value;
 				OnPropertyChanged();
 				OnPropertyChanged(nameof(IsProcessingRecognition));
+				OnPropertyChanged(nameof(IsRecognizingOrUploading));
 			}
 		}
 
@@ -293,7 +294,7 @@ namespace BP.Shared.ViewModels
 
 		public bool IsProcessingRecognition => IsRecognizing || IsRecording;
 
-		public bool IsRecognizingOrUploading => IsRecognizing || IsUploading;
+		public bool IsRecognizingOrUploading => IsRecognizing || IsRecording || IsUploading;
 
 		#endregion
 

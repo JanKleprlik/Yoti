@@ -12,7 +12,7 @@ namespace BP.Shared.AudioRecorder
 
 			public static uint Channels = 1;
 
-			public static ulong MaxRecordingUploadSize_Mb = 5;
+			public static ulong MaxRecordingUploadSize_Mb = 1;
 		}
 
 	}

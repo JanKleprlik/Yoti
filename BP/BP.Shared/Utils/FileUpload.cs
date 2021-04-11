@@ -15,7 +15,7 @@ namespace BP.Shared.Utils
 {
 	public static class FileUpload
 	{
-		public static async Task<byte[]> pickAndUploadFileAsync(Action<string> writeResult, object outputArrayLock, int maxSize_Mb)
+		public static async Task<byte[]> pickAndUploadFileAsync(Action<string> writeResult, object outputArrayLock, ulong maxSize_Mb)
 		{
 			byte[] outputArray;
 			#region UWP
@@ -31,7 +31,7 @@ namespace BP.Shared.Utils
 			{
 				var audioFileData = await file.OpenStreamForReadAsync();
 
-				if ((int)audioFileData.Length > maxSize_Mb * 1024 * 1024)
+				if ((ulong)audioFileData.Length > maxSize_Mb * 1024 * 1024)
 				{
 					writeResult($"File is too large.\nMaximum allowed size is {maxSize_Mb} Mb.");
 					return null;
@@ -52,8 +52,7 @@ namespace BP.Shared.Utils
 			}
 
 #endif
-			#endregion
-
+#endregion
 
 			#region ANDROID
 #if __ANDROID__
@@ -73,7 +72,7 @@ namespace BP.Shared.Utils
 				if (result != null)
 				{
 					var audioFileData = await result.OpenReadAsync();
-					if ((int)audioFileData.Length > maxSize_Mb * 1024 * 1024)
+					if ((ulong)audioFileData.Length > maxSize_Mb * 1024 * 1024)
 					{
 						writeResult($"File is too large.\nMaximum allowed size is {maxSize_Mb} Mb.");
 						return null;
@@ -100,6 +99,11 @@ namespace BP.Shared.Utils
 			}
 #endif
 			#endregion
+
+//other platforms are not supported
+#if !__ANDROID__ && !NETFX_CORE
+			return null;
+#endif
 		}
 	}
 }

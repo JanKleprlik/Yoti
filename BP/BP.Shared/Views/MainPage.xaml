@@ -299,7 +299,7 @@
 			Content="List songs"
 			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
 			Click="{x:Bind ListSongsBtn_Click}"
-			not_win:IsEnabled="{x:Bind MainPageVM.IsRecognizingOrUploading, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
+			not_wasm:IsEnabled="{x:Bind MainPageVM.IsRecognizingOrUploading, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
 
 		<Grid
