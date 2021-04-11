@@ -7,7 +7,6 @@
 		<ResourceDictionary Source="TextBox.xaml"/>
 		<ResourceDictionary Source="TextBlock.xaml"/>
 		<ResourceDictionary Source="DropDownButton.xaml"/>
-		<ResourceDictionary Source="Slider.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 	
 </ResourceDictionary>

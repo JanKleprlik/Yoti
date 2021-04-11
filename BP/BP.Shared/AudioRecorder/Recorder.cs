@@ -295,7 +295,7 @@ namespace BP.Shared.AudioRecorder
 #endregion
 #region ANDROID
 #if __ANDROID__
-		public async void ReplayRecordingANDROID()
+		public void ReplayRecordingANDROID()
 		{
 			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
 			lock (bufferLock)
