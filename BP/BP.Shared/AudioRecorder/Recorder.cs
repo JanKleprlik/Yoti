@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 #if NETFX_CORE
@@ -18,6 +15,7 @@ using Windows.UI.Xaml.Controls;
 #if __ANDROID__
 using Android.Media;
 using System.IO;
+using System.Threading;
 #endif
 
 
