@@ -12,12 +12,33 @@ using Uno.Extensions;
 
 namespace Database
 {
-	public class DatabaseSQLite
+	public sealed class DatabaseSQLite
 	{
 		private SQLiteConnection connection;
 		#region INITIALIZATION
 
-		public DatabaseSQLite()
+		private static DatabaseSQLite instance = null;
+		private static readonly object syncObject = new object();
+
+		public static DatabaseSQLite Instance
+		{
+			get
+			{
+				if (instance == null)
+				{
+					lock (syncObject)
+					{
+						if (instance == null)
+						{
+							instance = new DatabaseSQLite();
+						}
+					}
+				}
+				return instance;
+			}
+		}
+
+		private DatabaseSQLite()
 		{
 			this.Log().LogDebug("[DEBUG] In Database constructor");
 			string databasePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "AudioDatabase.db");
@@ -114,6 +135,50 @@ namespace Database
 
 			}
 		}
+
+		public void DeleteSong(Song song)
+		{
+			int deleteSongID = song.ID;
+			connection.Delete(song);
+
+			Dictionary<uint, List<ulong>> oldSearchData = GetSearchData();
+			Dictionary<uint, List<ulong>> newSearchData = new Dictionary<uint, List<ulong>>();
+
+			//list for repetitive usage
+			List<ulong> songDataList = new List<ulong>();
+
+			foreach(KeyValuePair<uint, List<ulong>> entry in oldSearchData)
+			{
+				songDataList.Clear();
+
+				foreach(ulong songData in entry.Value)
+				{
+					//do not add into new searchData if songID is same as deleteSongID
+					//cast type to int is because ulong songID consists of:
+					//32 bits of Absolute time of Anchor
+					//32 bits of songID
+					if (deleteSongID != (int)songData)
+					{
+						//add songData to new search Data
+						songDataList.Add(songData);
+					}
+				}
+
+				//if some songs live on entry.Key 
+				//put them into newSearchData
+				if (songDataList.Count != 0)
+				{
+					newSearchData.Add(entry.Key, songDataList);
+				}
+			}
+
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] oldSearchDataList.Count: {oldSearchData.Count}");
+			System.Diagnostics.Debug.WriteLine($"[DEBUG] newearchDataList.Count: {newSearchData.Count}");
+
+			UpdateSearchData(newSearchData);
+		}
+
+
 
 		#endregion
 

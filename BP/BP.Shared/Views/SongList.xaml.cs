@@ -17,6 +17,7 @@ using Database;
 using System.Collections.ObjectModel;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace BP.Shared.Views
 {
@@ -26,27 +27,18 @@ namespace BP.Shared.Views
 	public sealed partial class SongList : Page
 	{
 		private ObservableCollection<Song> songsList;
+		private DatabaseSQLite database;
+
 		public SongList()
 		{
 			this.InitializeComponent();
+			database = DatabaseSQLite.Instance;
 			songsList = new ObservableCollection<Song>();
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			if (e.Parameter is List<Song>)
-			{
-				var songs = e.Parameter as List<Song>;
-
-#if __WASM__ || __ANDROID__
-				foreach (var song in songs)
-				{
-					songsList.Add(song);
-				}
-#else
-				songsList = new ObservableCollection<Song>(songs);
-#endif
-			}
+			UpdateSongsList();
 
 			base.OnNavigatedTo(e);
 		}
@@ -56,12 +48,31 @@ namespace BP.Shared.Views
 			Frame.Navigate(typeof(MainPage));
 		}
 
+		private void UpdateSongsList()
+		{
+#if __WASM__ || __ANDROID__
+			var songs = database.GetSongs();
+			foreach (var song in songs)
+			{
+				songsList.Add(song);
+			}
+#else
+			songsList = new ObservableCollection<Song>(database.GetSongs());
 
-		private void SongBtn_Click(object sender, RoutedEventArgs e)
+#endif
+		}
+
+
+		private async void SongBtn_Click(object sender, RoutedEventArgs e)
 		{
 			var song = (sender as FrameworkElement).Tag as Song;
-			this.Log().LogInformation(song.Name);
+			this.Log().LogDebug($"Deleting song ID: {song.ID}\tName: {song.Name}\tAuthor: {song.Author}");
+			
+			//remove from database
+			await Task.Run(() => database.DeleteSong(song));
 
+			//remove from currently displayed list
+			songsList.Remove(song);
 		}
 	}
 }

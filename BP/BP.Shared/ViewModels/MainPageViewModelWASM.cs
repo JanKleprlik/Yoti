@@ -38,7 +38,7 @@ namespace BP.Shared.ViewModels
 			stringBuilder = new StringBuilder();
 			//Update UI
 			//In WASM UI Thread will be blocked while uploading
-			InformationText = "Processing uploaded file\n Please wait ...";
+			InformationText = "Processing uploaded file.\n Please wait ...";
 			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);"); //(size_limit, js metadata offset)
 		}
 

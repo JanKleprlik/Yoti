@@ -44,7 +44,7 @@ namespace BP.Shared.ViewModels
 			this.UIDispatcher = UIDispatcher; 
 			
 			audioRecorder = new Recorder();
-			Database = new DatabaseSQLite();
+			Database = DatabaseSQLite.Instance;
 			recognizer = new AudioRecognizer(textWriter);
 
 			//Popsat proč to tady dělám
