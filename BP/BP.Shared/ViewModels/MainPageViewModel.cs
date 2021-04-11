@@ -171,10 +171,15 @@ namespace BP.Shared.ViewModels
 			ShowUploadUI = false;
 		}
 
+		public void UpdateSavedSongs()
+		{
+			savedSongs = Database.GetSearchData();
+		}
+
 		public void TestMethod()
 		{
 			this.Log().LogDebug("DEBUG");
-			this.Log().LogDebug(settings.ToString());
+			this.Log().LogDebug(savedSongs.Count.ToString());
 		}
 		#endregion
 

@@ -4,7 +4,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
 using BP.Shared.Models;
 using BP.Shared.ViewModels;
-
+using Windows.UI.Xaml.Navigation;
 
 namespace BP.Shared.Views
 {
@@ -64,6 +64,17 @@ namespace BP.Shared.Views
 			settingsDialog = new SettingsDialog(SettingsVM);
 			Grid.SetRowSpan(settingsDialog, 3);
 			Grid.SetColumnSpan(settingsDialog, 3);			
+		}
+
+
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			if (e.Parameter is Boolean && (bool)e.Parameter)
+			{
+				MainPageVM.UpdateSavedSongs();				
+			}
+
+			base.OnNavigatedTo(e);
 		}
 
 	}

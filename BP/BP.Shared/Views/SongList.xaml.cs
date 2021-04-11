@@ -28,7 +28,7 @@ namespace BP.Shared.Views
 	{
 		private ObservableCollection<Song> songsList;
 		private DatabaseSQLite database;
-
+		private bool wasChange = false;
 		public SongList()
 		{
 			this.InitializeComponent();
@@ -45,7 +45,7 @@ namespace BP.Shared.Views
 
 		private void BackBtn_Click(object sender, RoutedEventArgs e)
 		{
-			Frame.Navigate(typeof(MainPage));
+			Frame.Navigate(typeof(MainPage), wasChange);
 		}
 
 		private void UpdateSongsList()
@@ -65,6 +65,7 @@ namespace BP.Shared.Views
 
 		private async void SongBtn_Click(object sender, RoutedEventArgs e)
 		{
+			wasChange = true;
 			var song = (sender as FrameworkElement).Tag as Song;
 			this.Log().LogDebug($"Deleting song ID: {song.ID}\tName: {song.Name}\tAuthor: {song.Author}");
 			

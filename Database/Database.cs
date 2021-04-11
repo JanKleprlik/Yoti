@@ -144,12 +144,10 @@ namespace Database
 			Dictionary<uint, List<ulong>> oldSearchData = GetSearchData();
 			Dictionary<uint, List<ulong>> newSearchData = new Dictionary<uint, List<ulong>>();
 
-			//list for repetitive usage
-			List<ulong> songDataList = new List<ulong>();
 
 			foreach(KeyValuePair<uint, List<ulong>> entry in oldSearchData)
 			{
-				songDataList.Clear();
+				List<ulong> songDataList = new List<ulong>();
 
 				foreach(ulong songData in entry.Value)
 				{
