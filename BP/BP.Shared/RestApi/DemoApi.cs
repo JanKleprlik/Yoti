@@ -10,7 +10,7 @@ namespace BP.Shared.RestApi
 		public async Task<string> Search()
 		{
 			var result = await GetAsync(
-				$"https://webapicore20210412194008.azurewebsites.net/values/333",
+				$"https://yotiserver.azurewebsites.net/weatherforecast",
 				new Dictionary<string, string> {
 					{"accept", "application/x-www-form-urlencoded" },
 				});
