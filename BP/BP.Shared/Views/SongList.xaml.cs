@@ -39,7 +39,7 @@ namespace BP.Shared.Views
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			UpdateSongsList();
-
+			wasChange = false;
 			base.OnNavigatedTo(e);
 		}
 
