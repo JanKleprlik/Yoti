@@ -1,7 +1,5 @@
 ﻿using BP.Shared.AudioRecorder;
 using BP.Shared.Utils;
-using AudioProcessing.Recognizer;
-using Database;
 using Windows.UI.Xaml.Controls;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
@@ -11,6 +9,7 @@ using System;
 using AudioProcessing.AudioFormats;
 using Windows.UI.Core;
 using System.Collections.Generic;
+using Database;
 
 namespace BP.Shared.ViewModels
 {
@@ -19,7 +18,7 @@ namespace BP.Shared.ViewModels
 		#region private fields
 
 		private Recorder audioRecorder { get; set; }
-		private AudioRecognizer recognizer { get; set; }
+		//private AudioRecognizer recognizer { get; set; }
 		private TextBlockTextWriter textWriter { get; set; }
 		private Settings settings { get; set; }
 		private CoreDispatcher UIDispatcher { get; set; }
@@ -34,7 +33,7 @@ namespace BP.Shared.ViewModels
 		#endregion
 
 
-		public DatabaseSQLite Database { get; private set; }
+		//public DatabaseSQLite Database { get; private set; }
 
 		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
 		{
@@ -44,11 +43,11 @@ namespace BP.Shared.ViewModels
 			this.UIDispatcher = UIDispatcher; 
 			
 			audioRecorder = new Recorder();
-			Database = DatabaseSQLite.Instance;
-			recognizer = new AudioRecognizer(textWriter);
+			//Database = DatabaseSQLite.Instance;
+			//recognizer = new AudioRecognizer(textWriter);
 
 			//Popsat proč to tady dělám
-			savedSongs = Database.GetSearchData();
+			//savedSongs = Database.GetSearchData();
 
 		}
 
@@ -175,7 +174,8 @@ namespace BP.Shared.ViewModels
 
 		public void UpdateSavedSongs()
 		{
-			savedSongs = Database.GetSearchData();
+			//savedSongs = Database.GetSearchData();
+			throw new NotImplementedException();
 		}
 
 		public async void TestMethod()
@@ -328,7 +328,8 @@ namespace BP.Shared.ViewModels
 #else
 				throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
 #endif
-				return await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
+				//return await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
+				throw new NotImplementedException();
 			}
 			catch(InvalidOperationException e)
 			{
@@ -348,7 +349,9 @@ namespace BP.Shared.ViewModels
 
 			try
 			{
-				Song song = Database.GetSongByID((uint)ID);
+				//TADY JSEM ZMENIL FKIN SONG TYPE Z DATABAZE NA MODEL
+				Song song = null; // Database.GetSongByID((uint)ID);
+				throw new NotImplementedException();
 				InformationText = $"\"{song.Name}\" by {song.Author}";
 			}
 			catch (ArgumentException e)
@@ -371,12 +374,12 @@ namespace BP.Shared.ViewModels
 				}
 
 				//TODO: popsat!!!
-				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-				uint songID = Database.AddSong(songName, songAuthor);
-				recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
-				Database.UpdateSearchData(savedSongs);
+				//var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+				//uint songID = Database.AddSong(songName, songAuthor);
+				//recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
+				//Database.UpdateSearchData(savedSongs);
 				this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
-
+				throw new NotImplementedException();
 			}
 			catch(Exception e)
 			{

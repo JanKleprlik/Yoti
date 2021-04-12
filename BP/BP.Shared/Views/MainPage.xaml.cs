@@ -38,7 +38,8 @@ namespace BP.Shared.Views
 		}
 		public void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
-			Frame.Navigate(typeof(SongList), MainPageVM.Database.GetSongs());
+			//Frame.Navigate(typeof(SongList), MainPageVM.Database.GetSongs());
+			throw new NotImplementedException();
 		}
 		private void setupFlickerAnimation()
 		{

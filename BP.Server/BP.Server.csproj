@@ -5,7 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.5" />
+    <PackageReference Include="Salar.Bois" Version="3.1.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
+  <Import Project="..\Database\Database.projitems" Label="Shared" />
+
+  <Import Project="..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />
 
 </Project>

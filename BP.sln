@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BP.Server", "BP.Server\BP.S
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		AudioProcessing\AudioProcessing.projitems*{103d687b-09a6-458d-bc12-c75005e02439}*SharedItemsImports = 5
+		Database\Database.projitems*{103d687b-09a6-458d-bc12-c75005e02439}*SharedItemsImports = 5
 		AudioProcessing\AudioProcessing.projitems*{34c88066-3dd3-402a-aa82-801e2f47fc53}*SharedItemsImports = 5
 		BP\BP.Shared\BP.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
 		Database\Database.projitems*{7358a2c4-04ce-49da-b95e-1677f2cd54ba}*SharedItemsImports = 13

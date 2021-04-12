@@ -1,19 +1,18 @@
 ﻿using AudioProcessing;
 using Microsoft.Extensions.Logging;
 using Salar.Bois;
-using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
-using Uno.Extensions;
 
 namespace Database
 {
 	public sealed class DatabaseSQLite
 	{
+		/*
 		private SQLiteConnection connection;
 		#region INITIALIZATION
 
@@ -274,5 +273,6 @@ namespace Database
 			}
 		}
 		#endregion
+		*/
 	}
 }
