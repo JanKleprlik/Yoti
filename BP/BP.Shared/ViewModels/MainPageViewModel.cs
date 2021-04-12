@@ -178,10 +178,15 @@ namespace BP.Shared.ViewModels
 			savedSongs = Database.GetSearchData();
 		}
 
-		public void TestMethod()
+		public async void TestMethod()
 		{
 			this.Log().LogDebug("DEBUG");
-			this.Log().LogDebug(savedSongs.Count.ToString());
+
+			RestApi.DemoApi da = new RestApi.DemoApi();
+
+			string res = await da.Search();
+
+			this.Log().LogDebug(res);
 		}
 		#endregion
 
