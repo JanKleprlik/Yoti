@@ -26,4 +26,11 @@ namespace Database
 		public int BPM {get; set;}
 	}
 
+	public class RecognitionResult
+	{
+		public Song Song { get; set; }
+
+		public string DetailInfo { get; set; }
+	}
+
 }

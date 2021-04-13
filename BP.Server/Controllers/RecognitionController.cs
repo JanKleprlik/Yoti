@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using AudioProcessing.AudioFormats;
 using AudioProcessing;
 using AudioProcessing.Recognizer;
+using System.IO;
 
 namespace BP.Server.Controllers
 {
@@ -23,7 +24,6 @@ namespace BP.Server.Controllers
 		private readonly SearchDataSingleton _searchDataInstance;
 		private readonly ILogger _logger;
 		private readonly AudioRecognizer _recognizer = new AudioRecognizer();
-
 		public RecognitionController(SongContext context, SearchDataSingleton searchDataCollection, ILogger<RecognitionController> logger)
 		{
 			_context = context;
@@ -31,7 +31,7 @@ namespace BP.Server.Controllers
 			_logger = logger;
 		}
 
-		// POST:recognition/uploadsong
+		// POST:recognition/AddNewSong
 		#region Upload new song
 		[HttpPost("[action]")]
 		public async Task<ActionResult<Song>> AddNewSong(SongWavFormat songToUpload)
@@ -41,74 +41,54 @@ namespace BP.Server.Controllers
 			_logger.LogInformation("Getting correct searchdata");
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
 			
-			uint? maxId = _context.Songs.Max(song => (uint?)song.Id);
-			if (maxId == null)
-			{
-				maxId = 0;
-			}
+			_context.Songs.Add(newSong);
+			_context.SaveChanges();
+			uint maxId = _context.Songs.Max(song => song.Id);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddTFPToDataStructure(songToUpload.TFPs, (uint)(maxId + 1), searchData);
+			_recognizer.AddTFPToDataStructure(songToUpload.TFPs, maxId, searchData);
 
 			//Update data in database
 			_searchDataInstance.SaveToDB(songToUpload.BPM);
-			_context.Songs.Add(newSong);
 			_context.SaveChanges();
 
 			return CreatedAtAction(nameof(GetSong), new { id = newSong.Id }, newSong);
 		}
 		#endregion
 
-		// POST:recognition/recognizesong
+		// POST:recognition/RecognizeSong
 		#region Recognize song
 		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> RecognizeSong(SongWavFormat songToUpload)
+		public async Task<ActionResult<RecognitionResult>> RecognizeSong(SongWavFormat songToUpload)
 		{
+			var stringWriter = new StringWriter();
+
 			_logger.LogDebug("Getting correct searchdata");
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
 
 			_logger.LogDebug("Recognizing song");
-			uint? song_id = _recognizer.RecognizeSong(songToUpload.TFPs, searchData);
-			_logger.LogDebug(song_id.ToString());
+			uint? song_id = _recognizer.RecognizeSong(songToUpload.TFPs, searchData, stringWriter);
+
 			if (song_id == null)
 			{
 				return NoContent();
 			}
 			else
 			{
-				return await GetSong((uint)song_id);
+				return new RecognitionResult
+				{
+					Song = await _context.Songs.FindAsync((uint)song_id),
+					DetailInfo = stringWriter.ToString()
+				};
+
 			}
 		}
 		#endregion
 
-		// POST:recognition/uploadtest
-		#region Upload new song test
-		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> uploadtest()
-		{
-			_logger.LogInformation("reading file");
-			byte[] outputArray = System.IO.File.ReadAllBytes("./NoSleep.wav");
-
-			WavFormat waf = new WavFormat(outputArray);
-
-			_logger.LogInformation("Getting time Frequencies");
-			List<TimeFrequencyPoint> tfps = _recognizer.GetTimeFrequencyPoints(waf);
-
-			SongWavFormat swf = new SongWavFormat
-			{
-				Author = "Martin Garrix",
-				Name = "No Sleep",
-				BPM = 0,
-				TFPs = tfps
-			};
-			return await AddNewSong(swf);
-		}
-		#endregion
-
-		// DELETE:recognition/deletetest/{id}
+		// DELETE:recognition/DeleteSong
 		#region Delete test
 		[HttpDelete("[action]")]
-		public async Task<ActionResult<Song>> deletetest(Song song)
+		public async Task<ActionResult<Song>> DeleteSong(Song song)
 		{
 			
 			if (! await _context.Songs.ContainsAsync(song))
@@ -124,30 +104,17 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
-
-
-		// POST:recognition/recognizetest
-		#region Recognize song test
-		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> recognizetest()
+		// GET: recognition/getsongs
+		#region Get all songs
+		[HttpGet("[action]")]
+		public async Task<ActionResult<IEnumerable<Song>>> GetSongs()
 		{
-			byte[] outputArray = System.IO.File.ReadAllBytes("./recording.wav");
-			WavFormat waf = new WavFormat(outputArray);
-
-			List<TimeFrequencyPoint> tfps = _recognizer.GetTimeFrequencyPoints(waf);
-
-			SongWavFormat swf = new SongWavFormat
-			{
-				Author = "NONE",
-				Name = "NONE",
-				BPM = 0,
-				TFPs = tfps
-			};
-
-			return await RecognizeSong(swf);
+			return await _context.Songs.ToListAsync();
 		}
 		#endregion
 
+
+		#region Private helpers
 		private Dictionary<uint, List<ulong>> GetSearchDataByBPM(int BPM)
 		{
 			if (!_searchDataInstance.SearchData.ContainsKey(BPM)) //doesnt contains the BPM yet -> add it
@@ -214,6 +181,10 @@ namespace BP.Server.Controllers
 
 		}
 
+		#endregion
+
+
+		#region TEST API -- OBSOLETE
 		// GET: recognition/getsong/{id}
 		#region Get song by Id
 		[HttpGet("[action]/{id}")]
@@ -229,14 +200,6 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
-		// GET: recognition/getsongs
-		#region Get all songs
-		[HttpGet("[action]")]
-		public async Task<ActionResult<IEnumerable<Song>>> GetSongs()
-		{
-			return await _context.Songs.ToListAsync();
-		}
-		#endregion
 
 		// POST: recognition/addnewsong
 		#region Add new song
@@ -301,6 +264,54 @@ namespace BP.Server.Controllers
 
 			return CreatedAtAction(nameof(TestGet), _searchDataInstance.SearchData);
 		}
+		#endregion
+
+		// POST:recognition/uploadtest
+		#region Upload new song test
+		[HttpPost("[action]")]
+		public async Task<ActionResult<Song>> uploadtest()
+		{
+			_logger.LogInformation("reading file");
+			byte[] outputArray = System.IO.File.ReadAllBytes("./NoSleep.wav");
+
+			WavFormat waf = new WavFormat(outputArray);
+
+			_logger.LogInformation("Getting time Frequencies");
+			List<TimeFrequencyPoint> tfps = _recognizer.GetTimeFrequencyPoints(waf);
+
+			SongWavFormat swf = new SongWavFormat
+			{
+				Author = "Martin Garrix",
+				Name = "No Sleep",
+				BPM = 0,
+				TFPs = tfps
+			};
+			return await AddNewSong(swf);
+		}
+		#endregion
+
+		// POST:recognition/recognizetest
+		#region Recognize song test
+		[HttpPost("[action]")]
+		public async Task<ActionResult<RecognitionResult>> recognizetest()
+		{
+			byte[] outputArray = System.IO.File.ReadAllBytes("./recording.wav");
+			WavFormat waf = new WavFormat(outputArray);
+
+			List<TimeFrequencyPoint> tfps = _recognizer.GetTimeFrequencyPoints(waf);
+
+			SongWavFormat swf = new SongWavFormat
+			{
+				Author = "NONE",
+				Name = "NONE",
+				BPM = 0,
+				TFPs = tfps
+			};
+
+			return await RecognizeSong(swf);
+		}
+		#endregion
+
 		#endregion
 
 	}

@@ -372,7 +372,7 @@ namespace BP.Shared.ViewModels
 				{
 					audioWav = new WavFormat(uploadedSong);
 				}
-				var recognizer = new AudioProcessing.Recognizer.AudioRecognizer(textWriter);
+				var recognizer = new AudioProcessing.Recognizer.AudioRecognizer();
 
 				//TODO: popsat!!!
 				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);

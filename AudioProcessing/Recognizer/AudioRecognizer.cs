@@ -10,15 +10,18 @@ namespace AudioProcessing.Recognizer
 {
 	public partial class AudioRecognizer
 	{
-		private TextWriter output;
+		private TextWriter output { get; set; } = null;
+		private bool IsOutputSet = false;
 
 		public AudioRecognizer(TextWriter textWriter)
 		{
+			IsOutputSet = true;
 			output = textWriter;
 		}
 
 		public AudioRecognizer()
 		{
+			IsOutputSet = false;
 			output = Console.Out;
 		}
 
@@ -36,27 +39,17 @@ namespace AudioProcessing.Recognizer
 			return TimeFrequencyPoints;
 		}
 
-		public uint? RecognizeSongOBSOLETE(IAudioFormat audio, Dictionary<uint, List<ulong>> database)
+		public uint? RecognizeSong(List<TimeFrequencyPoint> timeFrequencyPoints, Dictionary<uint, List<ulong>> database, TextWriter textWriter = null)
 		{
-			AudioProcessor.ConvertToMono(audio);
+			//set custom output if not set at initialization
+			if (!IsOutputSet && textWriter != null)
+				output = textWriter;
 
-			double[] data = Array.ConvertAll(audio.Data, item => (double)item);
-
-			//from 48 kHz to 12kHz
-			//TODO: create downsampleCoeficient for recognition
-			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate); 
-
-			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef;
-			var TimeFrequencyPoints = AudioProcessor.CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 0.9);
-
-			uint? finalSongID = FindBestMatch(database, TimeFrequencyPoints);
-
-			return finalSongID;
-		}
-
-		public uint? RecognizeSong(List<TimeFrequencyPoint> timeFrequencyPoints, Dictionary<uint, List<ulong>> database)
-		{
 			uint? finalSongID = FindBestMatch(database, timeFrequencyPoints);
+
+			//unset custom output
+			if (!IsOutputSet)
+				output = null;
 
 			return finalSongID;
 		}
