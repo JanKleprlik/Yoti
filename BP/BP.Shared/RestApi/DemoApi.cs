@@ -12,7 +12,7 @@ namespace BP.Shared.RestApi
 			var result = await GetAsync(
 				$"https://yotiserver.azurewebsites.net/weatherforecast",
 				new Dictionary<string, string> {
-					{"accept", "application/x-www-form-urlencoded" },
+					{"accept", "application/json" },
 				});
 
 

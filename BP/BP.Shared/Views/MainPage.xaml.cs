@@ -5,6 +5,10 @@ using Windows.UI.Xaml.Media.Animation;
 using BP.Shared.Models;
 using BP.Shared.ViewModels;
 using Windows.UI.Xaml.Navigation;
+using System.Collections.Generic;
+using Database;
+using Uno.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace BP.Shared.Views
 {
@@ -36,10 +40,13 @@ namespace BP.Shared.Views
 		{
 			ContentDialogResult result = await settingsDialog.ShowAsync();
 		}
-		public void ListSongsBtn_Click(object sender, RoutedEventArgs e)
+		public async void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
-			//Frame.Navigate(typeof(SongList), MainPageVM.Database.GetSongs());
-			throw new NotImplementedException();
+
+			List<Song> songs = await MainPageVM.RecognizerApi.GetSongs();
+
+			Frame.Navigate(typeof(SongList), songs);
+
 		}
 		private void setupFlickerAnimation()
 		{
@@ -70,11 +77,6 @@ namespace BP.Shared.Views
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			if (e.Parameter is Boolean && (bool)e.Parameter)
-			{
-				MainPageVM.UpdateSavedSongs();				
-			}
-
 			base.OnNavigatedTo(e);
 		}
 

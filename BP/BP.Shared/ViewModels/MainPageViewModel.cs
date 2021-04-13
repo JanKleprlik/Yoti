@@ -10,6 +10,7 @@ using AudioProcessing.AudioFormats;
 using Windows.UI.Core;
 using System.Collections.Generic;
 using Database;
+using BP.Shared.RestApi;
 
 namespace BP.Shared.ViewModels
 {
@@ -32,6 +33,7 @@ namespace BP.Shared.ViewModels
 
 		#endregion
 
+		public RecognizerApi RecognizerApi = new RecognizerApi();
 
 		//public DatabaseSQLite Database { get; private set; }
 
@@ -113,6 +115,7 @@ namespace BP.Shared.ViewModels
 #endif
 		}
 
+		//PORTED
 		public async void UploadNewSong()
 		{
 #if NETFX_CORE || __ANDROID__
@@ -124,6 +127,7 @@ namespace BP.Shared.ViewModels
 #endif
 		}
 
+		//PORTED
 		public async void AddNewSong()
 		{
 			if (NewSongName == "")
@@ -352,7 +356,7 @@ namespace BP.Shared.ViewModels
 				//TADY JSEM ZMENIL FKIN SONG TYPE Z DATABAZE NA MODEL
 				Song song = null; // Database.GetSongByID((uint)ID);
 				throw new NotImplementedException();
-				InformationText = $"\"{song.Name}\" by {song.Author}";
+				InformationText = $"\"{song.name}\" by {song.author}";
 			}
 			catch (ArgumentException e)
 			{

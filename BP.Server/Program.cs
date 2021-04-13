@@ -35,8 +35,11 @@ namespace BP.Server
 				try
 				{
 					var songContext = services.GetRequiredService<SongContext>();
+					//Delete database if exists
+					songContext.Database.EnsureDeleted();
+					//create database
 					songContext.Database.EnsureCreated();
-					//DbInitializer.Initialize(songContext);
+					DbInitializer.Initialize(songContext);
 				}
 				catch (Exception ex)
 				{
@@ -64,35 +67,36 @@ namespace BP.Server
 		public static void Initialize(SongContext context)
 		{
 
+			context.Songs.RemoveRange(context.Songs);
+			context.SearchDatas.RemoveRange(context.SearchDatas);
 
-			
 			//WavFormat wavFormat = new WavFormat(outputArray);
-			
+
 
 			#region COMMENTED
-			//// Look for any students.
-			//if (context.Songs.Any())
-			//{
-			//	return;   // DB has been seeded
-			//}
+			// Look for any students.
+			if (context.Songs.Any())
+			{
+				return;   // DB has been seeded
+			}
 
-			//var songs = new Song[]
-			//{
-			//	new Song{Name="1", Author="1"},
-			//	new Song{Name="2", Author="2"},
-			//	new Song{Name="3", Author="3"},
-			//	new Song{Name="4", Author="4"},
-			//	new Song{Name="5", Author="5"},
-			//	new Song{Name="6", Author="6"},
-			//	new Song{Name="7", Author="7"},
-			//	new Song{Name="8", Author="8"},
-			//	new Song{Name="9", Author="9"},
-			//	new Song{Name="10", Author="10"},
+			var songs = new Song[]
+			{
+				new Song{name="1", author="1", bpm = 0},
+				new Song{name="2", author="2", bpm = 0},
+				new Song{name="3", author="3", bpm = 0},
+				new Song{name="4", author="4", bpm = 0},
+				new Song{name="5", author="5", bpm = 0},
+				new Song{name="6", author="6", bpm = 0},
+				new Song{name="7", author="7", bpm = 0},
+				new Song{name="8", author="8", bpm = 0},
+				new Song{name="9", author="9", bpm = 0},
+				new Song{name="10", author="10", bpm = 0},
 
-			//};
+			};
 
-			//context.Songs.AddRange(songs);
-			//context.SaveChanges();
+			context.Songs.AddRange(songs);
+			context.SaveChanges();
 
 			//var searchData = new SearchData
 			//{

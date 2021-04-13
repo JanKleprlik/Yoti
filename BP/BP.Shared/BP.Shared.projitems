@@ -22,6 +22,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Recorder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BooleanConverters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RestApi\DemoApi.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RestApi\RecognizerApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RestApi\WebApiBase.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\CustomTextWriter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\SettingsModel.cs" />

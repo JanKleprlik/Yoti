@@ -36,23 +36,23 @@ namespace BP.Server.Controllers
 		[HttpPost("[action]")]
 		public async Task<ActionResult<Song>> AddNewSong(SongWavFormat songToUpload)
 		{
-			Song newSong = new Song { Author = songToUpload.Author, Name = songToUpload.Name };
+			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name };
 
 			_logger.LogInformation("Getting correct searchdata");
-			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
+			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
 			
 			_context.Songs.Add(newSong);
 			_context.SaveChanges();
-			uint maxId = _context.Songs.Max(song => song.Id);
+			uint maxId = _context.Songs.Max(song => song.id);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddTFPToDataStructure(songToUpload.TFPs, maxId, searchData);
+			_recognizer.AddTFPToDataStructure(songToUpload.tfps, maxId, searchData);
 
 			//Update data in database
-			_searchDataInstance.SaveToDB(songToUpload.BPM);
+			_searchDataInstance.SaveToDB(songToUpload.bpm);
 			_context.SaveChanges();
 
-			return CreatedAtAction(nameof(GetSong), new { id = newSong.Id }, newSong);
+			return CreatedAtAction(nameof(GetSong), new { id = newSong.id }, newSong);
 		}
 		#endregion
 
@@ -64,10 +64,10 @@ namespace BP.Server.Controllers
 			var stringWriter = new StringWriter();
 
 			_logger.LogDebug("Getting correct searchdata");
-			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
+			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
 
 			_logger.LogDebug("Recognizing song");
-			uint? song_id = _recognizer.RecognizeSong(songToUpload.TFPs, searchData, stringWriter);
+			uint? song_id = _recognizer.RecognizeSong(songToUpload.tfps, searchData, stringWriter);
 
 			if (song_id == null)
 			{
@@ -77,8 +77,8 @@ namespace BP.Server.Controllers
 			{
 				return new RecognitionResult
 				{
-					Song = await _context.Songs.FindAsync((uint)song_id),
-					DetailInfo = stringWriter.ToString()
+					song = await _context.Songs.FindAsync((uint)song_id),
+					detailinfo = stringWriter.ToString()
 				};
 
 			}
@@ -107,7 +107,7 @@ namespace BP.Server.Controllers
 		// GET: recognition/getsongs
 		#region Get all songs
 		[HttpGet("[action]")]
-		public async Task<ActionResult<IEnumerable<Song>>> GetSongs()
+		public async Task<ActionResult<List<Song>>> GetSongs()
 		{
 			return await _context.Songs.ToListAsync();
 		}
@@ -159,9 +159,9 @@ namespace BP.Server.Controllers
 
 		private void DeleteSongFromSearchData(Song song)
 		{
-			uint deleteSongId= song.Id;
+			uint deleteSongId= song.id;
 
-			Dictionary<uint, List<ulong>> oldSearchData = GetSearchDataByBPM(song.BPM);
+			Dictionary<uint, List<ulong>> oldSearchData = GetSearchDataByBPM(song.bpm);
 			Dictionary<uint, List<ulong>> newSearchData = new Dictionary<uint, List<ulong>>();
 
 
@@ -190,8 +190,8 @@ namespace BP.Server.Controllers
 				}
 			}
 
-			_searchDataInstance.SearchData[song.BPM] = newSearchData;
-			_searchDataInstance.SaveToDB(song.BPM);
+			_searchDataInstance.SearchData[song.bpm] = newSearchData;
+			_searchDataInstance.SaveToDB(song.bpm);
 
 		}
 

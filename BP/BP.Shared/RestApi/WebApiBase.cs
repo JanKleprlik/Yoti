@@ -61,6 +61,23 @@ namespace BP.Shared.RestApi
 			}
 		}
 
+		protected async Task<string> DeleteAsync(string url, string payload, Dictionary<string, string> headers = null)
+		{
+			using (var request = CreateRequestMessage(HttpMethod.Delete, url, headers))
+			{
+				request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
+				using (var response = await _client.SendAsync(request))
+				{
+					if (response.IsSuccessStatusCode)
+					{
+						return await response.Content.ReadAsStringAsync();
+					}
+
+					return null;
+				}
+			}
+		}
+
 		protected async Task<string> PostAsync(string url, string payload, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Post, url, headers))

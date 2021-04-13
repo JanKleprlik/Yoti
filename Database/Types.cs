@@ -8,29 +8,34 @@ namespace Database
 {
 	public class Song
 	{
-		public uint Id { get; set; }
+		public uint id { get; set; }
 
-		public string Name { get; set; }
+		public string name { get; set; }
 
-		public string Author { get; set; }
+		public string author { get; set; }
 
-		public int BPM { get; set; }
+		public int bpm { get; set; }
+
+		public override string ToString()
+		{
+			return $"{id} ----  {name} ---- {author} ---- {bpm}";
+		}
 	}
 
 	public class SongWavFormat
 	{
 		//public WavFormat Format { get; set; }
-		public List<TimeFrequencyPoint> TFPs { get; set; }
-		public string Name { get; set; }
-		public string Author { get; set; }
-		public int BPM {get; set;}
+		public List<TimeFrequencyPoint> tfps { get; set; }
+		public string name { get; set; }
+		public string author { get; set; }
+		public int bpm {get; set;}
 	}
 
 	public class RecognitionResult
 	{
-		public Song Song { get; set; }
+		public Song song { get; set; }
 
-		public string DetailInfo { get; set; }
+		public string detailinfo { get; set; }
 	}
 
 }

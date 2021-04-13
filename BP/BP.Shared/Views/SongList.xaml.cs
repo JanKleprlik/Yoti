@@ -18,6 +18,7 @@ using Uno.Extensions;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Database;
+using BP.Shared.RestApi;
 
 namespace BP.Shared.Views
 {
@@ -27,51 +28,48 @@ namespace BP.Shared.Views
 	public sealed partial class SongList : Page
 	{
 		private ObservableCollection<Song> songsList;
-		private bool wasChange = false;
+		private RecognizerApi recognizerapi = new RecognizerApi();
 		public SongList()
 		{
 			this.InitializeComponent();
-			//database = DatabaseSQLite.Instance;
 			songsList = new ObservableCollection<Song>();
+
 		}
 
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
-			UpdateSongsList();
-			wasChange = false;
+			if (e.Parameter is List<Song>)
+			{
+#if __WASM__ || __ANDROID__
+				var songs = e.Parameter as List<Song>;
+				foreach (var song in songs)
+				{
+					songsList.Add(song);
+				}
+#else
+
+				songsList = new ObservableCollection<Song>(e.Parameter as List<Song>);
+#endif
+			}
+
 			base.OnNavigatedTo(e);
 		}
 
 		private void BackBtn_Click(object sender, RoutedEventArgs e)
-		{
-			Frame.Navigate(typeof(MainPage), wasChange);
+		{ 
+			Frame.Navigate(typeof(MainPage));
 		}
-
-		private void UpdateSongsList()
-		{
-#if __WASM__ || __ANDROID__
-			//var songs = database.GetSongs();
-			//foreach (var song in songs)
-			//{
-			//	songsList.Add(song);
-			//}
-#else
-			//songsList = new ObservableCollection<Song>(database.GetSongs());
-#endif
-			throw new NotImplementedException();
-		}
-
 
 		private async void SongBtn_Click(object sender, RoutedEventArgs e)
 		{
-			wasChange = true;
 			var song = (sender as FrameworkElement).Tag as Song;
-			this.Log().LogDebug($"Deleting song ID: {song.Id}\tName: {song.Name}\tAuthor: {song.Author}");
+			this.Log().LogDebug($"Deleting song ID: {song.id}\tName: {song.name}\tAuthor: {song.author}");
 
 			//remove from database
-			//await Task.Run(() => database.DeleteSong(song));
-			throw new NotImplementedException("Delete song");
+			Song result = await recognizerapi.DeleteSong(song);
 
+			this.Log().LogDebug(song.ToString());
+			this.Log().LogDebug(result.ToString());
 			//remove from currently displayed list
 			songsList.Remove(song);
 		}
