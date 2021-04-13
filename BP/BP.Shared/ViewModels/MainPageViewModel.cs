@@ -372,9 +372,10 @@ namespace BP.Shared.ViewModels
 				{
 					audioWav = new WavFormat(uploadedSong);
 				}
+				var recognizer = new AudioProcessing.Recognizer.AudioRecognizer(textWriter);
 
 				//TODO: popsat!!!
-				//var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
 				//uint songID = Database.AddSong(songName, songAuthor);
 				//recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
 				//Database.UpdateSearchData(savedSongs);

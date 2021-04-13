@@ -17,6 +17,11 @@ namespace AudioProcessing.Recognizer
 			output = textWriter;
 		}
 
+		public AudioRecognizer()
+		{
+			output = Console.Out;
+		}
+
 		public List<TimeFrequencyPoint> GetTimeFrequencyPoints(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
@@ -31,7 +36,7 @@ namespace AudioProcessing.Recognizer
 			return TimeFrequencyPoints;
 		}
 
-		public uint? RecognizeSong(IAudioFormat audio, Dictionary<uint, List<ulong>> database)
+		public uint? RecognizeSongOBSOLETE(IAudioFormat audio, Dictionary<uint, List<ulong>> database)
 		{
 			AudioProcessor.ConvertToMono(audio);
 
@@ -39,12 +44,19 @@ namespace AudioProcessing.Recognizer
 
 			//from 48 kHz to 12kHz
 			//TODO: create downsampleCoeficient for recognition
-			double[] downsampledData = AudioProcessor.DownSample(data, 4, audio.SampleRate); 
+			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate); 
 
 			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef;
 			var TimeFrequencyPoints = AudioProcessor.CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 0.9);
 
 			uint? finalSongID = FindBestMatch(database, TimeFrequencyPoints);
+
+			return finalSongID;
+		}
+
+		public uint? RecognizeSong(List<TimeFrequencyPoint> timeFrequencyPoints, Dictionary<uint, List<ulong>> database)
+		{
+			uint? finalSongID = FindBestMatch(database, timeFrequencyPoints);
 
 			return finalSongID;
 		}

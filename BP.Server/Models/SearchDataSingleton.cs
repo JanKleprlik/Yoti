@@ -40,5 +40,58 @@ namespace BP.Server.Models
 
 		public Dictionary<int, Dictionary<uint, List<ulong>>> SearchData => _searchData;
 
+
+		public void SaveToDB()
+		{
+			using (var scope = scopeFactory.CreateScope())
+			{
+				var songContext = scope.ServiceProvider.GetRequiredService<SongContext>();
+				//Delete old records
+				songContext.SearchDatas.RemoveRange(songContext.SearchDatas);
+				songContext.SaveChanges();
+
+				var searchDatas = new SearchData[_searchData.Count];
+				int index = 0;
+
+				//Upload new records
+				foreach (KeyValuePair<int, Dictionary<uint, List<ulong>>> entry in _searchData)
+				{
+					searchDatas[index] = new SearchData
+					{
+						BPM = entry.Key,
+						SongDataSerialized = JsonSerializer.Serialize(entry.Value),
+					};
+
+					index++;
+				}
+				songContext.SearchDatas.AddRange(searchDatas);
+				songContext.SaveChanges();
+			}
+		}
+
+		public void SaveToDB(int BPM)
+		{
+			using (var scope = scopeFactory.CreateScope())
+			{
+				var songContext = scope.ServiceProvider.GetRequiredService<SongContext>();
+
+				//delete existing data first
+				SearchData dataToDelete = songContext.SearchDatas.Where(sData => sData.BPM == BPM).FirstOrDefault();
+				if (dataToDelete != null)
+				{
+					//Remove SearchData with correct BPM
+					songContext.SearchDatas.Remove(dataToDelete);
+					songContext.SaveChanges();
+				}
+				SearchData searchDataToSave = new SearchData
+				{
+					BPM = BPM,
+					SongDataSerialized = JsonSerializer.Serialize(_searchData[BPM]),
+				};
+
+				songContext.SearchDatas.Add(searchDataToSave);
+				songContext.SaveChanges();
+			}
+		}
 	}
 }

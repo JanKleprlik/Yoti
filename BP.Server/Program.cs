@@ -1,3 +1,4 @@
+using AudioProcessing.AudioFormats;
 using BP.Server.Models;
 using Database;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -34,7 +36,7 @@ namespace BP.Server
 				{
 					var songContext = services.GetRequiredService<SongContext>();
 					songContext.Database.EnsureCreated();
-					DbInitializer.Initialize(songContext);
+					//DbInitializer.Initialize(songContext);
 				}
 				catch (Exception ex)
 				{
@@ -61,38 +63,46 @@ namespace BP.Server
 	{
 		public static void Initialize(SongContext context)
 		{
-			// Look for any students.
-			if (context.Songs.Any())
-			{
-				return;   // DB has been seeded
-			}
 
-			var songs = new Song[]
-			{
-				new Song{Name="1", Author="1"},
-				new Song{Name="2", Author="2"},
-				new Song{Name="3", Author="3"},
-				new Song{Name="4", Author="4"},
-				new Song{Name="5", Author="5"},
-				new Song{Name="6", Author="6"},
-				new Song{Name="7", Author="7"},
-				new Song{Name="8", Author="8"},
-				new Song{Name="9", Author="9"},
-				new Song{Name="10", Author="10"},
 
-			};
+			
+			//WavFormat wavFormat = new WavFormat(outputArray);
+			
 
-			context.Songs.AddRange(songs);
-			context.SaveChanges();
+			#region COMMENTED
+			//// Look for any students.
+			//if (context.Songs.Any())
+			//{
+			//	return;   // DB has been seeded
+			//}
 
-			var searchData = new SearchData
-			{
-				BPM = 10,
-				SongDataSerialized = JsonSerializer.Serialize(new Dictionary<uint, List<ulong>>()),
-			};
+			//var songs = new Song[]
+			//{
+			//	new Song{Name="1", Author="1"},
+			//	new Song{Name="2", Author="2"},
+			//	new Song{Name="3", Author="3"},
+			//	new Song{Name="4", Author="4"},
+			//	new Song{Name="5", Author="5"},
+			//	new Song{Name="6", Author="6"},
+			//	new Song{Name="7", Author="7"},
+			//	new Song{Name="8", Author="8"},
+			//	new Song{Name="9", Author="9"},
+			//	new Song{Name="10", Author="10"},
 
-			context.SearchDatas.Add(searchData);
-			context.SaveChanges();
+			//};
+
+			//context.Songs.AddRange(songs);
+			//context.SaveChanges();
+
+			//var searchData = new SearchData
+			//{
+			//	BPM = 0,
+			//	SongDataSerialized = JsonSerializer.Serialize(new Dictionary<uint, List<ulong>>()),
+			//};
+
+			//context.SearchDatas.Add(searchData);
+			//context.SaveChanges();
+			#endregion
 		}
 	}
 }
