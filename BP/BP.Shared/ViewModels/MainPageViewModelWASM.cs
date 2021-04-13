@@ -1,5 +1,6 @@
 ﻿#if __WASM__
 using AudioProcessing.AudioFormats;
+using Database;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text;
@@ -70,10 +71,20 @@ namespace BP.Shared.ViewModels
 				this.Log().LogDebug("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
 				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
 
-				//uint? ID = recognizer.RecognizeSong(recordedAudioWav, Database.GetSearchData());
-				uint? ID = null;
-				this.Log().LogDebug($"[DEBUG] ID of recognized song is { ID }");
-				WriteRecognitionResults(ID);
+				var tfps = recognizer.GetTimeFrequencyPoints(recordedAudioWav);
+
+				SongWavFormat songWavFormat = new SongWavFormat
+				{
+					author = "none",
+					name = "none",
+					bpm = 0,
+					tfps = tfps
+				};
+
+				RecognitionResult result = await RecognizerApi.RecognizeSong(songWavFormat);
+
+				this.Log().LogDebug($"[DEBUG] ID of recognized song is { result.song.ToString() }");
+				WriteRecognitionResults(result);
 			}
 			else
 			{

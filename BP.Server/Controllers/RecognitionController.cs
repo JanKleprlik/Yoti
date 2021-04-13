@@ -69,9 +69,16 @@ namespace BP.Server.Controllers
 			_logger.LogDebug("Recognizing song");
 			uint? song_id = _recognizer.RecognizeSong(songToUpload.tfps, searchData, stringWriter);
 
+
+			stringWriter.Close();
+
 			if (song_id == null)
 			{
-				return NoContent();
+				return new RecognitionResult
+				{
+					song = null,
+					detailinfo = stringWriter.ToString()
+				};
 			}
 			else
 			{

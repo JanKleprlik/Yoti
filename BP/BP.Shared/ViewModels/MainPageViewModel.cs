@@ -11,6 +11,7 @@ using Windows.UI.Core;
 using System.Collections.Generic;
 using Database;
 using BP.Shared.RestApi;
+using AudioProcessing.Recognizer;
 
 namespace BP.Shared.ViewModels
 {
@@ -19,14 +20,10 @@ namespace BP.Shared.ViewModels
 		#region private fields
 
 		private Recorder audioRecorder { get; set; }
-		//private AudioRecognizer recognizer { get; set; }
+		private AudioRecognizer recognizer { get; set; }
 		private TextBlockTextWriter textWriter { get; set; }
 		private Settings settings { get; set; }
 		private CoreDispatcher UIDispatcher { get; set; }
-		/// <summary>
-		/// TODO: pořádně popsat co to je !!!
-		/// </summary>
-		private Dictionary<uint, List<ulong>> savedSongs { get; set; }
 
 		private byte[] uploadedSong { get; set; }
 		private object uploadedSongLock = new object();
@@ -35,7 +32,6 @@ namespace BP.Shared.ViewModels
 
 		public RecognizerApi RecognizerApi = new RecognizerApi();
 
-		//public DatabaseSQLite Database { get; private set; }
 
 		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
 		{
@@ -45,11 +41,7 @@ namespace BP.Shared.ViewModels
 			this.UIDispatcher = UIDispatcher; 
 			
 			audioRecorder = new Recorder();
-			//Database = DatabaseSQLite.Instance;
-			//recognizer = new AudioRecognizer(textWriter);
-
-			//Popsat proč to tady dělám
-			//savedSongs = Database.GetSearchData();
+			recognizer = new AudioRecognizer(textWriter);
 
 		}
 
@@ -94,7 +86,7 @@ namespace BP.Shared.ViewModels
 				IsRecognizing = true;
 				InformationText = "Looking for a match ...";
 
-				uint? recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
+				RecognitionResult recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
 
 				//Display result only on Windows and Android
 				//WASM is handled in event see MainPageViewModelWASM.cs
@@ -153,15 +145,24 @@ namespace BP.Shared.ViewModels
 
 				IsUploading = true;
 				InformationText = "Processing song";
+
 				Task adderTask = Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
 				await adderTask;
-				
+
 				IsUploading = false;
 				if (adderTask.Status == TaskStatus.Faulted)
 					InformationText = "Something went wrong...\nSong could not be uploaded.";
 				else
 					InformationText = $"\"{songName}\" by {songAuthor} added";
+				//close UI form
+				CloseNewSongForm();
 
+
+				//release resources and reset form input
+				uploadedSong = null;
+				UploadedSongText = "Please upload audio file";
+				NewSongAuthor = string.Empty;
+				NewSongName = string.Empty;
 				GC.Collect();
 			}
 		}
@@ -316,7 +317,7 @@ namespace BP.Shared.ViewModels
 
 		#region private Methods
 
-		private async Task<uint?> RecognizeSongFromRecording()
+		private async Task<RecognitionResult> RecognizeSongFromRecording()
 		{
 			IAudioFormat recordedAudioWav;
 			try
@@ -327,13 +328,22 @@ namespace BP.Shared.ViewModels
 				recordedAudioWav = await getAudioFormatFromRecordingANDROID();
 #elif __WASM__
 				recognizeWASM();
-				//Return 0 just to comply with method (recognition handling is done in recognizeWASM();
-				return 0; 
+				//Return null just to comply with method (recognition handling is done in recognizeWASM();
+				return null; 
 #else
 				throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
 #endif
-				//return await Task.Run(() => recognizer.RecognizeSong(recordedAudioWav, savedSongs));
-				throw new NotImplementedException();
+				var tfps = recognizer.GetTimeFrequencyPoints(recordedAudioWav);
+
+				SongWavFormat songWavFormat = new SongWavFormat
+				{
+					author = "none",
+					name = "none",
+					bpm = 0,
+					tfps = tfps
+				};
+
+				return await RecognizerApi.RecognizeSong(songWavFormat);
 			}
 			catch(InvalidOperationException e)
 			{
@@ -343,9 +353,10 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
-		private void WriteRecognitionResults(uint? ID)
+		private void WriteRecognitionResults(RecognitionResult result)
 		{
-			if (ID == null)
+			textWriter.WriteLine(result.detailinfo);
+			if (result.song == null)
 			{
 				InformationText = $"Song was not recognized.";
 				return;
@@ -353,10 +364,7 @@ namespace BP.Shared.ViewModels
 
 			try
 			{
-				//TADY JSEM ZMENIL FKIN SONG TYPE Z DATABAZE NA MODEL
-				Song song = null; // Database.GetSongByID((uint)ID);
-				throw new NotImplementedException();
-				InformationText = $"\"{song.name}\" by {song.author}";
+				InformationText = $"\"{result.song.name}\" by {result.song.author}";
 			}
 			catch (ArgumentException e)
 			{
@@ -365,7 +373,7 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
-		private void AddNewSongToDatabase(string songName, string songAuthor)
+		private async void AddNewSongToDatabase(string songName, string songAuthor)
 		{
 			this.Log().LogDebug($"[DEBUG] Adding {songName} by {songAuthor} into database.");
 
@@ -374,17 +382,25 @@ namespace BP.Shared.ViewModels
 			{
 				lock (uploadedSongLock)
 				{
-					audioWav = new WavFormat(uploadedSong);
+					audioWav = new WavFormat(this.uploadedSong);
 				}
-				var recognizer = new AudioProcessing.Recognizer.AudioRecognizer();
 
-				//TODO: popsat!!!
 				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
-				//uint songID = Database.AddSong(songName, songAuthor);
-				//recognizer.AddTFPToDataStructure(tfps, songID, savedSongs);
-				//Database.UpdateSearchData(savedSongs);
+
+				SongWavFormat songWavFormat = new SongWavFormat
+				{
+					author = songAuthor,
+					name = songName,
+					bpm = 0,
+					tfps = tfps
+				};
+
+				this.Log().LogDebug("Calling rest api");
+				await RecognizerApi.UploadSong(songWavFormat).ConfigureAwait(false);
+
 				this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
-				throw new NotImplementedException();
+
+
 			}
 			catch(Exception e)
 			{

@@ -33,7 +33,23 @@ namespace BP.Shared.RestApi
 			return null;
 		}
 	
-	
+		public async Task<RecognitionResult> RecognizeSong(SongWavFormat songToRecognize)
+		{
+			var result = await PostAsync(
+				baseUrl + "/recognizesong",
+				JsonSerializer.Serialize(songToRecognize),
+				defaultHeaders);
+
+			this.Log().LogInformation(result);
+
+			if (result != null)
+			{
+				return JsonSerializer.Deserialize<RecognitionResult>(result);
+			}
+
+			return null;
+		}
+
 		public async Task<List<Song>> GetSongs()
 		{
 			var result = await GetAsync(
