@@ -13,9 +13,6 @@
 			-->
       <Version>6.2.9</Version>
     </PackageReference>
-    <PackageReference Include="sqlite-net-pcl">
-      <Version>1.7.335</Version>
-    </PackageReference>
     <PackageReference Include="System.Runtime.Serialization.Formatters">
       <Version>4.3.0</Version>
     </PackageReference>
