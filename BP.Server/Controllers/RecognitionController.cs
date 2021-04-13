@@ -3,9 +3,11 @@ using Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BP.Server.Controllers
@@ -15,12 +17,13 @@ namespace BP.Server.Controllers
 	public class RecognitionController : ControllerBase
 	{
 		private readonly SongContext _context;
-		private readonly SearchDataCollection _searchData;
-
-		public RecognitionController(SongContext context, SearchDataCollection searchDataCollection)
+		private readonly SearchDataSingleton _searchDataInstance;
+		private readonly ILogger _logger;
+		public RecognitionController(SongContext context, SearchDataSingleton searchDataCollection, ILogger<RecognitionController> logger)
 		{
 			_context = context;
-			_searchData = searchDataCollection;
+			_searchDataInstance = searchDataCollection;
+			_logger = logger;
 		}
 
 		// GET: recognition/getsong/{id}
@@ -77,5 +80,67 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
+		// GET: recognition/test
+		#region TEST GET
+		[HttpGet("[action]")]
+		public async Task<ActionResult<Dictionary<int, Dictionary<uint, List<ulong>>>>> TestGet()
+		{
+			return _searchDataInstance.SearchData;
+		}
+		#endregion
+
+		// GET: recognition/test
+		#region TEST POST
+		[HttpPost("[action]")]
+		public async Task<ActionResult<Dictionary<int, Dictionary<uint, List<ulong>>>>> TestPost()
+		{
+
+			if (_searchDataInstance.SearchData.ContainsKey(120) && _searchDataInstance.SearchData[120].ContainsKey(1)) //contains 120 BPM
+			{
+				//Add to song value
+				_searchDataInstance.SearchData[120][1].Add((ulong)_searchDataInstance.SearchData[120][1].Count);
+				DumpToDB();
+			}
+			else
+			{
+				//BPM -> songValues
+				_searchDataInstance.SearchData.TryAdd(
+					120, //BPM
+					new Dictionary<uint, List<ulong>> { 
+						{1, new List<ulong> { 0, 1, 2 } } 
+					});
+				DumpToDB();
+			}
+
+			return CreatedAtAction(nameof(TestGet), _searchDataInstance.SearchData);
+		}
+		#endregion
+
+
+
+		public void DumpToDB()
+		{
+
+			//Delete old records
+			_context.SearchDatas.RemoveRange(_context.SearchDatas);
+			_context.SaveChanges();
+
+			var searchDatas = new SearchData[_searchDataInstance.SearchData.Count];
+			int index = 0;
+
+			//Upload new records
+			foreach (KeyValuePair<int, Dictionary<uint, List<ulong>>> entry in _searchDataInstance.SearchData)
+			{
+				searchDatas[index] = new SearchData
+				{
+					BPM = entry.Key,
+					SongDataSerialized = JsonSerializer.Serialize(entry.Value),
+				};
+
+				index++;
+			}
+			_context.SearchDatas.AddRange(searchDatas);
+			_context.SaveChanges();
+		}
 	}
 }

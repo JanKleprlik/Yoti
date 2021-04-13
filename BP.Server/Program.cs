@@ -6,8 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace BP.Server
@@ -19,8 +21,6 @@ namespace BP.Server
 			var host = CreateHostBuilder(args).Build();
 
 			CreateDbIfNotExists(host);
-
-			//PopulateSearchData(host);
 
 			host.Run();
 		}
@@ -46,6 +46,11 @@ namespace BP.Server
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
+				.ConfigureLogging(logging =>
+				{
+					logging.ClearProviders();
+					logging.AddConsole();
+				})
 				.ConfigureWebHostDefaults(webBuilder =>
 				{
 					webBuilder.UseStartup<Startup>();
@@ -78,6 +83,15 @@ namespace BP.Server
 			};
 
 			context.Songs.AddRange(songs);
+			context.SaveChanges();
+
+			var searchData = new SearchData
+			{
+				BPM = 10,
+				SongDataSerialized = JsonSerializer.Serialize(new Dictionary<uint, List<ulong>>()),
+			};
+
+			context.SearchDatas.Add(searchData);
 			context.SaveChanges();
 		}
 	}

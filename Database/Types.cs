@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Database
@@ -12,8 +13,4 @@ namespace Database
 		public string Author { get; set; }
 	}
 
-	public class SearchData
-	{
-		public byte[] serializedData { get; set; }
-	}
 }

@@ -18,7 +18,7 @@ namespace BP.Server.Models
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Song>().ToTable("Songs");
-			modelBuilder.Entity<SearchData>().HasNoKey().ToTable("SearchData");
+			modelBuilder.Entity<SearchData>().ToTable("SearchData");
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace Database
 {
 	public sealed class DatabaseSQLite
 	{
-		/*
+		/*/
 		private SQLiteConnection connection;
 		#region INITIALIZATION
 
@@ -191,34 +191,19 @@ namespace Database
 			var searchDataQueryRes = connection.Query<SearchData>("SELECT * FROM SearchData");
 			if (searchDataQueryRes.Count != 0)
 			{
-				Stopwatch sw = new Stopwatch();
-				sw.Start();
 
-				this.Log().LogDebug("[DEBUG] Database is NOT empty.");
 				var searchData = searchDataQueryRes[0];
 				var memStream = new MemoryStream();
 
-				sw.Stop();
-				this.Log().LogDebug($"[DEBUG] common: {sw.ElapsedMilliseconds}");
-				sw.Reset();
-				sw.Start();
 
 				memStream.Write(searchData.serializedData, 0, searchData.serializedData.Length);
 				memStream.Position = 0;
 
-				sw.Stop();
-				this.Log().LogDebug($"[DEBUG] SERIALIZATION: {sw.ElapsedMilliseconds}");
-				sw.Reset();
-				sw.Start();
+
 
 
 				var boisSerializer = new BoisSerializer();
 				var deserialized = boisSerializer.Deserialize<Dictionary<uint, List<ulong>>>(memStream);
-
-				sw.Stop();
-				this.Log().LogDebug($"[DEBUG] DESERIALIZATION: {sw.ElapsedMilliseconds}");
-
-
 				return deserialized;
 			}
 			else
@@ -229,6 +214,7 @@ namespace Database
 			}
 
 		}
+
 
 		public Song GetSongByID(uint ID)
 		{
@@ -273,6 +259,6 @@ namespace Database
 			}
 		}
 		#endregion
-		*/
+		/**/
 	}
 }
