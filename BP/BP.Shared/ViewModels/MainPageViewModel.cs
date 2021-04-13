@@ -186,12 +186,6 @@ namespace BP.Shared.ViewModels
 		public async void TestMethod()
 		{
 			this.Log().LogDebug("DEBUG");
-
-			RestApi.DemoApi da = new RestApi.DemoApi();
-
-			string res = await da.Search();
-
-			this.Log().LogDebug(res);
 		}
 		#endregion
 
