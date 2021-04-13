@@ -113,6 +113,20 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
+		// GET: recognition/getsong/{id}
+		#region Get song by Id
+		[HttpGet("[action]/{id}")]
+		public async Task<ActionResult<Song>> GetSong(uint id)
+		{
+			var song = await _context.Songs.FindAsync(id);
+			if (song == null)
+			{
+				return NotFound();
+			}
+
+			return song;
+		}
+		#endregion
 
 		#region Private helpers
 		private Dictionary<uint, List<ulong>> GetSearchDataByBPM(int BPM)
@@ -183,24 +197,8 @@ namespace BP.Server.Controllers
 
 		#endregion
 
-
+		/*/
 		#region TEST API -- OBSOLETE
-		// GET: recognition/getsong/{id}
-		#region Get song by Id
-		[HttpGet("[action]/{id}")]
-		public async Task<ActionResult<Song>> GetSong(uint id)
-		{
-			var song = await _context.Songs.FindAsync(id);
-			if (song == null)
-			{
-				return NotFound();
-			}
-
-			return song;
-		}
-		#endregion
-
-
 		// POST: recognition/addnewsong
 		#region Add new song
 		[HttpPost("[action]")]
@@ -272,7 +270,7 @@ namespace BP.Server.Controllers
 		public async Task<ActionResult<Song>> uploadtest()
 		{
 			_logger.LogInformation("reading file");
-			byte[] outputArray = System.IO.File.ReadAllBytes("./NoSleep.wav");
+			byte[] outputArray = System.IO.File.ReadAllBytes("./Home.wav");
 
 			WavFormat waf = new WavFormat(outputArray);
 
@@ -282,7 +280,7 @@ namespace BP.Server.Controllers
 			SongWavFormat swf = new SongWavFormat
 			{
 				Author = "Martin Garrix",
-				Name = "No Sleep",
+				Name = "Home",
 				BPM = 0,
 				TFPs = tfps
 			};
@@ -313,6 +311,6 @@ namespace BP.Server.Controllers
 		#endregion
 
 		#endregion
-
+		/**/
 	}
 }
