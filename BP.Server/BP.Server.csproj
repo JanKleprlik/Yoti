@@ -10,10 +10,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
   <Import Project="..\Database\Database.projitems" Label="Shared" />
 
   <Import Project="..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />
