@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Database;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace BP.Shared.RestApi
 {
@@ -18,14 +18,14 @@ namespace BP.Shared.RestApi
 		{
 			var result = await PostAsync(
 				baseUrl + "/addnewsong",
-				JsonConvert.SerializeObject(songToUpload),
+				JsonSerializer.Serialize(songToUpload),
 				defaultHeaders);
 
 			this.Log().LogInformation(result);
 
 			if (result != null)
 			{
-				return JsonConvert.DeserializeObject<Song>(result);
+				return JsonSerializer.Deserialize<Song>(result);
 			}
 
 			return null;
@@ -35,14 +35,14 @@ namespace BP.Shared.RestApi
 		{
 			var result = await PostAsync(
 				baseUrl + "/recognizesong",
-				JsonConvert.SerializeObject(songToRecognize),
+				JsonSerializer.Serialize(songToRecognize),
 				defaultHeaders);
 
 			this.Log().LogInformation(result);
 
 			if (result != null)
 			{
-				return JsonConvert.DeserializeObject<RecognitionResult>(result);
+				return JsonSerializer.Deserialize<RecognitionResult>(result);
 			}
 
 			return null;
@@ -58,7 +58,7 @@ namespace BP.Shared.RestApi
 
 			if (result != null)
 			{
-				return JsonConvert.DeserializeObject<List<Song>>(result);
+				return JsonSerializer.Deserialize<List<Song>>(result);
 			}
 
 			return new List<Song>();
@@ -68,12 +68,12 @@ namespace BP.Shared.RestApi
 		{
 			var result = await this.DeleteAsync(
 				baseUrl + "/deletesong",
-				JsonConvert.SerializeObject(songToDelete),
+				JsonSerializer.Serialize(songToDelete),
 				defaultHeaders);
 
 			if (result != null)
 			{
-				return JsonConvert.DeserializeObject<Song>(result);
+				return JsonSerializer.Deserialize<Song>(result);
 			}
 
 			return null;

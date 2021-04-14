@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using Database;
 using BP.Shared.RestApi;
 using AudioProcessing.Recognizer;
-using Newtonsoft.Json;
 using System.Linq;
 
 namespace BP.Shared.ViewModels
@@ -199,18 +198,6 @@ namespace BP.Shared.ViewModels
 		public async void TestMethod()
 		{
 			this.Log().LogDebug("DEBUG");
-
-			string JsonData = "[{\"id\":1,\"name\":\"1\",\"author\":\"1\",\"bpm\":0},{\"id\":2,\"name\":\"2\",\"author\":\"2\",\"bpm\":0}]";
-
-			//List<Song> songs = JsonSerializer.Deserialize<List<Song>>(JsonData);
-			List<Song> songs = JsonConvert.DeserializeObject<List<Song>>(JsonData);
-
-
-			foreach(var song in songs)
-			{
-				this.Log().LogInformation(song.ToString());
-			}
-
 		}
 		#endregion
 
