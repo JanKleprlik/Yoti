@@ -52,6 +52,19 @@ namespace BP.Shared.ViewModels
 
 		public string RecordingLengthText => $"Recording length: {RecordingLength} sec";
 
+		public int[] SupportedSamplingRates
+		{
+			get => _settings.SupportedSamplingRates;
+		}
+
+		public int[] SupportedNumbersOfChannels
+		{
+			get => _settings.SupportedNumbersOfChannels;
+		}
+		public Type[] SupportedAudioFormats
+		{
+			get => _settings.SupportedAudioFormats;
+		}
 
 		public bool UseMicrophone
 		{

@@ -53,25 +53,40 @@ namespace BP.Shared.ViewModels
 				var base64Data = Regex.Match(stringBuilder.ToString(), @"data:((audio)|(application))/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
 				var binData = Convert.FromBase64String(base64Data); //this is the data I want byte[]
 
-				IAudioFormat recordedAudioWav;
-				
-				if (settings.UseMicrophone)
+
+
+				try
 				{
-					recordedAudioWav = new WavFormat(binData);
+					if (settings.UseMicrophone)
+					{
+						uploadedSongFormat = new WavFormat(binData);
+					}
+					else
+					{
+						//TODO: Extract raw pcm data form binData using ffmpeg
+						var shortData = AudioProcessing.Tools.Converter.BytesToShorts(binData);
+						uploadedSongFormat = new WavFormat(Parameters.SamplingRate,Parameters.Channels, shortData.Length, shortData);
+					}
+					if (!IsSupported(uploadedSongFormat))
+					{
+						//release resources
+						uploadedSongFormat = null;
+						return;
+					}
 				}
-				else
+				catch(ArgumentException ex)
 				{
-					//TODO: Extract raw pcm data form binData using ffmpeg
-					var shortData = AudioProcessing.Tools.Converter.BytesToShorts(binData);
-					recordedAudioWav = new WavFormat(Parameters.SamplingRate,Parameters.Channels, shortData.Length, shortData);
+					this.Log().LogError(ex.Message);
+					InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+					return;
 				}
 
-				this.Log().LogDebug("[DEBUG] Channels: " + recordedAudioWav.Channels);
-				this.Log().LogDebug("[DEBUG] SampleRate: " + recordedAudioWav.SampleRate);
-				this.Log().LogDebug("[DEBUG] NumOfData: " + recordedAudioWav.NumOfDataSamples);
-				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + recordedAudioWav.Data.Length);
+				this.Log().LogDebug("[DEBUG] Channels: " + uploadedSongFormat.Channels);
+				this.Log().LogDebug("[DEBUG] SampleRate: " + uploadedSongFormat.SampleRate);
+				this.Log().LogDebug("[DEBUG] NumOfData: " + uploadedSongFormat.NumOfDataSamples);
+				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSongFormat.Data.Length);
 
-				var tfps = recognizer.GetTimeFrequencyPoints(recordedAudioWav);
+				var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
 
 				SongWavFormat songWavFormat = new SongWavFormat
 				{
@@ -82,14 +97,13 @@ namespace BP.Shared.ViewModels
 				};
 
 				RecognitionResult result = await RecognizerApi.RecognizeSong(songWavFormat);
-
-				this.Log().LogDebug($"[DEBUG] ID of recognized song is { result.song.ToString() }");
 				WriteRecognitionResults(result);
 			}
 			else
 			{
 				stringBuilder.Append(e.FileAsDataUrl);
-				//repeat until e.isDone;
+
+				//repeat until e.isDone == true;
 				WasmSongEvent += OnSongToRecognizeEvent;
 			}
 		}
@@ -101,11 +115,27 @@ namespace BP.Shared.ViewModels
 			{
 				this.Log().LogDebug($"Full song uploaded, now converting uploaded data...");
 				
-				uploadedSong = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want
-				
+				byte[] uploadedSong = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want
+				try 
+				{ 
+					uploadedSongFormat = new WavFormat(uploadedSong);
+					if (!IsSupported(uploadedSongFormat))
+					{
+						//release resources
+						uploadedSongFormat = null;
+						return;
+					}
+				}
+				catch(ArgumentException ex)
+				{
+					this.Log().LogError(ex.Message);
+					InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+					return;
+				}
+
 				//Update UI
 				UploadedSongText = e.FileAsDataUrl;
-				InformationText = "File uploaded";
+				InformationText = "File picked";
 
 				this.Log().LogDebug($"Uploaded song converted to byte[].");
 			}

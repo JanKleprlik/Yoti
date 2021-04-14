@@ -19,7 +19,7 @@ namespace AudioProcessing.AudioFormats
 		{
 			if ( rawData.Length < 4 || !IsCorrectFormat(new[] { rawData[0], rawData[1], rawData[2], rawData[3] }))
 			{
-				throw new InvalidCastException("Invalid data format given to Wav format constructor.");
+				throw new ArgumentException("Invalid data format given to Wav format constructor.");
 			}
 
 			int fmtOffset = FindOffset(rawData, new byte[] { 0x66, 0x6D, 0x74, 0x20 });

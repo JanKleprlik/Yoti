@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using Database;
 using BP.Shared.RestApi;
 using AudioProcessing.Recognizer;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace BP.Shared.ViewModels
 {
@@ -26,6 +28,7 @@ namespace BP.Shared.ViewModels
 		private CoreDispatcher UIDispatcher { get; set; }
 
 		private byte[] uploadedSong { get; set; }
+		private IAudioFormat uploadedSongFormat { get; set; }
 		private object uploadedSongLock = new object();
 
 		#endregion
@@ -86,12 +89,14 @@ namespace BP.Shared.ViewModels
 				IsRecognizing = true;
 				InformationText = "Looking for a match ...";
 
-				RecognitionResult recognizedSongID = await Task.Run(() => RecognizeSongFromRecording());
+				//null if there was problem with the recording
+				RecognitionResult recognitionResult = await RecognizeSongFromRecording();
 
 				//Display result only on Windows and Android
 				//WASM is handled in event see MainPageViewModelWASM.cs
 	#if __ANDROID__ || NETFX_CORE
-				WriteRecognitionResults(recognizedSongID);
+				if (recognitionResult != null)
+					WriteRecognitionResults(recognitionResult);
 	#endif
 				IsRecognizing = false;
 			}
@@ -111,7 +116,24 @@ namespace BP.Shared.ViewModels
 		public async void UploadNewSong()
 		{
 #if NETFX_CORE || __ANDROID__
-			uploadedSong = await FileUpload.pickAndUploadFileAsync(value => UploadedSongText = value, uploadedSongLock, maxSize_Mb:50);
+			byte[] uploadedSong = await FileUpload.pickAndUploadFileAsync(value => UploadedSongText = value, uploadedSongLock, maxSize_Mb:50);
+			try
+			{
+				uploadedSongFormat = new WavFormat(uploadedSong);
+				if (!IsSupported(uploadedSongFormat))
+				{
+					//release resources
+					uploadedSongFormat = null;
+					return;
+				}
+			}
+			catch(ArgumentException e)
+			{
+				this.Log().LogError(e.Message);
+				InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+				return;
+			}
+
 #elif __WASM__
 			await pickAndUploadFileWASM();
 #else
@@ -132,13 +154,13 @@ namespace BP.Shared.ViewModels
 				InformationText = "Please enter song author.";
 				return;
 			}
-			if (uploadedSong == null)
+			if (uploadedSongFormat == null)
 			{
 				InformationText = "Please upload song file.";
 				return;
 			}
 
-			if (uploadedSong != null && NewSongName != "" && NewSongAuthor!= "")
+			if (uploadedSongFormat != null && NewSongName != "" && NewSongAuthor!= "")
 			{
 				string songName = NewSongName;
 				string songAuthor = NewSongAuthor;
@@ -146,20 +168,17 @@ namespace BP.Shared.ViewModels
 				IsUploading = true;
 				InformationText = "Processing song";
 
-				Task adderTask = Task.Run(() => AddNewSongToDatabase(songName, songAuthor));
-				await adderTask;
-
+				bool wasAdded = await AddNewSongToDatabase(songName, songAuthor);
 				IsUploading = false;
-				if (adderTask.Status == TaskStatus.Faulted)
-					InformationText = "Something went wrong...\nSong could not be uploaded.";
-				else
+
+				if (wasAdded)
 					InformationText = $"\"{songName}\" by {songAuthor} added";
+				
 				//close UI form
 				CloseNewSongForm();
 
-
 				//release resources and reset form input
-				uploadedSong = null;
+				uploadedSongFormat = null;
 				UploadedSongText = "Please upload audio file";
 				NewSongAuthor = string.Empty;
 				NewSongName = string.Empty;
@@ -177,15 +196,21 @@ namespace BP.Shared.ViewModels
 			ShowUploadUI = false;
 		}
 
-		public void UpdateSavedSongs()
-		{
-			//savedSongs = Database.GetSearchData();
-			throw new NotImplementedException();
-		}
-
 		public async void TestMethod()
 		{
 			this.Log().LogDebug("DEBUG");
+
+			string JsonData = "[{\"id\":1,\"name\":\"1\",\"author\":\"1\",\"bpm\":0},{\"id\":2,\"name\":\"2\",\"author\":\"2\",\"bpm\":0}]";
+
+			//List<Song> songs = JsonSerializer.Deserialize<List<Song>>(JsonData);
+			List<Song> songs = JsonConvert.DeserializeObject<List<Song>>(JsonData);
+
+
+			foreach(var song in songs)
+			{
+				this.Log().LogInformation(song.ToString());
+			}
+
 		}
 		#endregion
 
@@ -313,13 +338,12 @@ namespace BP.Shared.ViewModels
 
 		private async Task<RecognitionResult> RecognizeSongFromRecording()
 		{
-			IAudioFormat recordedAudioWav;
 			try
 			{
 #if NETFX_CORE
-				recordedAudioWav = await getAudioFormatFromRecodingUWP();
+				uploadedSongFormat = await getAudioFormatFromRecodingUWP();
 #elif __ANDROID__
-				recordedAudioWav = await getAudioFormatFromRecordingANDROID();
+				uploadedSongFormat= await getAudioFormatFromRecordingANDROID();
 #elif __WASM__
 				recognizeWASM();
 				//Return null just to comply with method (recognition handling is done in recognizeWASM();
@@ -327,7 +351,15 @@ namespace BP.Shared.ViewModels
 #else
 				throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
 #endif
-				var tfps = recognizer.GetTimeFrequencyPoints(recordedAudioWav);
+
+				if (!IsSupported(uploadedSongFormat))
+				{
+					//release resources
+					uploadedSongFormat = null;
+					return null;
+				}
+
+				var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
 
 				SongWavFormat songWavFormat = new SongWavFormat
 				{
@@ -339,10 +371,9 @@ namespace BP.Shared.ViewModels
 
 				return await RecognizerApi.RecognizeSong(songWavFormat);
 			}
-			catch(InvalidOperationException e)
+			catch(ArgumentException e)
 			{
-				this.Log().LogError(e.Message);
-				//null as not recognized
+				InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
 				return null;
 			}
 		}
@@ -356,30 +387,22 @@ namespace BP.Shared.ViewModels
 				return;
 			}
 
-			try
-			{
-				InformationText = $"\"{result.song.name}\" by {result.song.author}";
-			}
-			catch (ArgumentException e)
-			{
-				this.Log().LogError(e.Message);
-				InformationText = "Song was not recognized.";
-			}
+			InformationText = $"\"{result.song.name}\" by {result.song.author}";
 		}
 
-		private async void AddNewSongToDatabase(string songName, string songAuthor)
+		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor)
 		{
 			this.Log().LogDebug($"[DEBUG] Adding {songName} by {songAuthor} into database.");
-
-			IAudioFormat audioWav;
 			try
 			{
-				lock (uploadedSongLock)
+				if (!IsSupported(uploadedSongFormat))
 				{
-					audioWav = new WavFormat(this.uploadedSong);
+					//release resources
+					uploadedSongFormat = null;
+					return false;
 				}
 
-				var tfps = recognizer.GetTimeFrequencyPoints(audioWav);
+				var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
 
 				SongWavFormat songWavFormat = new SongWavFormat
 				{
@@ -394,13 +417,38 @@ namespace BP.Shared.ViewModels
 
 				this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
 
-
+				return true;
 			}
-			catch(Exception e)
+			catch(ArgumentException e)
 			{
 				this.Log().LogError(e.Message);
-				throw e;
+				InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+				return false;
 			}
+		}
+
+		private bool IsSupported(IAudioFormat audioFormat)
+		{
+
+			if (!Array.Exists(settings.SupportedAudioFormats, element => element.Equals(audioFormat.GetType())))
+			{
+				InformationText = $"Unsupported audio format: {audioFormat.GetType()}\nSupported audio formats: {string.Join<Type>(", ", settings.SupportedAudioFormats)}";
+				return false;
+			}
+
+			if (!Array.Exists(settings.SupportedNumbersOfChannels, element => element == audioFormat.Channels))
+			{
+				InformationText = $"Unsupported number of channels: {audioFormat.Channels}\nSupported numbers of channels: {string.Join<int>(", ", settings.SupportedNumbersOfChannels)}";
+				return false;
+			}
+			
+			if (!Array.Exists(settings.SupportedSamplingRates, element => element == audioFormat.SampleRate))
+			{
+				InformationText = $"Unsupported sampling rate: {audioFormat.SampleRate}\nSupported sampling rates: {string.Join<int>(", ", settings.SupportedSamplingRates)}";
+				return false;
+			}
+
+			return true;
 		}
 
 #endregion

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AudioProcessing.AudioFormats;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -45,7 +46,7 @@ namespace BP.Shared.Models
 			}
 			set
 			{
-				this.recordingLength = Math.Max(Math.Min(value, 8), 3); //set min 3, max 10 secs
+				this.recordingLength = Math.Max(Math.Min(value, 8), 3); //set min 3, max 8 secs
 			}
 		}
 		/// <summary>
@@ -53,13 +54,26 @@ namespace BP.Shared.Models
 		/// </summary>
 		private int recordingLength;
 
+		public int[] SupportedNumbersOfChannels { get; } = new int[] { 1, 2 };
+		public int[] SupportedSamplingRates { get; } = new int[] { 48000};
+		public Type[] SupportedAudioFormats { get; } = new Type[] { typeof(WavFormat) };
+
+
+
 		public void SetToDefault()
 		{
 			ConstQAlgorithm = false;
 			DetailedInfo = false;
-			UseMicrophone = false;
 			RecordingLength = 3;
+
+#if __WASM__
+			UseMicrophone = false;
+#else
+			UseMicrophone = true;
+#endif
+
 		}
+
 
 		public override string ToString()
 		{

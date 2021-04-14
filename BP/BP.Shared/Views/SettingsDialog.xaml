@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:wasm="http://uno.ui/wasm"
+	xmlns:not_wasm="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:android="http://uno.ui/android"
     mc:Ignorable="d wasm android"
 	
@@ -53,7 +54,7 @@
 			OffContent="Detailed info"
 			IsOn="{x:Bind SettingsViewModel.DetailedInfo, Mode=TwoWay}"
 			/>
-		<ToggleSwitch 
+		<not_wasm:ToggleSwitch 
 			x:Name="UseMicrophone"
 			OnContent="Use microphone"
 			OffContent="Use microphone"
