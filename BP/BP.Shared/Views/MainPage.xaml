@@ -248,7 +248,7 @@
 			Grid.Column="1"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
-			VerticalScrollBarVisibility="Auto"
+			VerticalScrollBarVisibility="Hidden"
 			Margin="0,100,0,0"
 			>
 			<StackPanel
@@ -272,6 +272,7 @@
 						x:Name="InformationTextBlk"
 						not_android:FontSize="30"
 						TextWrapping="Wrap"
+						CanBeScrollAnchor="False"
 						Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
 						/>
 
