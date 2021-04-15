@@ -129,22 +129,12 @@ namespace AudioProcessing.Recognizer
 		/// <returns></returns>
 		public int GetBPM(IAudioFormat audio)
 		{
-			//AudioProcessor.ConvertToMono(audio);
-
+			AudioProcessor.ConvertToMono(audio);
 			//using floats instead of doubles here because of filters from NAudio library
-			float[] data = Array.ConvertAll(audio.Data, item => (float)item / 32768f);
+			float[] data = Array.ConvertAll(audio.Data, item => (float)item);
 
-			//for (int i = 3200; i < 3300; i++)
-			//{
-			//	Console.WriteLine(data[i]);
-			//}
 
 			FilterBPMFrequencies(data, (float)audio.SampleRate);
-
-			for (int i = 3200; i < 3300; i++)
-			{
-				Console.WriteLine(data[i]);
-			}
 
 			EnergyPeak[] energyPeaks = GetEnergyPeaks(data, audio.SampleRate);
 
@@ -156,28 +146,24 @@ namespace AudioProcessing.Recognizer
 			//<BPM, Count>
 			Dictionary<int, int> BPMs = new Dictionary<int, int>();
 
-			for(int currentIdx = 0; currentIdx < energyPeaks.Length - Parameters.PeakNeighbourRange; currentIdx++)
+			for(int currentIdx = 0; currentIdx < energyPeaks.Length; currentIdx++)
 			{
 				EnergyPeak currentPeak = energyPeaks[currentIdx];
 				for(int neighbourNumber = 1; neighbourNumber < Parameters.PeakNeighbourRange; neighbourNumber++)
 				{
 					int neighbourIdx = currentIdx + neighbourNumber;
+					//Out of EnergyPeaks bounds
 					if (neighbourIdx >= energyPeaks.Length)
 						break;
+					
 					EnergyPeak neighbourPeak = energyPeaks[neighbourIdx];
-					float delta = neighbourPeak.Time - currentPeak.Time;
-					float potentialBPM = 60f * sampleRate / delta; //60 for minute
+					int BPM = GetPeakBPM(currentPeak, neighbourPeak, sampleRate);
 
-					int BPM = GetBPMInRange(potentialBPM);
-
+					//Save BPM into data structure
 					if (BPMs.ContainsKey(BPM))
-					{
 						BPMs[BPM]++; //raise number of occurances
-					}
 					else
-					{
 						BPMs.Add(BPM, 1); //start with 1 occurace
-					}
 				}
 			}
 
@@ -187,63 +173,45 @@ namespace AudioProcessing.Recognizer
 			List<KeyValuePair<int, int>> res = new List<KeyValuePair<int, int>>();
 			foreach(KeyValuePair<int, int> entry in BPMs)
 			{
-				res.Add(new KeyValuePair<int,int>(entry.Key, entry.Value));
-
-				//Console.WriteLine($"BPM: {entry.Key} \tOccurances:{entry.Value}");
-				//if (entry.Value > maxOccurance)
-				//{
-				//	maxOccurance = entry.Value;
-				//	resultBPM = entry.Key;
-				//}
+				if (entry.Value > maxOccurance)
+				{
+					maxOccurance = entry.Value;
+					resultBPM = entry.Key;
+				}
 			}
-
-			var resAr = res.ToArray();
-
-			Array.Sort(resAr, (x, y) => y.Value.CompareTo(x.Value));
-			if (resAr.Length > 5)
-			{
-				Array.Resize(ref resAr, 5);
-			}
-			foreach (var entry in resAr)
-			{
-				Console.WriteLine($"BPM: {entry.Key} \tOccurances:{entry.Value}");
-			}
-
 			return resultBPM;
 		}
 
-		private int GetBPMInRange(float bpm)
+		private int GetPeakBPM(EnergyPeak currentPeak, EnergyPeak neighbourPeak, float sampleRate)
 		{
+			float deltaT = neighbourPeak.Time - currentPeak.Time;
+			float potentialBPM = 60f * sampleRate / deltaT; //60 for minute
 
 			//Raise BPM up by a factor of two until in range
-			while(bpm < Parameters.BPMLowLimit)
+			while (potentialBPM < Parameters.BPMLowLimit)
 			{
-				bpm *= 2;
+				potentialBPM *= 2;
 			}
 			//Lower BPM down by a factor of two until in range
-			while(bpm > Parameters.BPMHighLimit)
+			while(potentialBPM > Parameters.BPMHighLimit)
 			{
-				bpm /= 2;
+				potentialBPM /= 2;
 			}
 
-			return Convert.ToInt32(bpm);
+			return Convert.ToInt32(potentialBPM);
 		}
 
 		private EnergyPeak[] GetEnergyPeaks(float[] data, uint sampleRate)
 		{
 			int samplesInPart = (int)sampleRate / Parameters.PartsPerSecond;
-			int totalParts = data.Length / 2 / samplesInPart;
+			int totalParts = data.Length / samplesInPart;
 			EnergyPeak[] peaks = new EnergyPeak[totalParts];
+
 			//foreach part get maximum energy peak
 			for (int i = 0; i < totalParts; i++)
 			{
-				//peaks[i] = GetMaxEnergyPeak(data, i * samplesInPart, samplesInPart);
-				peaks[i] = GetMaxEnergyPeak(data, i, samplesInPart);
+				peaks[i] = GetMaxEnergyPeak(data, i * samplesInPart, samplesInPart);
 			}
-
-			Array.Sort(peaks, (x, y) => y.Energy.CompareTo(x.Energy));
-			Array.Resize(ref peaks, peaks.Length / 2);
-			Array.Sort(peaks, (x, y) => x.Time.CompareTo(y.Time));
 
 			return peaks;
 		}
@@ -259,41 +227,18 @@ namespace AudioProcessing.Recognizer
 		private EnergyPeak GetMaxEnergyPeak(float[] data, int start, int steps)
 		{
 			//Set max with first value
-			//EnergyPeak max = new EnergyPeak()
-			//{
-			//	Energy = data[start],
-			//	Time = start
-			//};
-			//for (int i = start + 1; i < start + steps; i++)
-			//{
-			//	//save max
-			//	if (max.Energy < data[i])
-			//	{
-			//		max.Energy = data[i];
-			//		max.Time = i;
-			//	}
-			//}
 			EnergyPeak max = new EnergyPeak()
 			{
-				Energy = 0f,
-				Time = -1
+				Energy = data[start],
+				Time = start
 			};
-
-			for (int j = 0; j < steps; ++j)
+			for (int i = start + 1; i < start + steps; i++)
 			{
-				float vol = 0.0F;
-				for (int k = 0; k < 2; ++k)
+				//save max
+				if (max.Energy < data[i])
 				{
-					float v = data[start * 2 * steps + j * 2 + k];
-					if (vol < v)
-					{
-						vol = v;
-					}
-				}
-				if (max.Time== -1 || max.Energy< vol)
-				{
-					max.Time = start * steps + j;
-					max.Energy= vol;
+					max.Energy = data[i];
+					max.Time = i;
 				}
 			}
 
@@ -302,15 +247,13 @@ namespace AudioProcessing.Recognizer
 
 		private void FilterBPMFrequencies(float[] data, float sampleRate)
 		{
-			for (int ch = 0; ch < 2; ++ch)
-			{
-				BiQuadFilter lowpass = BiQuadFilter.LowPassFilter(sampleRate, Parameters.BPMHighFreq, 1f);
-				BiQuadFilter highpass = BiQuadFilter.HighPassFilter(sampleRate, Parameters.BPMLowFreq, 1f);
 
-				for (int i = ch; i < data.Length; i+=2)
-				{
-					data[i] = highpass.Transform(lowpass.Transform(data[i]));
-				}
+			BiQuadFilter lowpass = BiQuadFilter.LowPassFilter(sampleRate, Parameters.BPMHighFreq, 1f);
+			BiQuadFilter highpass = BiQuadFilter.HighPassFilter(sampleRate, Parameters.BPMLowFreq, 1f);
+
+			for (int i = 0; i < data.Length; i++)
+			{
+				data[i] = highpass.Transform(lowpass.Transform(data[i]));
 			}
 
 		}
