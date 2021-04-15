@@ -36,10 +36,10 @@ namespace BP.Server
 				{
 					var songContext = services.GetRequiredService<SongContext>();
 					//Delete database if exists
-					songContext.Database.EnsureDeleted();
-					//create database
+					//songContext.Database.EnsureDeleted();
+					//Create database
 					songContext.Database.EnsureCreated();
-					DbInitializer.Initialize(songContext);
+					//DbInitializer.Initialize(songContext);
 				}
 				catch (Exception ex)
 				{

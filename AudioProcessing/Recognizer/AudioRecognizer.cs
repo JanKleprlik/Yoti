@@ -43,13 +43,13 @@ namespace AudioProcessing.Recognizer
 			return TimeFrequencyPoints;
 		}
 
-		public uint? RecognizeSong(List<TimeFrequencyPoint> timeFrequencyPoints, Dictionary<uint, List<ulong>> database, TextWriter textWriter = null)
+		public uint? RecognizeSong(List<TimeFrequencyPoint> timeFrequencyPoints, Dictionary<uint, List<ulong>> database, out double probability, TextWriter textWriter = null)
 		{
 			//set custom output if not set at initialization
 			if (!IsOutputSet && textWriter != null)
 				output = textWriter;
 
-			uint? finalSongID = FindBestMatch(database, timeFrequencyPoints);
+			uint? finalSongID = FindBestMatch(database, timeFrequencyPoints, out probability);
 
 			//unset custom output
 			if (!IsOutputSet)
@@ -104,7 +104,7 @@ namespace AudioProcessing.Recognizer
 			}
 		}
 
-		public uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints)
+		public uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints, out double probability)
 		{
 			//[address;(AbsAnchorTimes)]
 			Dictionary<uint, List<uint>> recordAddresses = CreateRecordAddresses(timeFrequencyPoints);
@@ -119,7 +119,7 @@ namespace AudioProcessing.Recognizer
 			var deltas = GetDeltas(filteredSongs, recordAddresses);
 
 			//pick the songID with highest delta
-			return MaximizeTimeCoherency(deltas, timeFrequencyPoints.Count);
+			return MaximizeTimeCoherency(deltas, timeFrequencyPoints.Count,out probability);
 		}
 
 		/// <summary>
@@ -276,24 +276,22 @@ namespace AudioProcessing.Recognizer
 		/// <param name="deltas">[songID, num of time coherent notes]</param>
 		/// <param name="totalNotes">total number of notes in recording</param>
 		/// <returns></returns>
-		private uint? MaximizeTimeCoherency(Dictionary<uint, int> deltas, int totalNotes)
+		private uint? MaximizeTimeCoherency(Dictionary<uint, int> deltas, int totalNotes, out double probability)
 		{
 			uint? songID = null;
 			int longestCoherency = 0;
-			System.Diagnostics.Debug.WriteLine($"   Total number of notes: {totalNotes}");
+			probability = 0d;
 			foreach (var pair in deltas)
 			{
-				System.Diagnostics.Debug.WriteLine($"   Song ID: {pair.Key} has {pair.Value} coherent notes which is {(double)pair.Value / totalNotes * 100:##.###} %");
-				output.WriteLineAsync($"   Song ID: {pair.Key} has {pair.Value} coherent notes which is {Math.Min(100d, (double)pair.Value / totalNotes * 100):##.###} %");
+				output.WriteLineAsync($"Song ID: {pair.Key} is {Math.Min(100d, (double)pair.Value / totalNotes * 100):##.#} % time coherent.");
 				if (pair.Value > longestCoherency && pair.Value > Parameters.CoherentNotesCoef * totalNotes)
 				{
 					longestCoherency = pair.Value;
+					probability = (double)longestCoherency / totalNotes * 100;
 					songID = pair.Key;
 				}
 			}
-			if (songID != null)
-				System.Diagnostics.Debug.WriteLine($"\n   Song ID: {songID} has {longestCoherency} coherent notes which is {(double)longestCoherency / totalNotes * 100:##.###} %");
-				output.WriteLineAsync($"\n   Song ID: {songID} has {longestCoherency} coherent notes which is {Math.Min(100d, (double)longestCoherency / totalNotes * 100):##.###} %");
+
 			return songID;
 		}
 
@@ -439,19 +437,17 @@ namespace AudioProcessing.Recognizer
 			}
 
 			//Print number of common couples in each song and record
-			foreach (uint songID in res.Keys)
-			{
-				int couples = commonCoupleAmount[songID];
-				int TGZs = commonTGZAmount[songID];
-				//NOTE: result can be more than 100% (some parts of the songs may repeat - refrains)
-				if ((double) TGZs / couples > 0.5)
-				{
-					output.WriteLineAsync($"   Song ID: {songID} has {couples} couples where {TGZs} are in target zones: {Math.Min(100d, (double)TGZs / couples * 100):##.###} %");
-				}
-				//Debug print all songs
-				System.Diagnostics.Debug.WriteLine($"   Song ID: {songID} has {couples} couples where {TGZs} are in target zones: {(double)TGZs / couples * 100:##.###} %");
+			//foreach (uint songID in res.Keys)
+			//{
+			//	int couples = commonCoupleAmount[songID];
+			//	int TGZs = commonTGZAmount[songID];
+			//	//NOTE: result can be more than 100% (some parts of the songs may repeat - refrains)
+			//	if ((double) TGZs / couples > 0.6) //print only songs with over 60 % match
+			//	{
+			//		output.WriteLineAsync($"   Song ID: {songID} has {couples} couples where {TGZs} are in target zones: {Math.Min(100d, (double)TGZs / couples * 100):##.###} %");
+			//	}
+			//}
 
-			}
 			Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();
 
 			//remove songs that have low ratio of couples that make a TGZ
@@ -463,7 +459,6 @@ namespace AudioProcessing.Recognizer
 				//remove songs that don't have enough samples in TGZ
 				//		- min is 1720 * coef (for noise cancellation)
 				//			- avg 2. samples per bin common (2 out of 6) with about 860 bins per 10 (1000/11.7) seconds = 1720
-
 				if ((commonTGZAmount[songID] < 1400 || ratio < Parameters.SamplesInTgzCoef) && //normal songs have a lot of samples in TGZ with not that high ratio (thus wont get deleted)
 					ratio < 0.8d) //or test sounds (Hertz.wav or 400Hz.wav) dont have many samples in TGZ but have high ratio
 				{

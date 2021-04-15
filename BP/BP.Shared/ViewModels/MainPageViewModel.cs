@@ -50,11 +50,14 @@ namespace BP.Shared.ViewModels
 		#region Commands
 
 		public async void RecognizeSong()
-		{
+		{	
+			//Setup UI
 			bool sucessfullRecordingUpload = true;
+			WasRecognized = false;
 			textWriter.Clear();
-			InformationText = settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
 
+
+			InformationText = settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
 			if (settings.UseMicrophone)
 			{
 				IsRecording = true;
@@ -254,6 +257,19 @@ namespace BP.Shared.ViewModels
 
 		}
 
+		private Uri _youtubeLink;
+		public Uri YouTubeLink
+		{
+			get => _youtubeLink;
+
+			set
+			{
+				_youtubeLink = value;
+				OnPropertyChanged();
+			}
+
+		}
+
 		private bool _showUploadUI;
 		public bool ShowUploadUI
 		{
@@ -314,6 +330,17 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
+		private bool _wasRecognized;
+		public bool WasRecognized
+		{
+			get => _wasRecognized;
+			set
+			{
+				_wasRecognized = value;
+				OnPropertyChanged();
+			}
+		}
+
 		public bool IsProcessingRecognition => IsRecognizing || IsRecording;
 
 		public bool IsRecognizingOrUploading => IsRecognizing || IsRecording || IsUploading;
@@ -367,6 +394,13 @@ namespace BP.Shared.ViewModels
 			}
 
 			InformationText = $"\"{result.song.name}\" by {result.song.author}";
+			YouTubeLink = CreateYouTubeLink(result.song.name, result.song.author);
+			WasRecognized = true;
+		}
+
+		private Uri CreateYouTubeLink(string songName, string songAuthor)
+		{
+			return new Uri($"https://www.youtube.com/results?search_query={songName}+by+{songAuthor}");
 		}
 
 		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor)

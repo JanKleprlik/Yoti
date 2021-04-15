@@ -146,6 +146,12 @@
 						<Setter Target="SettingsBtn.Margin" Value="0,25,0,0"/>
 						<Setter Target="RecognizeBtn.Margin" Value="0,20,0,0"/>
 
+						<Setter Target="YouTubeBtn.(Grid.Row)" Value="1"/>
+						<Setter Target="YouTubeBtn.(Grid.Column)" Value="0"/>
+						<Setter Target="YouTubeBtn.(Grid.ColumnSpan)" Value="2"/>
+						<Setter Target="YouTubeBtn.Margin" Value="0,10,0,10"/>
+						<Setter Target="YouTubeBtn.HorizontalAlignment" Value="Center"/>
+						<Setter Target="InformationTextBlk.HorizontalAlignment" Value="Center"/>
 					</VisualState.Setters>
 				</VisualState>
 			</VisualStateGroup>
@@ -196,6 +202,7 @@
 			x:Name="TestButton"
 			Content="TEST"
 			Click="{x:Bind MainPageVM.TestMethod}"
+			Visibility="Collapsed"
 			/>
 
 		<!-- SECOND ROW -->
@@ -250,12 +257,40 @@
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center"
 			>
-			<TextBlock
-				x:Name="InformationTextBlk"
-				not_android:FontSize="30"
-				TextWrapping="Wrap"
-				Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
-				/>
+				<Grid>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="Auto"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<TextBlock
+						Grid.Column="0"
+						Grid.Row="0"
+						x:Name="InformationTextBlk"
+						not_android:FontSize="30"
+						TextWrapping="Wrap"
+						Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
+						/>
+
+					<HyperlinkButton						
+						x:Name="YouTubeBtn"
+						Grid.Row="0"
+						Grid.Column="1"
+						Margin="20,0,0,0"
+						Padding="5"
+						Width="Auto"
+						Height="40"
+						HorizontalAlignment="Center"
+						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+						NavigateUri="{x:Bind MainPageVM.YouTubeLink, Mode=OneWay}">
+						<Image 
+							Source="ms-appx:///Assets\youtube_logo_dark.png"
+							Stretch="Uniform"/>
+					</HyperlinkButton>
+				</Grid>
 			<ProgressBar
 				x:Name="RecognizeProgressBar"
 				Grid.Row="1"
@@ -267,6 +302,13 @@
 				Foreground="{StaticResource SecondaryHighlightedColor}"
 				win:Visibility="{x:Bind MainPageVM.IsRecognizingOrUploading, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				not_win:Visibility="Collapsed"
+				/>
+			<TextBlock
+				Text="Detailed info:"
+				FontSize="20"
+				android:FontSize="10"
+				Foreground="{StaticResource SecondaryHighlightedColor}"
+				Visibility="{x:Bind SettingsVM.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				/>
 			<TextBlock
 				x:Name="outputTextBox"

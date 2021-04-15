@@ -36,7 +36,7 @@ namespace BP.Server.Controllers
 		[HttpPost("[action]")]
 		public async Task<ActionResult<Song>> AddNewSong(SongWavFormat songToUpload)
 		{
-			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name };
+			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, bpm = songToUpload.bpm};
 
 			_logger.LogInformation("Getting correct searchdata");
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
@@ -67,12 +67,38 @@ namespace BP.Server.Controllers
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
 
 			_logger.LogDebug("Recognizing song");
-			uint? song_id = _recognizer.RecognizeSong(songToUpload.tfps, searchData, stringWriter);
+			double maxProbability = 0;
+			uint? songId = _recognizer.RecognizeSong(songToUpload.tfps, searchData, out maxProbability, stringWriter);
 
+			if (songId == null)
+			{
+				_logger.LogDebug("Song not found by BPM");
+				foreach(KeyValuePair<int, Dictionary<uint, List<ulong>>> entry in _searchDataInstance.SearchData)
+				{
+					if (entry.Key == songToUpload.bpm)
+						continue; //skip searchdata that was already searched through
+
+
+					searchData = GetSearchDataByBPM(entry.Key);
+					uint? potentialSongId = _recognizer.RecognizeSong(songToUpload.tfps, searchData, out double probability, stringWriter);
+
+					//if result is not null and probabilty is higher than current max
+					//remember the id and new max probability
+					if (potentialSongId != null && probability > maxProbability)
+					{
+						_logger.LogDebug($"New potential song id found: {potentialSongId} with proba: {probability} in BPM: {entry.Key}");
+						songId = potentialSongId;
+						maxProbability = probability;
+					}
+				}
+			}
+			//write result probability
+			if (songId != null)
+				await stringWriter.WriteLineAsync($"Recognized song with ID: {songId} is a {Math.Min(100d, maxProbability):##.#}% match.");
 
 			stringWriter.Close();
 
-			if (song_id == null)
+			if (songId == null)
 			{
 				return new RecognitionResult
 				{
@@ -84,7 +110,7 @@ namespace BP.Server.Controllers
 			{
 				return new RecognitionResult
 				{
-					song = await _context.Songs.FindAsync((uint)song_id),
+					song = await _context.Songs.FindAsync((uint)songId),
 					detailinfo = stringWriter.ToString()
 				};
 
@@ -203,121 +229,5 @@ namespace BP.Server.Controllers
 		}
 
 		#endregion
-
-		/*/
-		#region TEST API -- OBSOLETE
-		// POST: recognition/addnewsong
-		#region Add new song
-		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> AddNewSong(Song song)
-		{
-			_context.Songs.Add(song);
-			await _context.SaveChangesAsync();
-
-			return CreatedAtAction(nameof(GetSong), new { id = song.Id }, song);
-		}
-		#endregion
-
-		// DELETE: recognition/deletesong/{id}
-		#region Delete song
-		[HttpDelete("[action]/{id}")]
-		public async Task<ActionResult<Song>> DeleteSong(int id)
-		{
-			var song = await _context.Songs.FindAsync(id);
-			if (song == null)
-			{
-				return NotFound();
-			}
-
-			_context.Songs.Remove(song);
-			await _context.SaveChangesAsync();
-
-			return song;
-		}
-		#endregion
-
-		// GET: recognition/test
-		#region TEST GET
-		[HttpGet("[action]")]
-		public async Task<ActionResult<Dictionary<int, Dictionary<uint, List<ulong>>>>> TestGet()
-		{
-			return _searchDataInstance.SearchData;
-		}
-		#endregion
-
-		// GET: recognition/test
-		#region TEST POST
-		[HttpPost("[action]")]
-		public async Task<ActionResult<Dictionary<int, Dictionary<uint, List<ulong>>>>> TestPost()
-		{
-
-			if (_searchDataInstance.SearchData.ContainsKey(120) && _searchDataInstance.SearchData[120].ContainsKey(1)) //contains 120 BPM
-			{
-				//Add to song value
-				_searchDataInstance.SearchData[120][1].Add((ulong)_searchDataInstance.SearchData[120][1].Count);
-			}
-			else
-			{
-				//BPM -> songValues
-				_searchDataInstance.SearchData.TryAdd(
-					120, //BPM
-					new Dictionary<uint, List<ulong>> { 
-						{1, new List<ulong> { 0, 1, 2 } } 
-					});
-			}
-			_searchDataInstance.SaveToDB(120);
-
-			return CreatedAtAction(nameof(TestGet), _searchDataInstance.SearchData);
-		}
-		#endregion
-
-		// POST:recognition/uploadtest
-		#region Upload new song test
-		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> uploadtest()
-		{
-			_logger.LogInformation("reading file");
-			byte[] outputArray = System.IO.File.ReadAllBytes("./Home.wav");
-
-			WavFormat waf = new WavFormat(outputArray);
-
-			_logger.LogInformation("Getting time Frequencies");
-			List<TimeFrequencyPoint> tfps = _recognizer.GetTimeFrequencyPoints(waf);
-
-			SongWavFormat swf = new SongWavFormat
-			{
-				Author = "Martin Garrix",
-				Name = "Home",
-				BPM = 0,
-				TFPs = tfps
-			};
-			return await AddNewSong(swf);
-		}
-		#endregion
-
-		// POST:recognition/recognizetest
-		#region Recognize song test
-		[HttpPost("[action]")]
-		public async Task<ActionResult<RecognitionResult>> recognizetest()
-		{
-			byte[] outputArray = System.IO.File.ReadAllBytes("./recording.wav");
-			WavFormat waf = new WavFormat(outputArray);
-
-			List<TimeFrequencyPoint> tfps = _recognizer.GetTimeFrequencyPoints(waf);
-
-			SongWavFormat swf = new SongWavFormat
-			{
-				Author = "NONE",
-				Name = "NONE",
-				BPM = 0,
-				TFPs = tfps
-			};
-
-			return await RecognizeSong(swf);
-		}
-		#endregion
-
-		#endregion
-		/**/
 	}
 }
