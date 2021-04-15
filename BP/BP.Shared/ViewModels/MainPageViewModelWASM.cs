@@ -86,15 +86,8 @@ namespace BP.Shared.ViewModels
 				this.Log().LogDebug("[DEBUG] NumOfData: " + uploadedSongFormat.NumOfDataSamples);
 				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSongFormat.Data.Length);
 
-				var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
-
-				SongWavFormat songWavFormat = new SongWavFormat
-				{
-					author = "none",
-					name = "none",
-					bpm = 0,
-					tfps = tfps
-				};
+				//Name and Author is not important for recognition call
+				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none");
 
 				RecognitionResult result = await RecognizerApi.RecognizeSong(songWavFormat);
 				WriteRecognitionResults(result);

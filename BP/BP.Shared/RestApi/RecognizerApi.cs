@@ -21,7 +21,7 @@ namespace BP.Shared.RestApi
 				JsonSerializer.Serialize(songToUpload),
 				defaultHeaders);
 
-			this.Log().LogInformation(result);
+			this.Log().LogDebug(result);
 
 			if (result != null)
 			{
@@ -38,7 +38,7 @@ namespace BP.Shared.RestApi
 				JsonSerializer.Serialize(songToRecognize),
 				defaultHeaders);
 
-			this.Log().LogInformation(result);
+			this.Log().LogDebug(result);
 
 			if (result != null)
 			{
@@ -54,7 +54,7 @@ namespace BP.Shared.RestApi
 			   baseUrl + "/getsongs",
 			   defaultHeaders);
 
-			this.Log().LogInformation(result);
+			this.Log().LogDebug(result);
 
 			if (result != null)
 			{

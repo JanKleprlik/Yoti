@@ -345,16 +345,9 @@ namespace BP.Shared.ViewModels
 					return null;
 				}
 
-				var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
-
-				SongWavFormat songWavFormat = new SongWavFormat
-				{
-					author = "none",
-					name = "none",
-					bpm = 0,
-					tfps = tfps
-				};
-
+				//Name and Author is not important for recognition call
+				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none");
+				
 				return await RecognizerApi.RecognizeSong(songWavFormat);
 			}
 			catch(ArgumentException e)
@@ -388,15 +381,7 @@ namespace BP.Shared.ViewModels
 					return false;
 				}
 
-				var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
-
-				SongWavFormat songWavFormat = new SongWavFormat
-				{
-					author = songAuthor,
-					name = songName,
-					bpm = 0,
-					tfps = tfps
-				};
+				SongWavFormat songWavFormat = CreateSongWavFormat(songAuthor, songName);
 
 				this.Log().LogDebug("Calling rest api");
 				await RecognizerApi.UploadSong(songWavFormat).ConfigureAwait(false);
@@ -435,6 +420,23 @@ namespace BP.Shared.ViewModels
 			}
 
 			return true;
+		}
+
+		private SongWavFormat CreateSongWavFormat(string songAuthor, string songName)
+		{
+			int BPM = recognizer.GetBPM(uploadedSongFormat, approximate: true);
+			this.Log().LogInformation($"BPM: {BPM}");
+			var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
+
+			SongWavFormat songWavFormat = new SongWavFormat
+			{
+				author = songAuthor,
+				name = songName,
+				bpm = BPM,
+				tfps = tfps
+			};
+
+			return songWavFormat;
 		}
 
 #endregion

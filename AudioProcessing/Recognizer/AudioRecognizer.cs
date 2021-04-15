@@ -127,7 +127,7 @@ namespace AudioProcessing.Recognizer
 		/// </summary>
 		/// <param name="audio"></param>
 		/// <returns></returns>
-		public int GetBPM(IAudioFormat audio)
+		public int GetBPM(IAudioFormat audio,bool approximate = false)
 		{
 			AudioProcessor.ConvertToMono(audio);
 			//using floats instead of doubles here because of filters from NAudio library
@@ -138,10 +138,10 @@ namespace AudioProcessing.Recognizer
 
 			EnergyPeak[] energyPeaks = GetEnergyPeaks(data, audio.SampleRate);
 
-			return GetMostProbableBPM(energyPeaks, (float)audio.SampleRate);
+			return GetMostProbableBPM(energyPeaks, (float)audio.SampleRate, approximate);
 		}
 
-		private int GetMostProbableBPM(EnergyPeak[] energyPeaks, float sampleRate)
+		private int GetMostProbableBPM(EnergyPeak[] energyPeaks, float sampleRate,bool approximate)
 		{
 			//<BPM, Count>
 			Dictionary<int, int> BPMs = new Dictionary<int, int>();
@@ -157,7 +157,7 @@ namespace AudioProcessing.Recognizer
 						break;
 					
 					EnergyPeak neighbourPeak = energyPeaks[neighbourIdx];
-					int BPM = GetPeakBPM(currentPeak, neighbourPeak, sampleRate);
+					int BPM = GetPeakBPM(currentPeak, neighbourPeak, sampleRate, approximate);
 
 					//Save BPM into data structure
 					if (BPMs.ContainsKey(BPM))
@@ -179,10 +179,11 @@ namespace AudioProcessing.Recognizer
 					resultBPM = entry.Key;
 				}
 			}
+
 			return resultBPM;
 		}
 
-		private int GetPeakBPM(EnergyPeak currentPeak, EnergyPeak neighbourPeak, float sampleRate)
+		private int GetPeakBPM(EnergyPeak currentPeak, EnergyPeak neighbourPeak, float sampleRate, bool approximate)
 		{
 			float deltaT = neighbourPeak.Time - currentPeak.Time;
 			float potentialBPM = 60f * sampleRate / deltaT; //60 for minute
@@ -197,8 +198,18 @@ namespace AudioProcessing.Recognizer
 			{
 				potentialBPM /= 2;
 			}
+			if (!approximate)
+				return Convert.ToInt32(potentialBPM);
+			else
+				return GetApproxBPM(potentialBPM);
+		}
 
-			return Convert.ToInt32(potentialBPM);
+		private int GetApproxBPM(float inputBPM)
+		{
+			//round inputBPM to closest multiple of 5
+			int intervalizedBPM = Convert.ToInt32(inputBPM / Parameters.ApproximateIntervalSize) * Parameters.ApproximateIntervalSize;
+			//return BPM in interval [BPMLowLimit, BPMHighLimit]
+			return Math.Min(Math.Max(intervalizedBPM, Convert.ToInt32(Parameters.BPMLowLimit)), Convert.ToInt32(Parameters.BPMHighLimit));
 		}
 
 		private EnergyPeak[] GetEnergyPeaks(float[] data, uint sampleRate)
