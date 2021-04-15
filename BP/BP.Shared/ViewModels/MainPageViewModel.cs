@@ -13,6 +13,7 @@ using Database;
 using BP.Shared.RestApi;
 using AudioProcessing.Recognizer;
 using System.Linq;
+using System.IO;
 
 namespace BP.Shared.ViewModels
 {
@@ -78,7 +79,15 @@ namespace BP.Shared.ViewModels
 			}
 			else
 			{
-				sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value);
+				try
+				{
+					sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value);
+				}
+				catch(FileLoadException e)
+				{
+					sucessfullRecordingUpload = false;
+					InformationText = "Could not upload file.";
+				}
 			}
 
 			if (sucessfullRecordingUpload)
