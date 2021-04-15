@@ -13,6 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)AudioFormats\WavFormat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Parameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\AudioProcessor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Processor\BiQuadFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\ButterworthFilter.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Processor\FastFourierTransformation.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Recognizer\AudioRecognizer.cs" />

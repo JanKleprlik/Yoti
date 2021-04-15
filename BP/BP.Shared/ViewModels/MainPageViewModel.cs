@@ -52,7 +52,6 @@ namespace BP.Shared.ViewModels
 		public async void RecognizeSong()
 		{
 			bool sucessfullRecordingUpload = true;
-
 			textWriter.Clear();
 			InformationText = settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
 

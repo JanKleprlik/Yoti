@@ -34,6 +34,36 @@ namespace AudioProcessing.Recognizer
 			/// </summary>
 			public static double CoherentNotesCoef = 0.4;
 
+			/// <summary>
+			/// Low frequency limit for BPM detection
+			/// </summary>
+			public static float BPMLowFreq = 100f;
+
+
+			/// <summary>
+			/// High frequency liimt for BPM detection
+			/// </summary>
+			public static float BPMHighFreq = 150f;
+
+			/// <summary>
+			/// Nubmer of parts in a second for EnergyPeakDetection
+			/// </summary>
+			public static int PartsPerSecond = 2;
+
+			/// <summary>
+			/// Lowest allowed BPM
+			/// </summary>
+			public static float BPMLowLimit = 90f;
+
+			/// <summary>
+			/// Highest allowed BPM
+			/// </summary>
+			public static float BPMHighLimit= 180f;
+
+			/// <summary>
+			/// Number of fllowing peaks to consider when getting BPM
+			/// </summary>
+			public static int PeakNeighbourRange = 10;
 		}
 	}
 }

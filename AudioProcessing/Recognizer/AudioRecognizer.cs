@@ -24,7 +24,11 @@ namespace AudioProcessing.Recognizer
 			IsOutputSet = false;
 			output = Console.Out;
 		}
-
+		/// <summary>
+		/// WARNING: Converts audio into single channel.
+		/// </summary>
+		/// <param name="audio"></param>
+		/// <returns></returns>
 		public List<TimeFrequencyPoint> GetTimeFrequencyPoints(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
@@ -117,6 +121,200 @@ namespace AudioProcessing.Recognizer
 			//pick the songID with highest delta
 			return MaximizeTimeCoherency(deltas, timeFrequencyPoints.Count);
 		}
+
+		/// <summary>
+		/// WARNING: Converts audio into single chanel.
+		/// </summary>
+		/// <param name="audio"></param>
+		/// <returns></returns>
+		public int GetBPM(IAudioFormat audio)
+		{
+			//AudioProcessor.ConvertToMono(audio);
+
+			//using floats instead of doubles here because of filters from NAudio library
+			float[] data = Array.ConvertAll(audio.Data, item => (float)item / 32768f);
+
+			//for (int i = 3200; i < 3300; i++)
+			//{
+			//	Console.WriteLine(data[i]);
+			//}
+
+			FilterBPMFrequencies(data, (float)audio.SampleRate);
+
+			for (int i = 3200; i < 3300; i++)
+			{
+				Console.WriteLine(data[i]);
+			}
+
+			EnergyPeak[] energyPeaks = GetEnergyPeaks(data, audio.SampleRate);
+
+			return GetMostProbableBPM(energyPeaks, (float)audio.SampleRate);
+		}
+
+		private int GetMostProbableBPM(EnergyPeak[] energyPeaks, float sampleRate)
+		{
+			//<BPM, Count>
+			Dictionary<int, int> BPMs = new Dictionary<int, int>();
+
+			for(int currentIdx = 0; currentIdx < energyPeaks.Length - Parameters.PeakNeighbourRange; currentIdx++)
+			{
+				EnergyPeak currentPeak = energyPeaks[currentIdx];
+				for(int neighbourNumber = 1; neighbourNumber < Parameters.PeakNeighbourRange; neighbourNumber++)
+				{
+					int neighbourIdx = currentIdx + neighbourNumber;
+					if (neighbourIdx >= energyPeaks.Length)
+						break;
+					EnergyPeak neighbourPeak = energyPeaks[neighbourIdx];
+					float delta = neighbourPeak.Time - currentPeak.Time;
+					float potentialBPM = 60f * sampleRate / delta; //60 for minute
+
+					int BPM = GetBPMInRange(potentialBPM);
+
+					if (BPMs.ContainsKey(BPM))
+					{
+						BPMs[BPM]++; //raise number of occurances
+					}
+					else
+					{
+						BPMs.Add(BPM, 1); //start with 1 occurace
+					}
+				}
+			}
+
+			int maxOccurance = 0;
+			int resultBPM = 0;
+			//BPM - COUNT
+			List<KeyValuePair<int, int>> res = new List<KeyValuePair<int, int>>();
+			foreach(KeyValuePair<int, int> entry in BPMs)
+			{
+				res.Add(new KeyValuePair<int,int>(entry.Key, entry.Value));
+
+				//Console.WriteLine($"BPM: {entry.Key} \tOccurances:{entry.Value}");
+				//if (entry.Value > maxOccurance)
+				//{
+				//	maxOccurance = entry.Value;
+				//	resultBPM = entry.Key;
+				//}
+			}
+
+			var resAr = res.ToArray();
+
+			Array.Sort(resAr, (x, y) => y.Value.CompareTo(x.Value));
+			if (resAr.Length > 5)
+			{
+				Array.Resize(ref resAr, 5);
+			}
+			foreach (var entry in resAr)
+			{
+				Console.WriteLine($"BPM: {entry.Key} \tOccurances:{entry.Value}");
+			}
+
+			return resultBPM;
+		}
+
+		private int GetBPMInRange(float bpm)
+		{
+
+			//Raise BPM up by a factor of two until in range
+			while(bpm < Parameters.BPMLowLimit)
+			{
+				bpm *= 2;
+			}
+			//Lower BPM down by a factor of two until in range
+			while(bpm > Parameters.BPMHighLimit)
+			{
+				bpm /= 2;
+			}
+
+			return Convert.ToInt32(bpm);
+		}
+
+		private EnergyPeak[] GetEnergyPeaks(float[] data, uint sampleRate)
+		{
+			int samplesInPart = (int)sampleRate / Parameters.PartsPerSecond;
+			int totalParts = data.Length / 2 / samplesInPart;
+			EnergyPeak[] peaks = new EnergyPeak[totalParts];
+			//foreach part get maximum energy peak
+			for (int i = 0; i < totalParts; i++)
+			{
+				//peaks[i] = GetMaxEnergyPeak(data, i * samplesInPart, samplesInPart);
+				peaks[i] = GetMaxEnergyPeak(data, i, samplesInPart);
+			}
+
+			Array.Sort(peaks, (x, y) => y.Energy.CompareTo(x.Energy));
+			Array.Resize(ref peaks, peaks.Length / 2);
+			Array.Sort(peaks, (x, y) => x.Time.CompareTo(y.Time));
+
+			return peaks;
+		}
+
+
+		/// <summary>
+		/// Get maximum EnergyPeak from data in interval [start, start+steps]
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		/// <returns></returns>
+		private EnergyPeak GetMaxEnergyPeak(float[] data, int start, int steps)
+		{
+			//Set max with first value
+			//EnergyPeak max = new EnergyPeak()
+			//{
+			//	Energy = data[start],
+			//	Time = start
+			//};
+			//for (int i = start + 1; i < start + steps; i++)
+			//{
+			//	//save max
+			//	if (max.Energy < data[i])
+			//	{
+			//		max.Energy = data[i];
+			//		max.Time = i;
+			//	}
+			//}
+			EnergyPeak max = new EnergyPeak()
+			{
+				Energy = 0f,
+				Time = -1
+			};
+
+			for (int j = 0; j < steps; ++j)
+			{
+				float vol = 0.0F;
+				for (int k = 0; k < 2; ++k)
+				{
+					float v = data[start * 2 * steps + j * 2 + k];
+					if (vol < v)
+					{
+						vol = v;
+					}
+				}
+				if (max.Time== -1 || max.Energy< vol)
+				{
+					max.Time = start * steps + j;
+					max.Energy= vol;
+				}
+			}
+
+			return max;
+		}
+
+		private void FilterBPMFrequencies(float[] data, float sampleRate)
+		{
+			for (int ch = 0; ch < 2; ++ch)
+			{
+				BiQuadFilter lowpass = BiQuadFilter.LowPassFilter(sampleRate, Parameters.BPMHighFreq, 1f);
+				BiQuadFilter highpass = BiQuadFilter.HighPassFilter(sampleRate, Parameters.BPMLowFreq, 1f);
+
+				for (int i = ch; i < data.Length; i+=2)
+				{
+					data[i] = highpass.Transform(lowpass.Transform(data[i]));
+				}
+			}
+
+		}
+
 
 		/// <summary>
 		/// Picks song with the most notes corresponding to the recording.
