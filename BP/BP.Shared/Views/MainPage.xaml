@@ -172,7 +172,7 @@
 		<TextBlock
 			x:Name="Loggo"
 			Text="Yöti"
-			FontSize="60"
+			FontSize="90"
 			HorizontalAlignment="Center"
 			VerticalAlignment="Center" Grid.Column="1"
 			/>
@@ -271,6 +271,7 @@
 						Grid.Row="0"
 						x:Name="InformationTextBlk"
 						not_android:FontSize="30"
+						android:FontSize="20"
 						TextWrapping="Wrap"
 						CanBeScrollAnchor="False"
 						Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
@@ -283,7 +284,8 @@
 						Margin="20,0,0,0"
 						Padding="5"
 						Width="Auto"
-						Height="40"
+						not_android:Height="40"
+						android:Height="30"
 						HorizontalAlignment="Center"
 						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 						NavigateUri="{x:Bind MainPageVM.YouTubeLink, Mode=OneWay}">
@@ -306,7 +308,7 @@
 				/>
 			<TextBlock
 				Text="Detailed info:"
-				FontSize="20"
+				not_android:FontSize="20"
 				android:FontSize="10"
 				Foreground="{StaticResource SecondaryHighlightedColor}"
 				Visibility="{x:Bind SettingsVM.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
