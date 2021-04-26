@@ -1,5 +1,5 @@
-﻿using AudioProcessing;
-using AudioProcessing.AudioFormats;
+﻿using AudioRecognitionLibrary;
+using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

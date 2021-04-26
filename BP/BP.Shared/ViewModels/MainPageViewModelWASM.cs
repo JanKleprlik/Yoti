@@ -1,5 +1,5 @@
 ﻿#if __WASM__
-using AudioProcessing.AudioFormats;
+using AudioRecognitionLibrary.AudioFormats;
 using Database;
 using Microsoft.Extensions.Logging;
 using System;
@@ -57,14 +57,16 @@ namespace BP.Shared.ViewModels
 
 				try
 				{
-					if (settings.UseMicrophone)
+					if (!settings.UseMicrophone)
 					{
+						this.Log().LogDebug("Uploaded song");
 						uploadedSongFormat = new WavFormat(binData);
 					}
 					else
 					{
+						this.Log().LogDebug("Used microphone");
 						//TODO: Extract raw pcm data form binData using ffmpeg
-						var shortData = AudioProcessing.Tools.Converter.BytesToShorts(binData);
+						var shortData = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(binData);
 						uploadedSongFormat = new WavFormat(Parameters.SamplingRate,Parameters.Channels, shortData.Length, shortData);
 					}
 					if (!IsSupported(uploadedSongFormat))

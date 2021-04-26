@@ -1,4 +1,4 @@
-﻿using AudioProcessing.AudioFormats;
+﻿using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Generic;
 using System.Text;

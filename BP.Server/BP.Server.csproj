@@ -10,8 +10,10 @@
     <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
-  <Import Project="..\Database\Database.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\AudioRecognitionLibrary\AudioRecognitionLibrary.csproj" />
+  </ItemGroup>
 
-  <Import Project="..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />
+  <Import Project="..\Database\Database.projitems" Label="Shared" />
 
 </Project>

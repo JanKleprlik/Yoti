@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AudioRecognitionLibrary.Processor
 {
-	class FastFourierTransformation
+	public class FastFourierTransformation
 	{
 		/// <summary>
 		/// FFT specialized for audio

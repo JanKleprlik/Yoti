@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 using BP.Shared.Models;
 using System.Threading.Tasks;
 using System;
-using AudioProcessing.AudioFormats;
+using AudioRecognitionLibrary.AudioFormats;
 using Windows.UI.Core;
 using System.Collections.Generic;
 using Database;
 using BP.Shared.RestApi;
-using AudioProcessing.Recognizer;
+using AudioRecognitionLibrary.Recognizer;
 using System.Linq;
 using System.IO;
 
@@ -467,9 +467,18 @@ namespace BP.Shared.ViewModels
 
 		private SongWavFormat CreateSongWavFormat(string songAuthor, string songName)
 		{
+
 			int BPM = recognizer.GetBPM(uploadedSongFormat, approximate: true);
 			this.Log().LogInformation($"BPM: {BPM}");
+
 			var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
+
+			this.Log().LogDebug($"tfps.Count: {tfps.Count}");
+
+			for(int i = 0; i < Math.Min(10, tfps.Count); i++)
+			{
+				this.Log().LogDebug($"i: {i} freq: {tfps[i].Frequency}, time: {tfps[i].Time}");
+			}
 
 			SongWavFormat songWavFormat = new SongWavFormat
 			{

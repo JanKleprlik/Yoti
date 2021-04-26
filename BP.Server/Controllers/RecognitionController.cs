@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AudioProcessing.AudioFormats;
-using AudioProcessing;
-using AudioProcessing.Recognizer;
+using AudioRecognitionLibrary.AudioFormats;
+using AudioRecognitionLibrary;
+using AudioRecognitionLibrary.Recognizer;
 using System.IO;
 
 namespace BP.Server.Controllers

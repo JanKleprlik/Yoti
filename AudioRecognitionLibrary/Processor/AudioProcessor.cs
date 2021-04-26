@@ -8,7 +8,7 @@ using AudioRecognitionLibrary.Tools;
 
 namespace AudioRecognitionLibrary.Processor
 {
-	static class AudioProcessor
+	public static class AudioProcessor
 	{
 		/// <summary>
 		/// Resamples data from multiple channels to single one.

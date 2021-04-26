@@ -1,4 +1,4 @@
-﻿using AudioProcessing.Processor;
+﻿using AudioRecognitionLibrary.Processor;
 using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
@@ -80,7 +80,7 @@ namespace Visualizer.MusicModes
 			for (uint i = 0; i < BufferSize / (2 * downSampleCoef); i++)
 			{
 				VA[i] = new Vertex(new Vector2f((float)(i * 0.5 * downSampleCoef + 100),
-					(float)(200 - AudioProcessing.Tools.Arithmetics.GetComplexAbs(bin[2 * i], bin[2 * i + 1]) / 100000))); //100000 is to scale visualisation so it fits the window
+					(float)(200 - AudioRecognitionLibrary.Tools.Arithmetics.GetComplexAbs(bin[2 * i], bin[2 * i + 1]) / 100000))); //100000 is to scale visualisation so it fits the window
 			}
 
 		}
