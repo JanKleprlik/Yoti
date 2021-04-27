@@ -213,6 +213,7 @@
 			Content="Recognize"
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
+			BorderBrush="{StaticResource SecondaryHighlightedColor}"
 			Click="{x:Bind MainPageVM.RecognizeSong}"
 			IsEnabled="{x:Bind MainPageVM.IsProcessingRecognition, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
