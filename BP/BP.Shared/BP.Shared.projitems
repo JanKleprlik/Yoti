@@ -110,5 +110,6 @@
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Assets\youtube_logo_dark.png">
     </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Assets\youtube_music_logo_dark.png" />
   </ItemGroup>
 </Project>

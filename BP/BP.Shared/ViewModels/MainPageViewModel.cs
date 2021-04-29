@@ -409,7 +409,7 @@ namespace BP.Shared.ViewModels
 
 		private Uri CreateYouTubeLink(string songName, string songAuthor)
 		{
-			return new Uri($"https://www.youtube.com/results?search_query={songName}+by+{songAuthor}");
+			return new Uri($"https://music.youtube.com/search?q={songName.Replace(' ','+')}+by+{songAuthor.Replace(' ','+')}");
 		}
 
 		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor)

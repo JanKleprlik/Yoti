@@ -62,7 +62,7 @@ namespace BP.Shared.Models
 
 		public void SetToDefault()
 		{
-			ConstQAlgorithm = false;
+			Lyrics = true;
 			DetailedInfo = false;
 			RecordingLength = 3;
 
@@ -78,7 +78,7 @@ namespace BP.Shared.Models
 		public override string ToString()
 		{
 			string text = "SETTINGS: \n" +
-				$"ConstQAlgorithm: {ConstQAlgorithm}\n" +
+				$"ConstQAlgorithm: {Lyrics}\n" +
 				$"DetailedInfo: {DetailedInfo}\n" +
 				$"UseMicrophone: {UseMicrophone}\n" +
 				$"RecordingLength: {RecordingLength}";

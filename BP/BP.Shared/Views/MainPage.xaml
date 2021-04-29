@@ -315,7 +315,7 @@
 						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 						NavigateUri="{x:Bind MainPageVM.YouTubeLink, Mode=OneWay}">
 						<Image 
-							Source="ms-appx:///Assets\youtube_logo_dark.png"
+							Source="ms-appx:///Assets\youtube_music_logo_dark.png"
 							Stretch="Uniform"/>
 					</HyperlinkButton>
 				</Grid>
