@@ -17,7 +17,7 @@ namespace BP.Shared.Models
 		/// <b>False</b>: Use FFT to get frequency domain.<br/>
 		/// Default: False
 		/// </summary>
-		public bool ConstQAlgorithm { get; set; }
+		public bool Lyrics { get; set; }
 
 		/// <summary>
 		/// <b>True</b>: Print detailed information about recognition. <br/>

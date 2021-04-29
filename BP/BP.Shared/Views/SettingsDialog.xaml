@@ -49,6 +49,12 @@
 			Visibility="Collapsed" 
 			/>
 		<ToggleSwitch 
+			x:Name="Lyrics"
+			OnContent="Lyrics"
+			OffContent="Lyrics"
+			IsOn="{x:Bind SettingsViewModel.Lyrics, Mode=TwoWay}"
+			/>
+		<ToggleSwitch 
 			x:Name="DetailedInfo"
 			OnContent="Detailed info"
 			OffContent="Detailed info"

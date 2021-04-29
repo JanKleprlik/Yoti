@@ -19,12 +19,12 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
-		public bool ConstQAlg
+		public bool Lyrics
 		{
-			get => Settings.ConstQAlgorithm;
+			get => Settings.Lyrics;
 			set
 			{
-				Settings.ConstQAlgorithm = value;
+				Settings.Lyrics = value;
 				OnPropertyChanged();
 			}
 		}
