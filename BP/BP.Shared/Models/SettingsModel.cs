@@ -62,7 +62,7 @@ namespace BP.Shared.Models
 
 		public void SetToDefault()
 		{
-			Lyrics = true;
+			Lyrics = false;
 			DetailedInfo = false;
 			RecordingLength = 3;
 

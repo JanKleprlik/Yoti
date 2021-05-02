@@ -266,6 +266,19 @@ namespace BP.Shared.ViewModels
 
 		}
 
+		private string _newSongLyrics;
+		public string NewSongLyrics
+		{
+			get => _newSongLyrics;
+
+			set
+			{
+				_newSongLyrics = value;
+				OnPropertyChanged();
+			}
+
+		}
+
 		private Uri _youtubeLink;
 		public Uri YouTubeLink
 		{

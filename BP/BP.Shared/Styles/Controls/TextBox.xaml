@@ -13,6 +13,14 @@
 		<wasm:Setter Property="Foreground" Value="White"/>
 	</Style>
 
+	<Style x:Key="LyricsTextBox" TargetType="TextBox">
+		<Setter Property="Template" Value="{StaticResource NonDeletableTextBox}"/>
+		<Setter Property="FontFamily" Value="{StaticResource Sansation}"/>
+		<Setter Property="FontSize" Value="17"/>
+		<wasm:Setter Property="Foreground" Value="White"/>
+		<Setter Property="BorderBrush" Value="Red"/>
+		<Setter Property="BorderThickness" Value="2"/>
+	</Style>
 
 
 	<ControlTemplate x:Key="DefaultTextBox" TargetType="TextBox">
@@ -169,6 +177,89 @@
                             VerticalAlignment="Stretch"
 							Foreground="White"
                             />
+		</Grid>
+	</ControlTemplate>
+
+
+	<ControlTemplate x:Key="NonDeletableTextBox" TargetType="TextBox">
+		<Grid>
+			<VisualStateManager.VisualStateGroups>
+				<VisualStateGroup x:Name="CommonStates">
+					<VisualState x:Name="Normal"/>
+					<VisualState x:Name="PointerOver"/>
+					<VisualState x:Name="Focused">
+						<VisualState.Setters>
+							<Setter Target="PlaceholderTextContentPresenter.Foreground" Value="White"/>
+							<Setter Target="BackgroundElement.Background" Value="{StaticResource PrimaryLightColor}"/>
+							<Setter Target="PlaceholderTextContentPresenter.Opacity" Value="0.4"/>
+						</VisualState.Setters>
+					</VisualState>
+					<VisualState x:Name="Disabled"/>
+				</VisualStateGroup>
+			</VisualStateManager.VisualStateGroups>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="*"/>
+				<ColumnDefinition Width="Auto"/>
+			</Grid.ColumnDefinitions>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+
+			<Border x:Name="BackgroundElement"
+			        Grid.Row="1"
+			        Background="{StaticResource PrimaryColor}"
+			        CornerRadius="15"
+			        Grid.ColumnSpan="2"
+			        Grid.RowSpan="1"
+					/>
+			<Border x:Name="BorderElement"
+                            Grid.Row="1"
+                            BorderBrush="{StaticResource SecondaryColor}"
+                            BorderThickness="2"
+							CornerRadius="15"
+                            Grid.ColumnSpan="2"
+                            Grid.RowSpan="1"
+							/>
+			<ContentPresenter x:Name="HeaderContentPresenter"
+                                      x:DeferLoadStrategy="Lazy"
+                                      Visibility="Collapsed"
+                                      Grid.Row="0"
+                                      Foreground="White"
+                                      Margin="15,0,0,5"
+                                      Grid.ColumnSpan="2"
+                                      Content="{TemplateBinding Header}"
+                                      FontWeight="Normal"
+                                      />
+			<ScrollViewer x:Name="ContentElement"
+                                  Grid.Row="1"
+                                  HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}"
+                                  HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                  VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}"
+                                  VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                  IsHorizontalRailEnabled="{TemplateBinding ScrollViewer.IsHorizontalRailEnabled}"
+                                  IsVerticalRailEnabled="{TemplateBinding ScrollViewer.IsVerticalRailEnabled}"
+                                  IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}"
+                                  Margin="{TemplateBinding BorderThickness}"
+                                  Padding="10,10,5,7"
+                                  IsTabStop="False"
+                                  AutomationProperties.AccessibilityView="Raw"
+                                  ZoomMode="Disabled"
+								  Foreground="White"
+                                  />
+			<ContentControl x:Name="PlaceholderTextContentPresenter"
+                                    Grid.Row="1"
+                                    Foreground="WhiteSmoke"
+                                    Margin="{TemplateBinding BorderThickness}"
+                                    Padding="10,5,0,7"
+                                    IsTabStop="False"
+                                    Grid.ColumnSpan="2"
+                                    Content="{TemplateBinding PlaceholderText}"
+                                    IsHitTestVisible="False"
+									VerticalAlignment="Top"
+									Opacity="0.7"
+                                    />
 		</Grid>
 	</ControlTemplate>
 
