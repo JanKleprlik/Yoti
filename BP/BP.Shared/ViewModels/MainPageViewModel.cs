@@ -127,6 +127,11 @@ namespace BP.Shared.ViewModels
 		{
 #if NETFX_CORE || __ANDROID__
 			byte[] uploadedSong = await FileUpload.pickAndUploadFileAsync(value => UploadedSongText = value, uploadedSongLock, maxSize_Mb:50);
+			
+			//file not picked
+			if (uploadedSong == null)
+				return;
+
 			try
 			{
 				uploadedSongFormat = new WavFormat(uploadedSong);
@@ -153,6 +158,9 @@ namespace BP.Shared.ViewModels
 
 		public async void AddNewSong()
 		{
+			//Reset UI
+			WasRecognized = false;
+
 			if (NewSongName == "")
 			{
 				InformationText = "Please enter song name.";
@@ -194,6 +202,8 @@ namespace BP.Shared.ViewModels
 				UploadedSongText = "Please upload audio file";
 				NewSongAuthor = string.Empty;
 				NewSongName = string.Empty;
+
+				//Force GC to avoid memory struggles on older phones
 				GC.Collect();
 			}
 		}
@@ -210,8 +220,16 @@ namespace BP.Shared.ViewModels
 
 		public async void ShowLyrics()
 		{
-			var lyricsShowDialog = new LyricsShowDialog(RecognizedSongLyrics);
-			await lyricsShowDialog.ShowAsync();
+			if (RecognizedSong == null)
+			{
+				var lyricsShowDialog = new LyricsShowDialog("No record.", "Lyrics");
+				await lyricsShowDialog.ShowAsync();
+			}
+			else
+			{
+				var lyricsShowDialog = new LyricsShowDialog(RecognizedSong.lyrics, RecognizedSong.name);
+				await lyricsShowDialog.ShowAsync();
+			}
 		}
 
 		public async void TestMethod()
@@ -375,7 +393,7 @@ namespace BP.Shared.ViewModels
 
 		public bool IsRecognizingOrUploading => IsRecognizing || IsRecording || IsUploading;
 
-		public string RecognizedSongLyrics = "No record.";
+		public Song RecognizedSong = null;
 		#endregion
 
 
@@ -427,7 +445,7 @@ namespace BP.Shared.ViewModels
 
 			InformationText = $"\"{result.song.name}\" by {result.song.author}";
 			YouTubeLink = CreateYouTubeLink(result.song.name, result.song.author);
-			RecognizedSongLyrics = result.song.lyrics.Replace("\r\n", Environment.NewLine);
+			RecognizedSong = result.song;
 			WasRecognized = true;
 		}
 

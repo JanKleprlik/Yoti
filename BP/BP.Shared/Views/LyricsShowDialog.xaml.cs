@@ -20,10 +20,12 @@ namespace BP.Shared.Views
     public sealed partial class LyricsShowDialog : ContentDialog
     {
 		public string Lyrics;
-        public LyricsShowDialog(string lyrics)
+		public string Name;
+        public LyricsShowDialog(string lyrics, string name)
         {
             this.InitializeComponent();
 			Lyrics = lyrics.Replace("\r\n", Environment.NewLine);
+			Name = name;
         }
 
     }

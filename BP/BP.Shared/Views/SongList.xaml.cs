@@ -54,7 +54,7 @@ namespace BP.Shared.Views
 			var song = (sender as FrameworkElement).Tag as Song;
 			this.Log().LogDebug($"Deleting song ID: {song.id}\tName: {song.name}\tAuthor: {song.author}");
 
-			var lyricsShowDialog = new LyricsShowDialog(song.lyrics);
+			var lyricsShowDialog = new LyricsShowDialog(song.lyrics, song.name);
 			await lyricsShowDialog.ShowAsync();
 		}
 

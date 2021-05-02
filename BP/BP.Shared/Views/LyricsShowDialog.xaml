@@ -8,7 +8,7 @@
 	xmlns:android="http://uno.ui/android"
     mc:Ignorable="d android"
 	
-	Title="Lyrics"
+	Title="{x:Bind Name}"
 	android:Foreground="Black"
     PrimaryButtonText="Done"
 
