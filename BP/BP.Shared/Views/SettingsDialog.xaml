@@ -42,12 +42,6 @@
 	<StackPanel x:Name="Options">
 		<!-- ConstQTransform feature is not supported -->
 		<ToggleSwitch 
-			x:Name="Lyrics"
-			OnContent="Lyrics"
-			OffContent="Lyrics"
-			IsOn="{x:Bind SettingsViewModel.Lyrics, Mode=TwoWay}"
-			/>
-		<ToggleSwitch 
 			x:Name="DetailedInfo"
 			OnContent="Detailed info"
 			OffContent="Detailed info"
@@ -66,6 +60,7 @@
 			Maximum="8"
 			Header="{x:Bind SettingsViewModel.RecordingLengthText, Mode=OneWay}"
 			Value="{x:Bind SettingsViewModel.RecordingLength, Mode=TwoWay}"
+			Visibility="{x:Bind SettingsViewModel.UseMicrophone, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			/>
 	</StackPanel>
 </ContentDialog>

@@ -159,11 +159,7 @@
 						<Setter Target="SettingsBtn.Margin" Value="0,25,0,0"/>
 						<Setter Target="RecognizeBtn.Margin" Value="0,20,0,0"/>
 
-						<Setter Target="YouTubeBtn.(Grid.Row)" Value="1"/>
-						<Setter Target="YouTubeBtn.(Grid.Column)" Value="0"/>
-						<Setter Target="YouTubeBtn.(Grid.ColumnSpan)" Value="2"/>
 						<Setter Target="YouTubeBtn.Margin" Value="0,10,0,10"/>
-						<Setter Target="YouTubeBtn.HorizontalAlignment" Value="Center"/>
 						<Setter Target="InformationTextBlk.HorizontalAlignment" Value="Center"/>
 					</VisualState.Setters>
 				</VisualState>
@@ -239,7 +235,8 @@
 			Grid.Row="1"
 			Grid.Column="1"
 			VerticalAlignment="Top"
-			Margin="230,25,0,0"
+			not_android:Margin="230,25,0,0"
+			android:Margin="210,25,0,0"
 			not_wasm:Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			wasm:Visibility="Collapsed"
 			Click="{x:Bind MainPageVM.ReplayRecording}"
@@ -282,19 +279,20 @@
 						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<TextBlock
-						Grid.Column="0"
+						Grid.ColumnSpan="2"
 						Grid.Row="0"
 						x:Name="InformationTextBlk"
 						not_android:FontSize="30"
 						android:FontSize="20"
 						TextWrapping="Wrap"
 						CanBeScrollAnchor="False"
+						HorizontalAlignment="Center"
 						Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
 						/>
 
 					<HyperlinkButton						
 						x:Name="YouTubeBtn"
-						Grid.Row="0"
+						Grid.Row="1"
 						Grid.Column="1"
 						Margin="20,0,0,0"
 						Padding="5"
@@ -308,6 +306,15 @@
 							Source="ms-appx:///Assets\youtube_music_logo_dark.png"
 							Stretch="Uniform"/>
 					</HyperlinkButton>
+					<Button
+						x:Name="LyricsBtn"
+						Grid.Row="1"
+						Grid.Column="0"
+						Content="Lyrics"
+						Template="{StaticResource NonexpandingOKButton}"
+						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+						Click="{x:Bind MainPageVM.ShowLyrics}"
+						/>
 				</Grid>
 			<ProgressBar
 				x:Name="RecognizeProgressBar"
@@ -320,22 +327,6 @@
 				Foreground="{StaticResource SecondaryHighlightedColor}"
 				win:Visibility="{x:Bind MainPageVM.IsRecognizingOrUploading, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				not_win:Visibility="Collapsed"
-				/>
-			<TextBlock
-				Text="Lyrics:"
-				not_android:FontSize="20"
-				android:FontSize="10"
-				Foreground="{StaticResource SecondaryHighlightedColor}"
-				Visibility="{x:Bind SettingsVM.Lyrics, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-				/>
-			<TextBlock
-				x:Name="lyricsTextBox"
-				Width="Auto"
-				Height="Auto"
-				android:FontSize="10"
-				TextWrapping="Wrap"
-				TextAlignment="Center"
-				Visibility="{x:Bind SettingsVM.Lyrics, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				/>
 			<TextBlock
 				Text="Detailed info:"

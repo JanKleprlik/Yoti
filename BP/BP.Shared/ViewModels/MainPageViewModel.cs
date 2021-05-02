@@ -14,6 +14,7 @@ using BP.Shared.RestApi;
 using AudioRecognitionLibrary.Recognizer;
 using System.Linq;
 using System.IO;
+using BP.Shared.Views;
 
 namespace BP.Shared.ViewModels
 {
@@ -172,11 +173,14 @@ namespace BP.Shared.ViewModels
 			{
 				string songName = NewSongName;
 				string songAuthor = NewSongAuthor;
+				string lyrics = NewSongLyrics.IsNullOrEmpty() ? "No record." : NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
 
 				IsUploading = true;
 				InformationText = "Processing song";
 
-				bool wasAdded = await AddNewSongToDatabase(songName, songAuthor);
+
+
+				bool wasAdded = await AddNewSongToDatabase(songName, songAuthor, lyrics);
 				IsUploading = false;
 
 				if (wasAdded)
@@ -202,6 +206,12 @@ namespace BP.Shared.ViewModels
 		public void CloseNewSongForm()
 		{
 			ShowUploadUI = false;
+		}
+
+		public async void ShowLyrics()
+		{
+			var lyricsShowDialog = new LyricsShowDialog(RecognizedSongLyrics);
+			await lyricsShowDialog.ShowAsync();
 		}
 
 		public async void TestMethod()
@@ -365,7 +375,9 @@ namespace BP.Shared.ViewModels
 
 		public bool IsRecognizingOrUploading => IsRecognizing || IsRecording || IsUploading;
 
+		public string RecognizedSongLyrics = "No record.";
 		#endregion
+
 
 		#region private Methods
 
@@ -415,6 +427,7 @@ namespace BP.Shared.ViewModels
 
 			InformationText = $"\"{result.song.name}\" by {result.song.author}";
 			YouTubeLink = CreateYouTubeLink(result.song.name, result.song.author);
+			RecognizedSongLyrics = result.song.lyrics.Replace("\r\n", Environment.NewLine);
 			WasRecognized = true;
 		}
 
@@ -423,7 +436,7 @@ namespace BP.Shared.ViewModels
 			return new Uri($"https://music.youtube.com/search?q={songName.Replace(' ','+')}+by+{songAuthor.Replace(' ','+')}");
 		}
 
-		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor)
+		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor, string lyrics)
 		{
 			this.Log().LogDebug($"[DEBUG] Adding {songName} by {songAuthor} into database.");
 			try
@@ -434,8 +447,6 @@ namespace BP.Shared.ViewModels
 					uploadedSongFormat = null;
 					return false;
 				}
-
-				string lyrics = NewSongLyrics.IsNullOrEmpty() ? "No record" : NewSongLyrics;
 
 				SongWavFormat songWavFormat = CreateSongWavFormat(songAuthor, songName, lyrics);
 

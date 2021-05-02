@@ -19,16 +19,6 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
-		public bool Lyrics
-		{
-			get => Settings.Lyrics;
-			set
-			{
-				Settings.Lyrics = value;
-				OnPropertyChanged();
-			}
-		}
-
 		public bool DetailedInfo
 		{
 			get => Settings.DetailedInfo;

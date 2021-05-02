@@ -1,5 +1,4 @@
-﻿using BP.Shared.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,19 +17,14 @@ using Windows.UI.Xaml.Navigation;
 
 namespace BP.Shared.Views
 {
-    public sealed partial class LyricsDialog : ContentDialog
+    public sealed partial class LyricsShowDialog : ContentDialog
     {
-		private MainPageViewModel MainPageViewModel;
-
-		public LyricsDialog(MainPageViewModel mainPageVM)
+		public string Lyrics;
+        public LyricsShowDialog(string lyrics)
         {
             this.InitializeComponent();
-			MainPageViewModel = mainPageVM;
-		}
+			Lyrics = lyrics.Replace("\r\n", Environment.NewLine);
+        }
 
-		public async void NewLineBtn_Clicked(object sender, RoutedEventArgs e)
-		{
-			lyricsTextBox.Text += "\r\n";
-		}
     }
 }

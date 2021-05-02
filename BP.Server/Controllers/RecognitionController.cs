@@ -161,6 +161,30 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
+		// DELETE:recognition/deletesongbyid/{id}
+		#region Delete test by Id
+		[HttpDelete("[action]/{id}")]
+		public async Task<ActionResult<Song>> DeleteSongById(uint id)
+		{
+			var song = await _context.Songs.FindAsync(id);
+			if (song == null)
+			{
+				return NotFound();
+			}
+
+			if (!await _context.Songs.ContainsAsync(song))
+			{
+				return NotFound();
+			}
+
+			_context.Songs.Remove(song);
+			DeleteSongFromSearchData(song);
+			_context.SaveChanges();
+
+			return song;
+		}
+		#endregion
+
 		#region Private helpers
 		private Dictionary<uint, List<ulong>> GetSearchDataByBPM(int BPM)
 		{
