@@ -46,13 +46,13 @@ namespace BP.Shared.Utils
 
 		public override Task WriteLineAsync(string value)
 		{
-			value += "\r\n";
+			value += Environment.NewLine;
 			return outputTextControl.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => { outputTextControl.Text += value; }).AsTask();
 		}
 
 		public override void WriteLine()
 		{
-			outputTextControl.Text += "\n";
+			outputTextControl.Text += Environment.NewLine;
 		}
 
 		public void Clear()

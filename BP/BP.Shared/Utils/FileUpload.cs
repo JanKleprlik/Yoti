@@ -33,7 +33,7 @@ namespace BP.Shared.Utils
 
 				if ((ulong)audioFileData.Length > maxSize_Mb * 1024 * 1024)
 				{
-					writeResult($"File is too large.\nMaximum allowed size is {maxSize_Mb} Mb.");
+					writeResult($"File is too large." + Environment.NewLine + "Maximum allowed size is {maxSize_Mb} Mb.");
 					return null;
 				}
 
@@ -74,7 +74,7 @@ namespace BP.Shared.Utils
 					var audioFileData = await result.OpenReadAsync();
 					if ((ulong)audioFileData.Length > maxSize_Mb * 1024 * 1024)
 					{
-						writeResult($"File is too large.\nMaximum allowed size is {maxSize_Mb} Mb.");
+						writeResult($"File is too large." + Environment.NewLine + "Maximum allowed size is {maxSize_Mb} Mb.");
 						return null;
 					}
 					lock (outputArrayLock)

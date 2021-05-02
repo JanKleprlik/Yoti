@@ -36,7 +36,7 @@ namespace BP.Server.Controllers
 		[HttpPost("[action]")]
 		public async Task<ActionResult<Song>> AddNewSong(SongWavFormat songToUpload)
 		{
-			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, bpm = songToUpload.bpm};
+			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, lyrics = songToUpload.lyrics, bpm = songToUpload.bpm};
 
 			_logger.LogInformation("Getting correct searchdata");
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);

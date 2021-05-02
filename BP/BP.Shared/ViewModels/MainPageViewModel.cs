@@ -122,7 +122,6 @@ namespace BP.Shared.ViewModels
 #endif
 		}
 
-		//PORTED
 		public async void UploadNewSong()
 		{
 #if NETFX_CORE || __ANDROID__
@@ -140,7 +139,7 @@ namespace BP.Shared.ViewModels
 			catch(ArgumentException e)
 			{
 				this.Log().LogError(e.Message);
-				InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+				InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
 				return;
 			}
 
@@ -151,7 +150,6 @@ namespace BP.Shared.ViewModels
 #endif
 		}
 
-		//PORTED
 		public async void AddNewSong()
 		{
 			if (NewSongName == "")
@@ -394,14 +392,14 @@ namespace BP.Shared.ViewModels
 					return null;
 				}
 
-				//Name and Author is not important for recognition call
-				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none");
+				//Name, Author and Lyrics is not important for recognition call
+				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none", "none");
 				
 				return await RecognizerApi.RecognizeSong(songWavFormat);
 			}
 			catch(ArgumentException e)
 			{
-				InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+				InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + " Please try a different audio file.";
 				return null;
 			}
 		}
@@ -437,7 +435,9 @@ namespace BP.Shared.ViewModels
 					return false;
 				}
 
-				SongWavFormat songWavFormat = CreateSongWavFormat(songAuthor, songName);
+				string lyrics = NewSongLyrics.IsNullOrEmpty() ? "No record" : NewSongLyrics;
+
+				SongWavFormat songWavFormat = CreateSongWavFormat(songAuthor, songName, lyrics);
 
 				this.Log().LogDebug("Calling rest api");
 				await RecognizerApi.UploadSong(songWavFormat).ConfigureAwait(false);
@@ -449,7 +449,7 @@ namespace BP.Shared.ViewModels
 			catch(ArgumentException e)
 			{
 				this.Log().LogError(e.Message);
-				InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+				InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
 				return false;
 			}
 		}
@@ -459,26 +459,26 @@ namespace BP.Shared.ViewModels
 
 			if (!Array.Exists(settings.SupportedAudioFormats, element => element.Equals(audioFormat.GetType())))
 			{
-				InformationText = $"Unsupported audio format: {audioFormat.GetType()}\nSupported audio formats: {string.Join<Type>(", ", settings.SupportedAudioFormats)}";
+				InformationText = $"Unsupported audio format: {audioFormat.GetType()}" + Environment.NewLine + $"Supported audio formats: {string.Join<Type>(", ", settings.SupportedAudioFormats)}";
 				return false;
 			}
 
 			if (!Array.Exists(settings.SupportedNumbersOfChannels, element => element == audioFormat.Channels))
 			{
-				InformationText = $"Unsupported number of channels: {audioFormat.Channels}\nSupported numbers of channels: {string.Join<int>(", ", settings.SupportedNumbersOfChannels)}";
+				InformationText = $"Unsupported number of channels: {audioFormat.Channels}" + Environment.NewLine + $"Supported numbers of channels: {string.Join<int>(", ", settings.SupportedNumbersOfChannels)}";
 				return false;
 			}
 			
 			if (!Array.Exists(settings.SupportedSamplingRates, element => element == audioFormat.SampleRate))
 			{
-				InformationText = $"Unsupported sampling rate: {audioFormat.SampleRate}\nSupported sampling rates: {string.Join<int>(", ", settings.SupportedSamplingRates)}";
+				InformationText = $"Unsupported sampling rate: {audioFormat.SampleRate}" + Environment.NewLine + $"Supported sampling rates: {string.Join<int>(", ", settings.SupportedSamplingRates)}";
 				return false;
 			}
 
 			return true;
 		}
 
-		private SongWavFormat CreateSongWavFormat(string songAuthor, string songName)
+		private SongWavFormat CreateSongWavFormat(string songAuthor, string songName, string lyrics)
 		{
 
 			int BPM = recognizer.GetBPM(uploadedSongFormat, approximate: true);
@@ -497,6 +497,7 @@ namespace BP.Shared.ViewModels
 			{
 				author = songAuthor,
 				name = songName,
+				lyrics = lyrics,
 				bpm = BPM,
 				tfps = tfps
 			};

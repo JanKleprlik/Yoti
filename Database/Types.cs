@@ -14,6 +14,8 @@ namespace Database
 
 		public string author { get; set; }
 
+		public string lyrics { get; set; }
+
 		public int bpm { get; set; }
 
 		public override string ToString()
@@ -28,6 +30,7 @@ namespace Database
 		public List<TimeFrequencyPoint> tfps { get; set; }
 		public string name { get; set; }
 		public string author { get; set; }
+		public string lyrics { get; set; }
 		public int bpm {get; set;}
 	}
 
