@@ -161,12 +161,12 @@ namespace BP.Shared.ViewModels
 			//Reset UI
 			WasRecognized = false;
 
-			if (NewSongName == "")
+			if (NewSongName.IsNullOrEmpty())
 			{
 				InformationText = "Please enter song name.";
 				return;
 			}
-			if (NewSongAuthor == "")
+			if (NewSongAuthor.IsNullOrEmpty())
 			{
 				InformationText = "Please enter song author.";
 				return;
@@ -177,11 +177,19 @@ namespace BP.Shared.ViewModels
 				return;
 			}
 
+			if (NewSongLyrics.IsNullOrEmpty())
+			{
+				InformationText = "Please enter the lyrics.";
+				return;
+			}
+
 			if (uploadedSongFormat != null && NewSongName != "" && NewSongAuthor!= "")
 			{
 				string songName = NewSongName;
 				string songAuthor = NewSongAuthor;
-				string lyrics = NewSongLyrics.IsNullOrEmpty() ? "No record." : NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
+				//unify end of line marks in database as '\r\n' so it can be replaced
+				//by Environment.NewLine in runtime depending on the system
+				string lyrics = NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
 
 				IsUploading = true;
 				InformationText = "Processing song";
