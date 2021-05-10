@@ -1,5 +1,5 @@
-﻿using AudioProcessing;
-using AudioProcessing.AudioFormats;
+﻿using AudioRecognitionLibrary;
+using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +13,8 @@ namespace Database
 		public string name { get; set; }
 
 		public string author { get; set; }
+
+		public string lyrics { get; set; }
 
 		public int bpm { get; set; }
 
@@ -28,6 +30,7 @@ namespace Database
 		public List<TimeFrequencyPoint> tfps { get; set; }
 		public string name { get; set; }
 		public string author { get; set; }
+		public string lyrics { get; set; }
 		public int bpm {get; set;}
 	}
 

@@ -3,7 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Windows.Storage;
 using System.IO;
-using AudioProcessing.AudioFormats;
+using AudioRecognitionLibrary.AudioFormats;
 
 namespace BP.Shared.ViewModels
 {

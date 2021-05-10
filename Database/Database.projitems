@@ -9,7 +9,6 @@
     <Import_RootNamespace>Database</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Database.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Types.cs" />
   </ItemGroup>
 </Project>

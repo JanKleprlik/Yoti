@@ -20,6 +20,7 @@ namespace BP.Shared.Views
 
 		private Storyboard flickerAnimation;
 		private SettingsDialog settingsDialog;
+		private LyricsDialog lyricsDialog;
 
 		public MainPage()
         {
@@ -30,13 +31,19 @@ namespace BP.Shared.Views
 			MainPageVM = new MainPageViewModel(outputTextBox, settings, Dispatcher);
 
 			setupFlickerAnimation();
-			setupSettingsDialog(settings);
+			setupContentDialogs();
 		}
 
 		public async void SettingsBtn_Click(object sender, RoutedEventArgs e)
 		{
 			ContentDialogResult result = await settingsDialog.ShowAsync();
 		}
+
+		public async void LyricsBtn_Click(object sender, RoutedEventArgs e)
+		{
+			ContentDialogResult resutl = await lyricsDialog.ShowAsync();
+		}
+
 		public async void ListSongsBtn_Click(object sender, RoutedEventArgs e)
 		{
 
@@ -45,6 +52,8 @@ namespace BP.Shared.Views
 			Frame.Navigate(typeof(SongList), songs);
 
 		}
+
+
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
@@ -64,11 +73,15 @@ namespace BP.Shared.Views
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 			flickerAnimation.Begin();
 		}
-		private void setupSettingsDialog(Settings settings)
+		private void setupContentDialogs()
 		{
 			settingsDialog = new SettingsDialog(SettingsVM);
 			Grid.SetRowSpan(settingsDialog, 3);
-			Grid.SetColumnSpan(settingsDialog, 3);			
+			Grid.SetColumnSpan(settingsDialog, 3);
+
+			lyricsDialog = new LyricsDialog(MainPageVM);
+			Grid.SetRowSpan(lyricsDialog, 3);
+			Grid.SetColumnSpan(lyricsDialog, 3);
 		}
 
 

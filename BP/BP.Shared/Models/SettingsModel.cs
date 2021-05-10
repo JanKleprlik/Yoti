@@ -1,4 +1,4 @@
-﻿using AudioProcessing.AudioFormats;
+﻿using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +17,7 @@ namespace BP.Shared.Models
 		/// <b>False</b>: Use FFT to get frequency domain.<br/>
 		/// Default: False
 		/// </summary>
-		public bool ConstQAlgorithm { get; set; }
+		public bool Lyrics { get; set; }
 
 		/// <summary>
 		/// <b>True</b>: Print detailed information about recognition. <br/>
@@ -62,7 +62,7 @@ namespace BP.Shared.Models
 
 		public void SetToDefault()
 		{
-			ConstQAlgorithm = false;
+			Lyrics = false;
 			DetailedInfo = false;
 			RecordingLength = 3;
 
@@ -78,7 +78,7 @@ namespace BP.Shared.Models
 		public override string ToString()
 		{
 			string text = "SETTINGS: \n" +
-				$"ConstQAlgorithm: {ConstQAlgorithm}\n" +
+				$"ConstQAlgorithm: {Lyrics}\n" +
 				$"DetailedInfo: {DetailedInfo}\n" +
 				$"UseMicrophone: {UseMicrophone}\n" +
 				$"RecordingLength: {RecordingLength}";

@@ -38,6 +38,7 @@ namespace BP.Shared.RestApi
 				JsonSerializer.Serialize(songToRecognize),
 				defaultHeaders);
 
+			this.Log().LogDebug(JsonSerializer.Serialize(songToRecognize));
 			this.Log().LogDebug(result);
 
 			if (result != null)

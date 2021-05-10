@@ -1,5 +1,5 @@
 ﻿using System;
-using AudioProcessing.Processor;
+using AudioRecognitionLibrary.Processor;
 using SFML.Audio;
 using SFML.Graphics;
 using SFML.System;
@@ -47,7 +47,7 @@ namespace Visualizer.MusicModes
 			if (VA.VertexCount != binsToRender)
 				VA.Resize((uint)binsToRender);
 
-			if (!AudioProcessing.Tools.Arithmetics.IsPowOfTwo(data.Length))
+			if (!AudioRecognitionLibrary.Tools.Arithmetics.IsPowOfTwo(data.Length))
 				throw new ArgumentException($"Data length: {data.Length} is not power of two.");
 
 			double Yscale = binsToRender / 512d; //scale so spectagram fits the screen

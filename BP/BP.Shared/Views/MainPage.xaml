@@ -31,6 +31,7 @@
 
 						<Setter Target="NewSongNameTB.(Grid.RowSpan)" Value="3"/>
 						<Setter Target="NewSongAuthorTB.(Grid.RowSpan)" Value="3"/>
+						<Setter Target="NewSongLyricsBtn.(Grid.RowSpan)" Value="3"/>
 						<Setter Target="UploadNewSongBtn.(Grid.RowSpan)" Value="3"/>
 						<Setter Target="ProcessNewSongBtn.(Grid.RowSpan)" Value="3"/>
 						<Setter Target="CancelNewSongBtn.(Grid.RowSpan)" Value="3"/>
@@ -40,10 +41,10 @@
 						<Setter Target="NewSongNameTB.Margin" Value="30,0,0,0"/>
 						<Setter Target="NewSongNameTB.HorizontalAlignment" Value="Left"/>
 
-						<Setter Target="NewSongAuthorTB.Margin" Value="210,0,0,0"/>
+						<Setter Target="NewSongAuthorTB.Margin" Value="190,0,0,0"/>
 						<Setter Target="NewSongAuthorTB.HorizontalAlignment" Value="Left"/>
 
-						<Setter Target="UploadNewSongBtn.Margin" Value="390,0,0,0"/>
+						<Setter Target="UploadNewSongBtn.Margin" Value="350,0,0,0"/>
 						<Setter Target="UploadNewSongBtn.HorizontalAlignment" Value="Left"/>
 
 						<Setter Target="ProcessNewSongBtn.Margin" Value="0,0,90,0"/>
@@ -52,9 +53,11 @@
 						<Setter Target="CancelNewSongBtn.Margin" Value="0"/>
 						<Setter Target="CancelNewSongBtn.HorizontalAlignment" Value="Right"/>
 
-						<Setter Target="UploadedSongText.Margin" Value="450,0,0,0"/>
+						<Setter Target="UploadedSongText.Margin" Value="390,0,0,0"/>
 						<Setter Target="UploadedSongText.HorizontalAlignment" Value="Left"/>
 						<Setter Target="UploadedSongText.MaxWidth" Value="200"/>
+
+						<Setter Target="NewSongLyricsBtn.Margin" Value="560,0,0,0"/>
 
 					</VisualState.Setters>
 				</VisualState>
@@ -68,6 +71,7 @@
 
 						<Setter Target="NewSongNameTB.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="NewSongAuthorTB.(Grid.RowSpan)" Value="1"/>
+						<Setter Target="NewSongLyricsBtn.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="UploadNewSongBtn.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="ProcessNewSongBtn.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="CancelNewSongBtn.(Grid.RowSpan)" Value="1"/>
@@ -75,6 +79,7 @@
 
 						<Setter Target="NewSongNameTB.(Grid.Row)" Value="0"/>
 						<Setter Target="NewSongAuthorTB.(Grid.Row)" Value="1"/>
+						<Setter Target="NewSongLyricsBtn.(Grid.Row)" Value="2"/>
 						<Setter Target="UploadNewSongBtn.(Grid.Row)" Value="2"/>
 						<Setter Target="ProcessNewSongBtn.(Grid.Row)" Value="2"/>
 						<Setter Target="CancelNewSongBtn.(Grid.Row)" Value="2"/>
@@ -99,6 +104,9 @@
 						<Setter Target="UploadedSongText.HorizontalAlignment" Value="Left"/>
 						<Setter Target="UploadedSongText.MaxWidth" Value="120"/>
 
+						<Setter Target="NewSongLyricsBtn.Margin" Value="190,0,0,0"/>
+						<Setter Target="NewSongLyricsBtn.HorizontalAlignment" Value="Left"/>
+
 					</VisualState.Setters>
 				</VisualState>
 
@@ -111,6 +119,7 @@
 
 						<Setter Target="NewSongNameTB.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="NewSongAuthorTB.(Grid.RowSpan)" Value="1"/>
+						<Setter Target="NewSongLyricsBtn.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="UploadNewSongBtn.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="ProcessNewSongBtn.(Grid.RowSpan)" Value="1"/>
 						<Setter Target="CancelNewSongBtn.(Grid.RowSpan)" Value="1"/>
@@ -119,6 +128,7 @@
 
 						<Setter Target="NewSongNameTB.(Grid.Row)" Value="0"/>
 						<Setter Target="NewSongAuthorTB.(Grid.Row)" Value="1"/>
+						<Setter Target="NewSongLyricsBtn.(Grid.Row)" Value="0"/>
 						<Setter Target="UploadNewSongBtn.(Grid.Row)" Value="2"/>
 						<Setter Target="ProcessNewSongBtn.(Grid.Row)" Value="1"/>
 						<Setter Target="CancelNewSongBtn.(Grid.Row)" Value="2"/>
@@ -129,6 +139,9 @@
 
 						<Setter Target="NewSongAuthorTB.Margin" Value="5"/>
 						<Setter Target="NewSongAuthorTB.HorizontalAlignment" Value="Left"/>
+
+						<Setter Target="NewSongLyricsBtn.Margin" Value="5"/>
+						<Setter Target="NewSongLyricsBtn.HorizontalAlignment" Value="Right"/>
 
 						<Setter Target="UploadNewSongBtn.Margin" Value="5"/>
 						<Setter Target="UploadNewSongBtn.HorizontalAlignment" Value="Left"/>
@@ -146,11 +159,7 @@
 						<Setter Target="SettingsBtn.Margin" Value="0,25,0,0"/>
 						<Setter Target="RecognizeBtn.Margin" Value="0,20,0,0"/>
 
-						<Setter Target="YouTubeBtn.(Grid.Row)" Value="1"/>
-						<Setter Target="YouTubeBtn.(Grid.Column)" Value="0"/>
-						<Setter Target="YouTubeBtn.(Grid.ColumnSpan)" Value="2"/>
 						<Setter Target="YouTubeBtn.Margin" Value="0,10,0,10"/>
-						<Setter Target="YouTubeBtn.HorizontalAlignment" Value="Center"/>
 						<Setter Target="InformationTextBlk.HorizontalAlignment" Value="Center"/>
 					</VisualState.Setters>
 				</VisualState>
@@ -189,7 +198,7 @@
 			RenderTransformOrigin="0.5,0.5"
 			Grid.Row="1"
 			Grid.Column="1"
-			Margin="110,32,0,0"
+			Margin="205,32,0,0"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
 			win:Visibility="{x:Bind MainPageVM.IsRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
@@ -210,9 +219,11 @@
 			x:Name="RecognizeBtn"
 			Grid.Row="1"
 			Grid.Column="1"
+			Width="200"
 			Content="Recognize"
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
+			BorderBrush="{StaticResource SecondaryHighlightedColor}"
 			Click="{x:Bind MainPageVM.RecognizeSong}"
 			IsEnabled="{x:Bind MainPageVM.IsProcessingRecognition, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
@@ -224,7 +235,8 @@
 			Grid.Row="1"
 			Grid.Column="1"
 			VerticalAlignment="Top"
-			Margin="150,25,0,0"
+			not_android:Margin="230,25,0,0"
+			android:Margin="210,25,0,0"
 			not_wasm:Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			wasm:Visibility="Collapsed"
 			Click="{x:Bind MainPageVM.ReplayRecording}"
@@ -267,19 +279,20 @@
 						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<TextBlock
-						Grid.Column="0"
+						Grid.ColumnSpan="2"
 						Grid.Row="0"
 						x:Name="InformationTextBlk"
 						not_android:FontSize="30"
 						android:FontSize="20"
 						TextWrapping="Wrap"
 						CanBeScrollAnchor="False"
+						HorizontalAlignment="Center"
 						Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
 						/>
 
 					<HyperlinkButton						
 						x:Name="YouTubeBtn"
-						Grid.Row="0"
+						Grid.Row="1"
 						Grid.Column="1"
 						Margin="20,0,0,0"
 						Padding="5"
@@ -290,9 +303,18 @@
 						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 						NavigateUri="{x:Bind MainPageVM.YouTubeLink, Mode=OneWay}">
 						<Image 
-							Source="ms-appx:///Assets\youtube_logo_dark.png"
+							Source="ms-appx:///Assets\youtube_music_logo_dark.png"
 							Stretch="Uniform"/>
 					</HyperlinkButton>
+					<Button
+						x:Name="LyricsBtn"
+						Grid.Row="1"
+						Grid.Column="0"
+						Content="Lyrics"
+						Template="{StaticResource NonexpandingOKButton}"
+						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+						Click="{x:Bind MainPageVM.ShowLyrics}"
+						/>
 				</Grid>
 			<ProgressBar
 				x:Name="RecognizeProgressBar"
@@ -364,31 +386,26 @@
 				x:Name="NewSongNameTB"
 				Text="{x:Bind MainPageVM.NewSongName, Mode=TwoWay}"
 				PlaceholderText="Name"
-				Grid.RowSpan="3"
+				Grid.Row="0"
 				HorizontalAlignment="Left"
 				Width="150"
 				FontSize="15"
-				Margin="30,0,0,0"
 				Height="35"
 				/>
 			<TextBox
 				x:Name="NewSongAuthorTB"
 				Text="{x:Bind MainPageVM.NewSongAuthor, Mode=TwoWay}"
 				PlaceholderText="Author"
-				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
 				Width="150"
 				FontSize="15"
-				Margin="210,0,0,0"
 				Height="35"
 				/>
 			<Button
 				x:Name="UploadNewSongBtn"
 				Style="{StaticResource IconStyle}"
 				Content="Audio"
-				Grid.RowSpan="3"
 				HorizontalAlignment="Left"
-				Margin="390,0,0,0"
 				Click="{x:Bind MainPageVM.UploadNewSong}"
 				/>
 			<TextBlock
@@ -396,8 +413,11 @@
 				Text="{x:Bind MainPageVM.UploadedSongText, Mode=OneWay}"
 				HorizontalAlignment="Left"
 				VerticalAlignment="Center"
-				Grid.RowSpan="3"
-				Margin="450,0,0,0"
+				/>
+			<Button
+				x:Name="NewSongLyricsBtn"
+				Content="Lyrics"
+				Click="LyricsBtn_Click"
 				/>
 			<Button
 				x:Name="ProcessNewSongBtn"

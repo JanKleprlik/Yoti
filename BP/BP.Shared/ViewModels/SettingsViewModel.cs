@@ -19,16 +19,6 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
-		public bool ConstQAlg
-		{
-			get => Settings.ConstQAlgorithm;
-			set
-			{
-				Settings.ConstQAlgorithm = value;
-				OnPropertyChanged();
-			}
-		}
-
 		public bool DetailedInfo
 		{
 			get => Settings.DetailedInfo;

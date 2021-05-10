@@ -9,9 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AudioProcessing.AudioFormats;
-using AudioProcessing;
-using AudioProcessing.Recognizer;
+using AudioRecognitionLibrary.AudioFormats;
+using AudioRecognitionLibrary;
+using AudioRecognitionLibrary.Recognizer;
 using System.IO;
 
 namespace BP.Server.Controllers
@@ -36,7 +36,7 @@ namespace BP.Server.Controllers
 		[HttpPost("[action]")]
 		public async Task<ActionResult<Song>> AddNewSong(SongWavFormat songToUpload)
 		{
-			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, bpm = songToUpload.bpm};
+			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, lyrics = songToUpload.lyrics, bpm = songToUpload.bpm};
 
 			_logger.LogInformation("Getting correct searchdata");
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
@@ -156,6 +156,30 @@ namespace BP.Server.Controllers
 			{
 				return NotFound();
 			}
+
+			return song;
+		}
+		#endregion
+
+		// DELETE:recognition/deletesongbyid/{id}
+		#region Delete test by Id
+		[HttpDelete("[action]/{id}")]
+		public async Task<ActionResult<Song>> DeleteSongById(uint id)
+		{
+			var song = await _context.Songs.FindAsync(id);
+			if (song == null)
+			{
+				return NotFound();
+			}
+
+			if (!await _context.Songs.ContainsAsync(song))
+			{
+				return NotFound();
+			}
+
+			_context.Songs.Remove(song);
+			DeleteSongFromSearchData(song);
+			_context.SaveChanges();
 
 			return song;
 		}

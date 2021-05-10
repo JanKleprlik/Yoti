@@ -14,11 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AudioRecognitionLibrary\AudioRecognitionLibrary.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Resources\Songs\400Hz.wav">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Import Project="..\AudioProcessing\AudioProcessing.projitems" Label="Shared" />
 
 </Project>

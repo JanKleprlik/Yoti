@@ -1,5 +1,5 @@
 ﻿#if __WASM__
-using AudioProcessing.AudioFormats;
+using AudioRecognitionLibrary.AudioFormats;
 using Database;
 using Microsoft.Extensions.Logging;
 using System;
@@ -39,7 +39,7 @@ namespace BP.Shared.ViewModels
 			stringBuilder = new StringBuilder();
 			//Update UI
 			//In WASM UI Thread will be blocked while uploading
-			InformationText = "Processing uploaded file.\n Please wait ...";
+			InformationText = "Processing uploaded file." + Environment.NewLine + " Please wait ...";
 			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);"); //(size_limit, js metadata offset)
 		}
 
@@ -57,14 +57,16 @@ namespace BP.Shared.ViewModels
 
 				try
 				{
-					if (settings.UseMicrophone)
+					if (!settings.UseMicrophone)
 					{
+						this.Log().LogDebug("Uploaded song");
 						uploadedSongFormat = new WavFormat(binData);
 					}
 					else
 					{
+						this.Log().LogDebug("Used microphone");
 						//TODO: Extract raw pcm data form binData using ffmpeg
-						var shortData = AudioProcessing.Tools.Converter.BytesToShorts(binData);
+						var shortData = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(binData);
 						uploadedSongFormat = new WavFormat(Parameters.SamplingRate,Parameters.Channels, shortData.Length, shortData);
 					}
 					if (!IsSupported(uploadedSongFormat))
@@ -77,7 +79,7 @@ namespace BP.Shared.ViewModels
 				catch(ArgumentException ex)
 				{
 					this.Log().LogError(ex.Message);
-					InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+					InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
 					return;
 				}
 
@@ -86,8 +88,8 @@ namespace BP.Shared.ViewModels
 				this.Log().LogDebug("[DEBUG] NumOfData: " + uploadedSongFormat.NumOfDataSamples);
 				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSongFormat.Data.Length);
 
-				//Name and Author is not important for recognition call
-				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none");
+				//Name, Author and Lyrics is not important for recognition call
+				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none", "none");
 
 				RecognitionResult result = await RecognizerApi.RecognizeSong(songWavFormat);
 				WriteRecognitionResults(result);
@@ -122,7 +124,7 @@ namespace BP.Shared.ViewModels
 				catch(ArgumentException ex)
 				{
 					this.Log().LogError(ex.Message);
-					InformationText = "Problem with uploaded wav file occured.\nPlease try a different audio file.";
+					InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
 					return;
 				}
 

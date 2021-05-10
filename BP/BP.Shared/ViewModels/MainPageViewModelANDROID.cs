@@ -1,6 +1,6 @@
 ﻿#if __ANDROID__
 
-using AudioProcessing.AudioFormats;
+using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -18,7 +18,7 @@ namespace BP.Shared.ViewModels
 
 			// On Android we only get raw data without .
 			// So I have to convert them manually to shorts and then use different manual constructor
-			short[] recordedDataShort = AudioProcessing.Tools.Converter.BytesToShorts(recordedSong);
+			short[] recordedDataShort = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(recordedSong);
 
 			return new WavFormat(
 				AudioRecorder.Recorder.Parameters.SamplingRate,

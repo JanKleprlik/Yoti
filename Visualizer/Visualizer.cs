@@ -1,7 +1,7 @@
 ﻿using System;
 using Visualizer.MusicModes;
 using SFML.Audio;
-using AudioProcessing.AudioFormats;
+using AudioRecognitionLibrary.AudioFormats;
 
 namespace Visualizer
 {

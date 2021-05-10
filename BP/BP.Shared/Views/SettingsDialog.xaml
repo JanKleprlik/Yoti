@@ -42,13 +42,6 @@
 	<StackPanel x:Name="Options">
 		<!-- ConstQTransform feature is not supported -->
 		<ToggleSwitch 
-			x:Name="ConstQAlg"
-			OnContent="Constant Q algorithm"
-			OffContent="Constant Q algorithm"
-			IsOn="{x:Bind SettingsViewModel.ConstQAlg, Mode=TwoWay}"
-			Visibility="Collapsed" 
-			/>
-		<ToggleSwitch 
 			x:Name="DetailedInfo"
 			OnContent="Detailed info"
 			OffContent="Detailed info"
@@ -67,6 +60,7 @@
 			Maximum="8"
 			Header="{x:Bind SettingsViewModel.RecordingLengthText, Mode=OneWay}"
 			Value="{x:Bind SettingsViewModel.RecordingLength, Mode=TwoWay}"
+			Visibility="{x:Bind SettingsViewModel.UseMicrophone, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			/>
 	</StackPanel>
 </ContentDialog>

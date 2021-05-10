@@ -65,7 +65,7 @@ namespace BP.Shared.AudioRecorder
 			var fileProperties = await file.GetBasicPropertiesAsync();
 			if (fileProperties.Size > Parameters.MaxRecordingUploadSize_Mb * 1024 * 1024)
 			{
-				writeResult($"Selected file is too big.\nMaximum allowed size is {Parameters.MaxRecordingUploadSize_Mb} Mb.");
+				writeResult($"Selected file is too big." + Environment.NewLine + "Maximum allowed size is {Parameters.MaxRecordingUploadSize_Mb} Mb.");
 				return false;
 			}
 			else 

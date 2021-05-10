@@ -56,7 +56,7 @@
 							<ColumnDefinition Width="40"/>
 							<ColumnDefinition Width="*"/>
 							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="30"/>
+							<ColumnDefinition Width="Auto"/>
 						</Grid.ColumnDefinitions>
 						<TextBlock
 							x:Name="SongID"
@@ -84,9 +84,8 @@
 							Style="{StaticResource DefaultTextBlock}"
 							/>
 						<Button
-							Style="{StaticResource IconStyle}"
-							Content="Delete"
-							Foreground="{StaticResource CancelColor}"
+							Template="{StaticResource NonexpandingOKButton}"
+							Content="Lyrics"
 							Tag="{Binding}"
 							Click="SongBtn_Click"
 							Grid.Column="3"

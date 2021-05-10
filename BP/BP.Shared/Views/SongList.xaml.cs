@@ -54,7 +54,13 @@ namespace BP.Shared.Views
 			var song = (sender as FrameworkElement).Tag as Song;
 			this.Log().LogDebug($"Deleting song ID: {song.id}\tName: {song.name}\tAuthor: {song.author}");
 
-			//remove from database
+			var lyricsShowDialog = new LyricsShowDialog(song.lyrics, song.name);
+			await lyricsShowDialog.ShowAsync();
+		}
+
+
+		private async void DeleteSong(Song song)
+		{
 			Song result = await recognizerapi.DeleteSong(song);
 
 			this.Log().LogDebug(song.ToString());
