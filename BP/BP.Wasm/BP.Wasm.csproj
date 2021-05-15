@@ -21,12 +21,14 @@
     <None Remove="Assets\AudioDatabase.db" />
     <None Remove="WasmScripts\Recorder.js" />
     <None Remove="WasmScripts\Recorder2.js" />
+    <None Remove="WasmScripts\RecordRTC.js" />
     <None Remove="WasmScripts\Uploader.js" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="WasmCSS\Fonts.css" />
     <EmbeddedResource Include="WasmScripts\AppManifest.js" />
     <EmbeddedResource Include="WasmScripts\Recorder.js" />
+    <EmbeddedResource Include="WasmScripts\RecordRTC.js" />
     <EmbeddedResource Include="WasmScripts\Uploader.js" />
 
 		<UpToDateCheckInput Include="WasmScripts\AudioRecorder.js" />
