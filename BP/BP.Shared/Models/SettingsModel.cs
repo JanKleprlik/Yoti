@@ -64,13 +64,13 @@ namespace BP.Shared.Models
 		{
 			Lyrics = false;
 			DetailedInfo = false;
-			RecordingLength = 3;
-
-#if __WASM__
-			UseMicrophone = false;
-#else
+			RecordingLength = 5;
 			UseMicrophone = true;
-#endif
+//#if __WASM__
+//			UseMicrophone = false;
+//#else
+//			UseMicrophone = true;
+//#endif
 
 		}
 

@@ -49,7 +49,7 @@ namespace BP.Shared.ViewModels
 			WasmSongEvent -= OnSongToRecognizeEvent;
 			if (e.isDone)
 			{
-
+				this.Log().LogDebug(stringBuilder.ToString());
 				var base64Data = Regex.Match(stringBuilder.ToString(), @"data:((audio)|(application))/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
 				var binData = Convert.FromBase64String(base64Data); //this is the data I want byte[]
 
@@ -65,9 +65,7 @@ namespace BP.Shared.ViewModels
 					else
 					{
 						this.Log().LogDebug("Used microphone");
-						//TODO: Extract raw pcm data form binData using ffmpeg
-						var shortData = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(binData);
-						uploadedSongFormat = new WavFormat(Parameters.SamplingRate,Parameters.Channels, shortData.Length, shortData);
+						uploadedSongFormat = new WavFormat(binData);
 					}
 					if (!IsSupported(uploadedSongFormat))
 					{

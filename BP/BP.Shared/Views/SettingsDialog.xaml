@@ -47,7 +47,7 @@
 			OffContent="Detailed info"
 			IsOn="{x:Bind SettingsViewModel.DetailedInfo, Mode=TwoWay}"
 			/>
-		<not_wasm:ToggleSwitch 
+		<ToggleSwitch 
 			x:Name="UseMicrophone"
 			OnContent="Use microphone"
 			OffContent="Use microphone"

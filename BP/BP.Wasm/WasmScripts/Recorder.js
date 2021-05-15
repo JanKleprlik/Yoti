@@ -1,67 +1,55 @@
 ﻿function record_and_recognize(recordingLength) {
-    var RecognizeMethod = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.Views.MainPage:ProcessEvent ");
+    var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.ViewModels.MainPageViewModel:ProcessEvent");
 
-    // get microphone access
-    if (navigator.getUserMedia) {
 
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(function (stream) {
-                start_recording(stream);
-            })
-            .catch(function (err) {
-                alert('Error capturing audio: ' + err);
-            });
-
-    } else { alert('getUserMedia not supported in this browser.'); }
-
-    function start_recording(stream) {
-        var streamTrack = stream.getAudioTracks()[0];
-        streamTrack.applyConstraints({
-            channelCount: 1,
+    navigator.mediaDevices.getUserMedia({
+        audio: true
+    }).then(async function (stream) {
+        let recorder = RecordRTC(stream, {
+            type: 'audio',
+            mimeType: 'audio/wav',
+            recorderType: StereoAudioRecorder,
             sampleRate: 48000,
-            sampleSize: 16,
-            noiseSuppression: false,
-            latency: 0.1
+            desiredSampRate: 48000,
+            numberOfAudioChannels: 1
+
         });
-        console.log(streamTrack);
-        console.log(streamTrack.getSettings());
+        recorder.startRecording();
 
+        const sleep = m => new Promise(r => setTimeout(r, m));
+        await sleep(5000);
 
-        const options = { mimeType: 'audio/webm;codecs=pcm' };
-        const recordedChunks = [];
-        const mediaRecorder = new MediaRecorder(stream, options);
-        var shouldStop = false;
-        var stopped = false;
+        recorder.stopRecording(function () {
+            let blob = recorder.getBlob();
 
-        mediaRecorder.ondataavailable = function (e) {
-            if (e.data.size > 0) {
-                recordedChunks.push(e.data);
-                shouldStop = true;
-            }
+            var reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function () {
+                var data = reader.result;
 
-            //send data to c#
-            if (shouldStop === true && stopped === true) {
-                var reader = new FileReader();
-                reader.readAsDataURL(new Blob(recordedChunks));
-
-                reader.onloadend = function () {
-                    var base64data = reader.result;
-                    RecognizeMethod(base64data, false); //send data
-                    RecognizeMethod(base64data, true); //process data
+                if (!data.startsWith('data:audio/wav;base64,')) {
+                    console.log('Unsupported format.');
+                    alert('Unsupported format.');
+                    return;
                 }
+
+                //start ... audio metadata of uploaded file
+                let start = 0;
+                let step = 500000;
+                let part = data.substring(start, start + step);
+                console.log(part);
+                while (part !== "") {
+                    processPartFile(part, false);
+                    start = start + step;
+                    part = data.substring(start, start + step);
+                }
+
+                //full file uploaded -> process it
+                console.log('Done recording file');
+                processPartFile("recording", true);
             }
 
-            //stop recording and give one more round to process last data collected
-            if (shouldStop === true && stopped === false) {
-                mediaRecorder.stop();
-                stopped = true;
-                console.log('stopped recording');
-            }
-
-        }
-
-        mediaRecorder.start(recordingLength);
-        console.log('start recording');
-    }
+        });
+    });
 
 }
