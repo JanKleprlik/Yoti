@@ -15,7 +15,6 @@
 	
 	Background="{StaticResource PrimaryDarkColor}"
 	NavigationCacheMode="Required"
-	DataContext="{x:Bind MainPageVM}"
 	>
 
 	<Grid x:Name="MainGrid"
@@ -201,7 +200,7 @@
 			Margin="205,32,0,0"
 			VerticalAlignment="Top"
 			HorizontalAlignment="Left"
-			win:Visibility="{x:Bind MainPageVM.IsRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+			win:Visibility="{x:Bind MainPageViewModel.IsRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			not_win:Visibility="Collapsed"
 			Opacity="1.0"
 			/>
@@ -210,7 +209,7 @@
 		<Button
 			x:Name="TestButton"
 			Content="TEST"
-			Click="{x:Bind MainPageVM.TestMethod}"
+			Click="{x:Bind MainPageViewModel.TestMethod}"
 			Visibility="Collapsed"
 			/>
 
@@ -224,8 +223,8 @@
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
 			BorderBrush="{StaticResource SecondaryHighlightedColor}"
-			Click="{x:Bind MainPageVM.RecognizeSong}"
-			IsEnabled="{x:Bind MainPageVM.IsProcessingRecognition, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
+			Click="{x:Bind MainPageViewModel.RecognizeSong}"
+			IsEnabled="{x:Bind MainPageViewModel.IsProcessingRecognition, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
 
 		<Button
@@ -237,9 +236,9 @@
 			VerticalAlignment="Top"
 			not_android:Margin="230,25,0,0"
 			android:Margin="210,25,0,0"
-			not_wasm:Visibility="{x:Bind MainPageVM.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+			not_wasm:Visibility="{x:Bind MainPageViewModel.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 			wasm:Visibility="Collapsed"
-			Click="{x:Bind MainPageVM.ReplayRecording}"
+			Click="{x:Bind MainPageViewModel.ReplayRecording}"
 			/>
 
 		<Button
@@ -253,7 +252,7 @@
 			VerticalAlignment="Top"
 			Height="30"
 			Width="30"
-			Click="{x:Bind SettingsBtn_Click}"
+			Click="{x:Bind MainPageViewModel.ShowSettings}"
 		/>
 		<ScrollViewer
 			Grid.Row="1"
@@ -287,7 +286,7 @@
 						TextWrapping="Wrap"
 						CanBeScrollAnchor="False"
 						HorizontalAlignment="Center"
-						Text="{x:Bind MainPageVM.InformationText, Mode=OneWay}"
+						Text="{x:Bind MainPageViewModel.InformationText, Mode=OneWay}"
 						/>
 
 					<HyperlinkButton						
@@ -300,8 +299,8 @@
 						not_android:Height="40"
 						android:Height="30"
 						HorizontalAlignment="Center"
-						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-						NavigateUri="{x:Bind MainPageVM.YouTubeLink, Mode=OneWay}">
+						Visibility="{x:Bind MainPageViewModel.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+						NavigateUri="{x:Bind MainPageViewModel.YouTubeLink, Mode=OneWay}">
 						<Image 
 							Source="ms-appx:///Assets\youtube_music_logo_dark.png"
 							Stretch="Uniform"/>
@@ -312,8 +311,8 @@
 						Grid.Column="0"
 						Content="Lyrics"
 						Template="{StaticResource NonexpandingOKButton}"
-						Visibility="{x:Bind MainPageVM.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-						Click="{x:Bind MainPageVM.ShowLyrics}"
+						Visibility="{x:Bind MainPageViewModel.WasRecognized, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+						Click="{x:Bind MainPageViewModel.ShowLyrics}"
 						/>
 				</Grid>
 			<ProgressBar
@@ -325,7 +324,7 @@
 				CornerRadius="5"
 				IsIndeterminate="True"
 				Foreground="{StaticResource SecondaryHighlightedColor}"
-				win:Visibility="{x:Bind MainPageVM.IsRecognizingOrUploading, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+				win:Visibility="{x:Bind MainPageViewModel.IsRecognizingOrUploading, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				not_win:Visibility="Collapsed"
 				/>
 			<TextBlock
@@ -333,7 +332,7 @@
 				not_android:FontSize="20"
 				android:FontSize="10"
 				Foreground="{StaticResource SecondaryHighlightedColor}"
-				Visibility="{x:Bind SettingsVM.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+				Visibility="{x:Bind MainPageViewModel.Settings.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				/>
 			<TextBlock
 				x:Name="outputTextBox"
@@ -341,7 +340,7 @@
 				Height="Auto"
 				android:FontSize="10"
 				TextWrapping="Wrap"
-				Visibility="{x:Bind SettingsVM.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+				Visibility="{x:Bind MainPageViewModel.Settings.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
 				/>
 		</StackPanel>
 		</ScrollViewer>
@@ -353,8 +352,8 @@
 			Grid.Column="1"
 			VerticalAlignment="Center"
 			Content="Add new song"
-			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
-			Click="{x:Bind MainPageVM.OpenNewSongForm}"
+			Visibility="{x:Bind MainPageViewModel.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
+			Click="{x:Bind MainPageViewModel.OpenNewSongForm}"
 			/>
 
 		<Button
@@ -364,9 +363,9 @@
 			VerticalAlignment="Center"
 			HorizontalAlignment="Right"
 			Content="List songs"
-			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
-			Click="{x:Bind ListSongsBtn_Click}"
-			not_wasm:IsEnabled="{x:Bind MainPageVM.IsRecognizingOrUploading, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
+			Visibility="{x:Bind MainPageViewModel.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
+			Click="{x:Bind NavigateToSongList}"
+			not_wasm:IsEnabled="{x:Bind MainPageViewModel.IsRecognizingOrUploading, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
 
 		<Grid
@@ -374,7 +373,7 @@
 			Grid.Row="2"
 			Grid.Column="1"
 			Grid.RowSpan="2" 
-			Visibility="{x:Bind MainPageVM.ShowUploadUI, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" 
+			Visibility="{x:Bind MainPageViewModel.ShowUploadUI, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}" 
 			>
 			<Grid.RowDefinitions>
 				<RowDefinition Height="1*"/>
@@ -384,7 +383,7 @@
 
 			<TextBox
 				x:Name="NewSongNameTB"
-				Text="{x:Bind MainPageVM.NewSongName, Mode=TwoWay}"
+				Text="{x:Bind MainPageViewModel.NewSongName, Mode=TwoWay}"
 				PlaceholderText="Name"
 				Grid.Row="0"
 				HorizontalAlignment="Left"
@@ -394,7 +393,7 @@
 				/>
 			<TextBox
 				x:Name="NewSongAuthorTB"
-				Text="{x:Bind MainPageVM.NewSongAuthor, Mode=TwoWay}"
+				Text="{x:Bind MainPageViewModel.NewSongAuthor, Mode=TwoWay}"
 				PlaceholderText="Author"
 				HorizontalAlignment="Left"
 				Width="150"
@@ -406,18 +405,18 @@
 				Style="{StaticResource IconStyle}"
 				Content="Audio"
 				HorizontalAlignment="Left"
-				Click="{x:Bind MainPageVM.UploadNewSong}"
+				Click="{x:Bind MainPageViewModel.UploadNewSong}"
 				/>
 			<TextBlock
 				x:Name="UploadedSongText"
-				Text="{x:Bind MainPageVM.UploadedSongText, Mode=OneWay}"
+				Text="{x:Bind MainPageViewModel.UploadedSongText, Mode=OneWay}"
 				HorizontalAlignment="Left"
 				VerticalAlignment="Center"
 				/>
 			<Button
 				x:Name="NewSongLyricsBtn"
 				Content="Lyrics"
-				Click="LyricsBtn_Click"
+				Click="{x:Bind MainPageViewModel.ShowLyricsEditDialog}"
 				/>
 			<Button
 				x:Name="ProcessNewSongBtn"
@@ -426,7 +425,7 @@
 				HorizontalAlignment="Right"
 				Margin="0,0,90,0"
 				BorderBrush="{StaticResource SecondaryHighlightedColor}"
-				Click="{x:Bind MainPageVM.AddNewSong}"
+				Click="{x:Bind MainPageViewModel.AddNewSong}"
 				/>
 			<Button
 				x:Name="CancelNewSongBtn"
@@ -434,7 +433,7 @@
 				Grid.RowSpan="3"
 				HorizontalAlignment="Right"
 				BorderBrush="{StaticResource CancelColor}"
-				Click="{x:Bind MainPageVM.CloseNewSongForm}"
+				Click="{x:Bind MainPageViewModel.CloseNewSongForm}"
 				/>
 		</Grid>
 	</Grid>

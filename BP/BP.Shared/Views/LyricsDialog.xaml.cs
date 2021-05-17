@@ -20,17 +20,20 @@ namespace BP.Shared.Views
 {
     public sealed partial class LyricsDialog : ContentDialog
     {
-		private MainPageViewModel MainPageViewModel;
 
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="mainPageVM">Reference to the main page view model</param>
 		public LyricsDialog(MainPageViewModel mainPageVM)
         {
             this.InitializeComponent();
-			MainPageViewModel = mainPageVM;
+			LyricsViewModel = new LyricsViewModel(mainPageVM);
 		}
 
-		public async void NewLineBtn_Clicked(object sender, RoutedEventArgs e)
-		{
-			lyricsTextBox.Text += "\r\n";
-		}
+		/// <summary>
+		/// Main page view model
+		/// </summary>
+		public LyricsViewModel LyricsViewModel;
     }
 }

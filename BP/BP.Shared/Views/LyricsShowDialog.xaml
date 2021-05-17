@@ -8,7 +8,7 @@
 	xmlns:android="http://uno.ui/android"
     mc:Ignorable="d android"
 	
-	Title="{x:Bind Name}"
+	Title="{x:Bind LyricsShowViewModel.Name}"
 	android:Foreground="Black"
     PrimaryButtonText="Done"
 
@@ -31,7 +31,7 @@
 	<ScrollViewer
 		>
 		<TextBlock
-			Text="{x:Bind Lyrics}"
+			Text="{x:Bind LyricsShowViewModel.Lyrics}"
 			TextWrapping="Wrap"
 			android:Foreground="Black"
 			/>

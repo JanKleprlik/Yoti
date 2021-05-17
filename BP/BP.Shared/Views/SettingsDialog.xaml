@@ -13,7 +13,7 @@
     Title="Settings"
     PrimaryButtonText="Done"
     SecondaryButtonText="Default"
-    SecondaryButtonClick="{x:Bind ContentDialog_SecondaryButtonClick}"
+    SecondaryButtonClick="{x:Bind SettingsViewModel.Reset}"
 	CornerRadius="25"
 	BorderBrush="{StaticResource PrimaryLightColor}"
 	BorderThickness="5"

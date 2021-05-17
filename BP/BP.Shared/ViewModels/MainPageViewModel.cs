@@ -25,9 +25,7 @@ namespace BP.Shared.ViewModels
 		private Recorder audioRecorder { get; set; }
 		private AudioRecognizer recognizer { get; set; }
 		private TextBlockTextWriter textWriter { get; set; }
-		private Settings settings { get; set; }
 		private CoreDispatcher UIDispatcher { get; set; }
-
 		private byte[] uploadedSong { get; set; }
 		private IAudioFormat uploadedSongFormat { get; set; }
 		private object uploadedSongLock = new object();
@@ -41,7 +39,7 @@ namespace BP.Shared.ViewModels
 		{
 			//Text writer to write recognition info into
 			textWriter = new TextBlockTextWriter(outputTextBlock);
-			this.settings = settings;
+			Settings = settings;
 			this.UIDispatcher = UIDispatcher; 
 			
 			audioRecorder = new Recorder();
@@ -59,11 +57,11 @@ namespace BP.Shared.ViewModels
 			textWriter.Clear();
 
 
-			InformationText = settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
-			if (settings.UseMicrophone)
+			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
+			if (Settings.UseMicrophone)
 			{
 				IsRecording = true;
-				sucessfullRecordingUpload = await Task.Run(() => audioRecorder.RecordAudio(settings.RecordingLength));
+				sucessfullRecordingUpload = await Task.Run(() => audioRecorder.RecordAudio(Settings.RecordingLength));
 				IsRecording = false;
 
 
@@ -230,14 +228,32 @@ namespace BP.Shared.ViewModels
 		{
 			if (RecognizedSong == null)
 			{
-				var lyricsShowDialog = new LyricsShowDialog("No record.", "Lyrics");
+				var lyricsShowDialog = new LyricsShowDialog(new Song()
+					{
+						lyrics = "No record.",
+						author = "Unknown",
+						name = "Lyrics",
+						bpm = 0
+					});
 				await lyricsShowDialog.ShowAsync();
 			}
 			else
 			{
-				var lyricsShowDialog = new LyricsShowDialog(RecognizedSong.lyrics, RecognizedSong.name);
+				var lyricsShowDialog = new LyricsShowDialog(RecognizedSong);
 				await lyricsShowDialog.ShowAsync();
 			}
+		}
+
+		public async void ShowSettings()
+		{
+			var settingsDialog = new SettingsDialog(new SettingsViewModel(Settings));
+			ContentDialogResult result = await settingsDialog.ShowAsync();
+		}
+
+		public async void ShowLyricsEditDialog()
+		{
+			var lyricsDialog = new LyricsDialog(this);
+			ContentDialogResult resutl = await lyricsDialog.ShowAsync();
 		}
 
 		public async void TestMethod()
@@ -247,6 +263,17 @@ namespace BP.Shared.ViewModels
 		#endregion
 
 		#region Properties
+
+		private Settings _settings;
+		public Settings Settings 
+		{ 
+			get => _settings;
+			set
+			{
+				_settings = value;
+				OnPropertyChanged();
+			}				 
+		}
 
 		private string _informationText = "You can start recording";
 		public string InformationText
@@ -494,21 +521,21 @@ namespace BP.Shared.ViewModels
 		private bool IsSupported(IAudioFormat audioFormat)
 		{
 
-			if (!Array.Exists(settings.SupportedAudioFormats, element => element.Equals(audioFormat.GetType())))
+			if (!Array.Exists(Settings.SupportedAudioFormats, element => element.Equals(audioFormat.GetType())))
 			{
-				InformationText = $"Unsupported audio format: {audioFormat.GetType()}" + Environment.NewLine + $"Supported audio formats: {string.Join<Type>(", ", settings.SupportedAudioFormats)}";
+				InformationText = $"Unsupported audio format: {audioFormat.GetType()}" + Environment.NewLine + $"Supported audio formats: {string.Join<Type>(", ", Settings.SupportedAudioFormats)}";
 				return false;
 			}
 
-			if (!Array.Exists(settings.SupportedNumbersOfChannels, element => element == audioFormat.Channels))
+			if (!Array.Exists(Settings.SupportedNumbersOfChannels, element => element == audioFormat.Channels))
 			{
-				InformationText = $"Unsupported number of channels: {audioFormat.Channels}" + Environment.NewLine + $"Supported numbers of channels: {string.Join<int>(", ", settings.SupportedNumbersOfChannels)}";
+				InformationText = $"Unsupported number of channels: {audioFormat.Channels}" + Environment.NewLine + $"Supported numbers of channels: {string.Join<int>(", ", Settings.SupportedNumbersOfChannels)}";
 				return false;
 			}
 			
-			if (!Array.Exists(settings.SupportedSamplingRates, element => element == audioFormat.SampleRate))
+			if (!Array.Exists(Settings.SupportedSamplingRates, element => element == audioFormat.SampleRate))
 			{
-				InformationText = $"Unsupported sampling rate: {audioFormat.SampleRate}" + Environment.NewLine + $"Supported sampling rates: {string.Join<int>(", ", settings.SupportedSamplingRates)}";
+				InformationText = $"Unsupported sampling rate: {audioFormat.SampleRate}" + Environment.NewLine + $"Supported sampling rates: {string.Join<int>(", ", Settings.SupportedSamplingRates)}";
 				return false;
 			}
 
@@ -541,6 +568,8 @@ namespace BP.Shared.ViewModels
 
 			return songWavFormat;
 		}
+
+
 
 #endregion
 	}

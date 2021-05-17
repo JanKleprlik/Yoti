@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BP.Shared.ViewModels;
+using Database;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,14 +21,21 @@ namespace BP.Shared.Views
 {
     public sealed partial class LyricsShowDialog : ContentDialog
     {
-		public string Lyrics;
-		public string Name;
-        public LyricsShowDialog(string lyrics, string name)
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="song">Song whose lyrics are to be displayed.</param>
+        public LyricsShowDialog(Song song)
         {
             this.InitializeComponent();
-			Lyrics = lyrics.Replace("\r\n", Environment.NewLine);
-			Name = name;
+			LyricsShowViewModel = new LyricsShowViewModel(song);
         }
+
+		/// <summary>
+		/// Lyrics show view model
+		/// </summary>
+		public LyricsShowViewModel LyricsShowViewModel;
 
     }
 }

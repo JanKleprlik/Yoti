@@ -6,16 +6,20 @@ namespace BP.Shared.Views
 {
 	public sealed partial class SettingsDialog : ContentDialog
 	{
-		private SettingsViewModel SettingsViewModel;
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="settingsVM">Reference to settings view model</param>
 		public SettingsDialog(SettingsViewModel settingsVM)
 		{
 			this.InitializeComponent();
 			SettingsViewModel = settingsVM;
 		}
 
-		private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-		{
-			SettingsViewModel.Reset();
-		}
+		/// <summary>
+		/// Settings view model
+		/// </summary>
+		public SettingsViewModel SettingsViewModel;
 	}
 }

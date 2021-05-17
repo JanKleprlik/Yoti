@@ -12,23 +12,39 @@ using BP.Shared.RestApi;
 namespace BP.Shared.Views
 {
 	/// <summary>
-	/// An empty page that can be used on its own or navigated to within a Frame.
+	/// Page showing list of songs in the database.
 	/// </summary>
 	public sealed partial class SongList : Page
 	{
-		private ObservableCollection<Song> songsList;
-		private RecognizerApi recognizerapi = new RecognizerApi();
+		/// <summary>
+		/// Default constructor
+		/// </summary>
 		public SongList()
 		{
 			this.InitializeComponent();
-			songsList = new ObservableCollection<Song>();
-
 		}
 
+		/// <summary>
+		/// List of songs to display.
+		/// </summary>
+		private ObservableCollection<Song> songsList = new ObservableCollection<Song>();
+
+		/// <summary>
+		/// API for the server
+		/// </summary>
+		private RecognizerApi recognizerApi = new RecognizerApi();
+
+
+		/// <summary>
+		/// Fills songs collection when navigated to this page.
+		/// </summary>
+		/// <param name="e"></param>
 		protected override void OnNavigatedTo(NavigationEventArgs e)
 		{
 			if (e.Parameter is List<Song>)
 			{
+				// Initialization of ObservableCollection with List<Song> does not
+				// work on Android and WASM thus songs must be added one by one.
 #if __WASM__ || __ANDROID__
 				var songs = e.Parameter as List<Song>;
 				foreach (var song in songs)
@@ -36,7 +52,6 @@ namespace BP.Shared.Views
 					songsList.Add(song);
 				}
 #else
-
 				songsList = new ObservableCollection<Song>(e.Parameter as List<Song>);
 #endif
 			}
@@ -44,28 +59,37 @@ namespace BP.Shared.Views
 			base.OnNavigatedTo(e);
 		}
 
-		private void BackBtn_Click(object sender, RoutedEventArgs e)
+		/// <summary>
+		/// Back button handler.
+		/// </summary>
+		private void NavigateBack(object sender, RoutedEventArgs e)
 		{ 
 			Frame.Navigate(typeof(MainPage));
 		}
 
-		private async void SongBtn_Click(object sender, RoutedEventArgs e)
+		/// <summary>
+		/// Lyrics button handler.
+		/// </summary>
+		private async void ShowLyrics(object sender, RoutedEventArgs e)
 		{
 			var song = (sender as FrameworkElement).Tag as Song;
-			this.Log().LogDebug($"Deleting song ID: {song.id}\tName: {song.name}\tAuthor: {song.author}");
 
-			var lyricsShowDialog = new LyricsShowDialog(song.lyrics, song.name);
+			var lyricsShowDialog = new LyricsShowDialog(song);
 			await lyricsShowDialog.ShowAsync();
 		}
 
-
-		private async void DeleteSong(Song song)
+		/// <summary>
+		/// Delete button handler.
+		/// </summary>
+		/// <param name="song"></param>
+		private async void DeleteSong(object sender, RoutedEventArgs e)
 		{
-			Song result = await recognizerapi.DeleteSong(song);
+			var song = (sender as FrameworkElement).Tag as Song;
 
-			this.Log().LogDebug(song.ToString());
-			this.Log().LogDebug(result.ToString());
-			//remove from currently displayed list
+			// Remove song from database
+			Song result = await recognizerApi.DeleteSong(song);
+
+			// Remove song from currently displayed list
 			songsList.Remove(song);
 		}
 	}

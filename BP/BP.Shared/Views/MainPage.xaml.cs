@@ -14,46 +14,45 @@ namespace BP.Shared.Views
 {
     public sealed partial class MainPage : Page
     {
-		private Settings settings;
-		private SettingsViewModel SettingsVM;
-		private MainPageViewModel MainPageVM;
 
-		private Storyboard flickerAnimation;
-		private SettingsDialog settingsDialog;
-		private LyricsDialog lyricsDialog;
-
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public MainPage()
         {
             this.InitializeComponent();
 
-			settings = new Settings();
-			SettingsVM = new SettingsViewModel(settings);
-			MainPageVM = new MainPageViewModel(outputTextBox, settings, Dispatcher);
+			MainPageViewModel = new MainPageViewModel(outputTextBox, new Settings(), Dispatcher);
 
 			setupFlickerAnimation();
-			setupContentDialogs();
 		}
 
-		public async void SettingsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			ContentDialogResult result = await settingsDialog.ShowAsync();
-		}
+		/// <summary>
+		/// Main page view model.
+		/// </summary>
+		public MainPageViewModel MainPageViewModel;
 
-		public async void LyricsBtn_Click(object sender, RoutedEventArgs e)
-		{
-			ContentDialogResult resutl = await lyricsDialog.ShowAsync();
-		}
+		/// <summary>
+		/// Animation indicating recording process.
+		/// </summary>
+		private Storyboard flickerAnimation;
 
-		public async void ListSongsBtn_Click(object sender, RoutedEventArgs e)
+		/// <summary>
+		/// Navigation to Song List page handler
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		public async void NavigateToSongList(object sender, RoutedEventArgs e)
 		{
-
-			List<Song> songs = await MainPageVM.RecognizerApi.GetSongs();
+			List<Song> songs = await MainPageViewModel.RecognizerApi.GetSongs();
 
 			Frame.Navigate(typeof(SongList), songs);
-
 		}
 
 
+		/// <summary>
+		/// Flicker animation setup.
+		/// </summary>
 		private void setupFlickerAnimation()
 		{
 			flickerAnimation = new Storyboard();
@@ -73,22 +72,5 @@ namespace BP.Shared.Views
 			flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 			flickerAnimation.Begin();
 		}
-		private void setupContentDialogs()
-		{
-			settingsDialog = new SettingsDialog(SettingsVM);
-			Grid.SetRowSpan(settingsDialog, 3);
-			Grid.SetColumnSpan(settingsDialog, 3);
-
-			lyricsDialog = new LyricsDialog(MainPageVM);
-			Grid.SetRowSpan(lyricsDialog, 3);
-			Grid.SetColumnSpan(lyricsDialog, 3);
-		}
-
-
-		protected override void OnNavigatedTo(NavigationEventArgs e)
-		{
-			base.OnNavigatedTo(e);
-		}
-
 	}
 }
