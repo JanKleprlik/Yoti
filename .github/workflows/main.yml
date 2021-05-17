@@ -19,15 +19,15 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore Dependencies
-      run: dotnet restore ./GitHub.UnoPages/GitHub.UnoPages.Wasm/GitHub.UnoPages.Wasm.csproj
+      run: dotnet restore ./BP/BP.Wasm/BP.Wasm.csproj
     - name: Build 
-      run: dotnet build ./GitHub.UnoPages/GitHub.UnoPages.Wasm/GitHub.UnoPages.Wasm.csproj --no-restore -f $framework -c $config
+      run: dotnet build ./BP/BP.Wasm/BP.Wasm.csproj --no-restore -f $framework -c $config
     - name: Publish Artifacts
       uses: actions/upload-artifact@v1.0.0
       if: github.event_name == 'workflow_dispatch' # Only deploy if Workflow manually ran
       with:
         name: pages
-        path: ./GitHub.UnoPages/GitHub.UnoPages.Wasm/bin/${{env.config}}/${{env.framework}}/dist/        
+        path: ./BP/BP.Wasm/bin/${{env.config}}/${{env.framework}}/dist/        
   deploy:
     needs: build 
     runs-on: ubuntu-latest
