@@ -14,7 +14,7 @@ namespace BP.Shared.RestApi
 			};
 		private readonly string baseUrl = "https://yotiserver.azurewebsites.net/recognition";
 
-		public async Task<Song> UploadSong(SongWavFormat songToUpload)
+		public async Task<Song> UploadSong(PreprocessedSongData songToUpload)
 		{
 			var result = await PostAsync(
 				baseUrl + "/addnewsong",
@@ -31,7 +31,7 @@ namespace BP.Shared.RestApi
 			return null;
 		}
 	
-		public async Task<RecognitionResult> RecognizeSong(SongWavFormat songToRecognize)
+		public async Task<RecognitionResult> RecognizeSong(PreprocessedSongData songToRecognize)
 		{
 			var result = await PostAsync(
 				baseUrl + "/recognizesong",

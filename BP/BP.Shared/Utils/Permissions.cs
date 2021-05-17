@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 
 namespace BP.Shared.Utils
 {
+	/// <summary>
+	/// Class for getting permisions in runtime.
+	/// </summary>
 	static public class Permissions
 	{
 #if __ANDROID__
 		static public class Droid
 		{
+			/// <summary>
+			/// Obtains external storage permission.
+			/// </summary>
+			/// <returns>True if permission is granted, false otherwise.</returns>
 			public static async Task<bool> GetExternalStoragePermission()
 			{
 				CancellationTokenSource source = new CancellationTokenSource();
@@ -18,6 +25,10 @@ namespace BP.Shared.Utils
 				return await Windows.Extensions.PermissionsHelper.TryGetPermission(token, Android.Manifest.Permission.ReadExternalStorage);
 			}
 
+			/// <summary>
+			/// Obtains microphone permission.
+			/// </summary>
+			/// <returns>True if permission is granted, false otherwise.</returns>
 			public static async Task<bool> GetMicPermission()
 			{
 				CancellationTokenSource source = new CancellationTokenSource();

@@ -7,7 +7,15 @@ namespace BP.Shared.ViewModels
 {
 	public class SettingsViewModel : BaseViewModel
 	{
-		public SettingsViewModel(Settings settings = null) => Settings = settings ?? new Settings();
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="settings">Settings Model reference</param>
+		public SettingsViewModel(Settings settings)
+		{
+			Settings = settings;
+		}
+
 		private Settings _settings;
 		public Settings Settings
 		{
@@ -18,7 +26,9 @@ namespace BP.Shared.ViewModels
 				OnPropertyChanged(string.Empty);
 			}
 		}
-
+		/// <summary>
+		/// Show detailed info about song recognition.
+		/// </summary>
 		public bool DetailedInfo
 		{
 			get => Settings.DetailedInfo;
@@ -29,6 +39,9 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Length of microphone recording for song recognition.
+		/// </summary>
 		public int RecordingLength
 		{
 			get => Settings.RecordingLength;
@@ -39,23 +52,39 @@ namespace BP.Shared.ViewModels
 				OnPropertyChanged(nameof(RecordingLengthText));
 			}
 		}
+		
 
 		public string RecordingLengthText => $"Recording length: {RecordingLength} sec";
 
+		/// <summary>
+		/// An array of supported sample rates
+		/// </summary>
 		public int[] SupportedSamplingRates
 		{
 			get => _settings.SupportedSamplingRates;
 		}
 
+		/// <summary>
+		/// An array of supported number of audio channels in recording.
+		/// </summary>
 		public int[] SupportedNumbersOfChannels
 		{
 			get => _settings.SupportedNumbersOfChannels;
 		}
+
+		/// <summary>
+		/// An array of supported audio formats (wav, ...).
+		/// </summary>
 		public Type[] SupportedAudioFormats
 		{
 			get => _settings.SupportedAudioFormats;
 		}
 
+		/// <summary>
+		/// Determines a way to obtain audio for song recognition.<br></br>
+		/// True - Microphone <br></br>
+		/// False - File Picker
+		/// </summary>
 		public bool UseMicrophone
 		{
 			get => Settings.UseMicrophone;
@@ -65,7 +94,10 @@ namespace BP.Shared.ViewModels
 				OnPropertyChanged();
 			}
 		}
-	
+		
+		/// <summary>
+		/// Reset settings to default values
+		/// </summary>
 		public void Reset()
 		{
 			_settings.SetToDefault();

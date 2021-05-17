@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using Database;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
+using BP.Shared.RestApi;
 
 namespace BP.Shared.Views
 {
@@ -44,7 +45,8 @@ namespace BP.Shared.Views
 		/// <param name="e"></param>
 		public async void NavigateToSongList(object sender, RoutedEventArgs e)
 		{
-			List<Song> songs = await MainPageViewModel.RecognizerApi.GetSongs();
+			var recognizerApi = new RecognizerApi();
+			List<Song> songs = await recognizerApi.GetSongs();
 
 			Frame.Navigate(typeof(SongList), songs);
 		}

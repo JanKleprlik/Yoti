@@ -8,69 +8,96 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Uno.Extensions;
 using Uno.Foundation;
-using static BP.Shared.AudioRecorder.Recorder;
+using static BP.Shared.AudioRecorder.AudioDataProvider;
 
 namespace BP.Shared.ViewModels
 {
 	public partial class MainPageViewModel : BaseViewModel
 	{
-		private static StringBuilder stringBuilder;
-		private async void recognizeWASM()
+		#region private properties
+		private static StringBuilder stringBuilder { get; set; }
+		#endregion
+
+		#region Commands
+		/// <summary>
+		/// Starts recording audio or opens filepicker, validates uploaded song format, queries server for song recognition and shows result on the screen. <br></br>
+		/// Also handles necessary UI updates. <br></br>
+		/// WASM only.
+		/// </summary>
+		public async void RecognizeSong_WASM()
 		{
+			// Setup Delegates
 			DeleteDelegates();
 			WasmSongEvent += OnSongToRecognizeEvent;
+
+			// Update UI
+			WasRecognized = false;
+			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
+
 			if (Settings.UseMicrophone)
 			{
+				IsRecording = true;
 				stringBuilder = new StringBuilder();
 				var escapedRecLength = WebAssemblyRuntime.EscapeJs((Settings.RecordingLength).ToString());
 				WebAssemblyRuntime.InvokeJS($"record_and_recognize({escapedRecLength});");
 			}
 			else
 			{
+				IsUploading = true;
 				stringBuilder = new StringBuilder();
-				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioRecorder.Recorder.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
+				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioRecorder.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
 			}
 		}
 
-		private async Task pickAndUploadFileWASM()
+		/// <summary>
+		/// Opens FilePicker via javascript and allows user to pick audio file.<br></br>
+		/// WASM only.
+		/// </summary>
+		/// <returns></returns>
+		public async Task UploadNewSong_WASM()
 		{
+			// Setup delegates and resources
 			DeleteDelegates();
 			WasmSongEvent += OnNewSongUploadedEvent;
 			stringBuilder = new StringBuilder();
-			//Update UI
-			//In WASM UI Thread will be blocked while uploading
+			
+			// In WASM UI Thread will be blocked while uploading
+			// so we should give user some feedback before hand.
 			InformationText = "Processing uploaded file." + Environment.NewLine + " Please wait ...";
 			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);"); //(size_limit, js metadata offset)
 		}
+		#endregion
 
-
-		private async void OnSongToRecognizeEvent(object sender, WasmSongEventHandlerArgs e)
+		#region Events for javascript
+		/// <summary>
+		/// C# side processing of uploaded or recorded audio data when recognizing song.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e">Instance with audio data and process status information.</param>
+		private async void OnSongToRecognizeEvent(object sender, WasmEventHandlerArgs e)
 		{
 			WasmSongEvent -= OnSongToRecognizeEvent;
+			// Audio data is fully uploaded from javascript to C#, now recognize the song
 			if (e.isDone)
 			{
-				this.Log().LogDebug(stringBuilder.ToString());
-				var base64Data = Regex.Match(stringBuilder.ToString(), @"data:((audio)|(application))/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-				var binData = Convert.FromBase64String(base64Data); //this is the data I want byte[]
+				// Update UI
+				IsRecording = false;
+				IsUploading = false;
+				IsRecognizing = true;
+				InformationText = "Looking for a match ...";
 
-
+				// Convert audio data from Base64 string to byteArray
+				string base64Data = Regex.Match(stringBuilder.ToString(), @"data:((audio)|(application))/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+				byte[] binData = Convert.FromBase64String(base64Data); //this is the data I want byte[]
 
 				try
 				{
-					if (!Settings.UseMicrophone)
-					{
-						this.Log().LogDebug("Uploaded song");
-						uploadedSongFormat = new WavFormat(binData);
-					}
-					else
-					{
-						this.Log().LogDebug("Used microphone");
-						uploadedSongFormat = new WavFormat(binData);
-					}
-					if (!IsSupported(uploadedSongFormat))
+					// Convert byte array to wav format
+					uploadedSong = new WavFormat(binData);
+					if (!IsSupported(uploadedSong))
 					{
 						//release resources
-						uploadedSongFormat = null;
+						uploadedSong = null;
 						return;
 					}
 				}
@@ -81,41 +108,51 @@ namespace BP.Shared.ViewModels
 					return;
 				}
 
-				this.Log().LogDebug("[DEBUG] Channels: " + uploadedSongFormat.Channels);
-				this.Log().LogDebug("[DEBUG] SampleRate: " + uploadedSongFormat.SampleRate);
-				this.Log().LogDebug("[DEBUG] NumOfData: " + uploadedSongFormat.NumOfDataSamples);
-				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSongFormat.Data.Length);
+				this.Log().LogDebug("[DEBUG] Channels: " + uploadedSong.Channels);
+				this.Log().LogDebug("[DEBUG] SampleRate: " + uploadedSong.SampleRate);
+				this.Log().LogDebug("[DEBUG] NumOfData: " + uploadedSong.NumOfDataSamples);
+				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSong.Data.Length);
 
 				//Name, Author and Lyrics is not important for recognition call
-				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none", "none");
+				PreprocessedSongData songWavFormat = PreprocessSongData("none", "none", "none", uploadedSong);
+				RecognitionResult result = await recognizerApi.RecognizeSong(songWavFormat);
 
-				RecognitionResult result = await RecognizerApi.RecognizeSong(songWavFormat);
-				WriteRecognitionResults(result);
+
+				// Update UI
+				await WriteRecognitionResults(result);
+				IsRecognizing = false;
 			}
 			else
 			{
 				stringBuilder.Append(e.FileAsDataUrl);
 
-				//repeat until e.isDone == true;
+				//repeat this event until e.isDone == true;
 				WasmSongEvent += OnSongToRecognizeEvent;
 			}
 		}
-		private async void OnNewSongUploadedEvent(object sender, WasmSongEventHandlerArgs e)
+
+		/// <summary>
+		/// C# side of processing uploaded song from FilePicker when adding new song to the database.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e">Instance with audio data and process status information.</param>
+		private void OnNewSongUploadedEvent(object sender, WasmEventHandlerArgs e)
 		{
 			WasmSongEvent -= OnNewSongUploadedEvent;
-
+			// Song is fully uploaded from javascript to C#, now convert uploaded data to Wav Format
 			if (e.isDone)
 			{
-				this.Log().LogDebug($"Full song uploaded, now converting uploaded data...");
+				// Convert audio data from Base64 string to byte array
+				byte[] binData = Convert.FromBase64String(stringBuilder.ToString()); 
 				
-				byte[] uploadedSong = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want
 				try 
 				{ 
-					uploadedSongFormat = new WavFormat(uploadedSong);
-					if (!IsSupported(uploadedSongFormat))
+					// Convert byte array to wav format
+					uploadedSong = new WavFormat(binData);
+					if (!IsSupported(uploadedSong))
 					{
-						//release resources
-						uploadedSongFormat = null;
+						// Release resources
+						uploadedSong = null;
 						return;
 					}
 				}
@@ -126,48 +163,76 @@ namespace BP.Shared.ViewModels
 					return;
 				}
 
-				//Update UI
+				// Update UI
 				UploadedSongText = e.FileAsDataUrl;
 				InformationText = "File picked";
-
-				this.Log().LogDebug($"Uploaded song converted to byte[].");
 			}
 			else
 			{
 				stringBuilder.Append(e.FileAsDataUrl);
-				//repeat until e.isDone
+				// Repeat this event until e.isDone
 				WasmSongEvent += OnNewSongUploadedEvent;
 			}
 		}
+		#endregion
 
-		public static void ProcessEvent(string fileAsDataUrl, bool isDone) => WasmSongEvent?.Invoke(null, new WasmSongEventHandlerArgs(fileAsDataUrl, isDone));
 
-		//Upload Event Handler
+		/// <summary>
+		/// Static method to be called from javascript invoking selected delegates.
+		/// </summary>
+		/// <param name="fileAsDataUrl">File data to be transfered.</param>
+		/// <param name="isDone">Flag indicating wether complete file was transfered.</param>
+		public static void ProcessEvent(string fileAsDataUrl, bool isDone) => WasmSongEvent?.Invoke(null, new WasmEventHandlerArgs(fileAsDataUrl, isDone));
 
-		private static event WasmSongEventHandler WasmSongEvent;
+		/// <summary>
+		/// Upload event handler
+		/// </summary>
+		private static event WasmEventHandler WasmSongEvent;
 
-		private delegate void WasmSongEventHandler(object sender, WasmSongEventHandlerArgs args);
+		/// <summary>
+		/// Event handler delegate.
+		/// </summary>
+		private delegate void WasmEventHandler(object sender, WasmEventHandlerArgs args);
 
-		private class WasmSongEventHandlerArgs
+		/// <summary>
+		/// Event handler argument class used to transfer data from javascript to C#
+		/// </summary>
+		private class WasmEventHandlerArgs
 		{
-			public string FileAsDataUrl { get; }
-			public bool isDone { get; }
-			public WasmSongEventHandlerArgs(string fileAsDataUrl, bool isDone)
+			/// <summary>
+			/// Constructor
+			/// </summary>
+			/// <param name="fileAsDataUrl">Data to be transfered.</param>
+			/// <param name="isDone">Flag indicating wether complete file was transfered.</param>
+			public WasmEventHandlerArgs(string fileAsDataUrl, bool isDone)
 			{
 				FileAsDataUrl = fileAsDataUrl;
 				this.isDone = isDone;
-			}	
+			}
 
+			/// <summary>
+			/// File data to be transfered.
+			/// </summary>
+			public string FileAsDataUrl { get; }
+
+			/// <summary>
+			/// Flag indicating wether complete file was transfered.
+			/// </summary>
+			public bool isDone { get; }
 		}
 
+		/// <summary>
+		/// Helper method deleting all buffered delegates.
+		/// </summary>
 		private void DeleteDelegates()
 		{
-			this.Log().LogDebug("Deleting delegates...");
-			//Delete delegates 
 			WasmSongEvent -= OnSongToRecognizeEvent;
 			WasmSongEvent -= OnNewSongUploadedEvent;
 		}
 		
+		/// <summary>
+		/// File upload canceled handler.
+		/// </summary>
 		private void OnCancelEvent(object sender, EventArgs e)
 		{
 			DeleteDelegates();

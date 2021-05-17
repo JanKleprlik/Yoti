@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 #if NETFX_CORE
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
-using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
@@ -23,37 +22,73 @@ using System.Collections.Generic;
 
 namespace BP.Shared.AudioRecorder
 {
-	public sealed partial class Recorder
+	/// <summary>
+	/// Adapter for obtaining audio both by recording with microphone and by picking file with FilePicker.<br></br>
+	/// UWP and ANDROID only.
+	/// </summary>
+	public sealed partial class AudioDataProvider
 	{
-		private bool isRecording;
+		#region private properties
+		/// <summary>
+		/// Lock used for audio buffers.
+		/// </summary>
+		private object bufferLock { get; set; } = new object();
+		private bool isRecording { get; set; }
 
-		private object bufferLock = new object();
-
+		// UWP specific properties
 		#region UWP
 #if NETFX_CORE
-		MediaCapture audioCapture;
-		IRandomAccessStream buffer;
-		string filename;
-		string audioFile = "recording.wav";
-#endif
-		#endregion
-		#region ANDROID
-#if __ANDROID__
-		private byte[] buffer;
-		private AudioRecord rec;
-		private int bufferLimit = 480000;
+		/// <summary>
+		/// Media for audio capture via micorphone.
+		/// </summary>
+		private MediaCapture audioCapture { get; set; }
+		/// <summary>
+		/// Audio buffer.
+		/// </summary>
+		private IRandomAccessStream buffer { get; set; }
+		/// <summary>
+		/// Default name of tmp file to store recorded audio into so it can be replayed.
+		/// </summary>
+		private string audioFile { get; set; } = "recording.wav";
 #endif
 		#endregion
 
+		// ANDROID specific properties
+		#region ANDROID
+#if __ANDROID__
+		/// <summary>
+		/// Audio buffer.
+		/// </summary>
+		private byte[] buffer { get; set; }
+		/// <summary>
+		/// Audio Recorder
+		/// </summary>
+		private AudioRecord recorder { get; set; }
+		/// <summary>
+		/// Audio Buffer size limit.
+		/// </summary>
+		private int bufferLimit { get; set; } = 480000;
+#endif
+		#endregion
+
+		#endregion
+
+		/// <summary>
+		/// Open platform specific FilePicker and allow user to pick audio file of supported type.
+		/// </summary>
+		/// <param name="writeResult">Action accepting result of Upload process described in string.</param>
+		/// <returns>True if picked song was sucessfuly uploaded, false otherwise.</returns>
 		public async Task<bool> UploadRecording(Action<string> writeResult)
 		{
 			#region UWP
 #if NETFX_CORE
+			// Setup FilePicker
 			var picker = new Windows.Storage.Pickers.FileOpenPicker();
 			picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
 			picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
 			picker.FileTypeFilter.Add(".wav");
 
+			// Open FilePicker
 			StorageFile file = await picker.PickSingleFileAsync();
 			
 			if (file == null)
@@ -62,6 +97,7 @@ namespace BP.Shared.AudioRecorder
 				return false;
 			}
 			
+			// Check size of uploaded file
 			var fileProperties = await file.GetBasicPropertiesAsync();
 			if (fileProperties.Size > Parameters.MaxRecordingUploadSize_Mb * 1024 * 1024)
 			{
@@ -81,39 +117,39 @@ namespace BP.Shared.AudioRecorder
 			#region ANDROID
 #if __ANDROID__
 
-			buffer = await Utils.FileUpload.pickAndUploadFileAsync(writeResult, bufferLock, Recorder.Parameters.MaxRecordingUploadSize_Mb);
+			buffer = await Utils.FileUpload.PickAndUploadFileAsync(writeResult, AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb);
 			return buffer != null;
 #endif
 			#endregion
-
-			#region WASM
-#if __WASM__
-			return true;
-#endif
-			#endregion
-
-			//fallback return value for unsupported platforms
+			// Fallback value for unsupported platforms
 			return false;
 		}
 
 
 		#region RECORDING
-		public async Task<bool> RecordAudio(int recordingLength = 3)
+
+		/// <summary>
+		/// Platform specific audio recording using microphone.
+		/// </summary>
+		/// <param name="recordingLength"></param>
+		/// <returns>True if recording was sucessful, false otherwise.</returns>
+		public async Task<bool> RecordAudio(int recordingLength = 5)
 		{
 #if __ANDROID__
+			// Make sure we have Microphone permission on ANDROID devices
 			if (!await Utils.Permissions.Droid.GetMicPermission())
 			{
 				System.Diagnostics.Debug.WriteLine("[DEBUG] microphone acecss denied.");
 				return false;
 			}
 
-			bufferLimit = getBufferLimitFromTime(recordingLength);
+			bufferLimit = GetBufferLimitFromTime(recordingLength);
 #endif
 
 			await StartRecording();
 
 #if NETFX_CORE
-			//record audio for recordingLength seconds
+			// Record audio for recordingLength seconds
 			await Task.Delay(recordingLength * 1000);
 #endif
 
@@ -121,22 +157,26 @@ namespace BP.Shared.AudioRecorder
 			return true;
 		}
 
-		public async Task StartRecording()
+		/// <summary>
+		/// Starts the recording process.
+		/// </summary>
+		private async Task StartRecording()
 		{
 			if (isRecording)
 			{
-				//already recording
+				// Already recording
 				return;
 			}
 			else
 			{
 				#region UWP
 #if NETFX_CORE
-				await setupRecording();
+				// Prepare MediaRecorder and encoding profile
+				await SetupRecording();
 				var profile = MediaEncodingProfile.CreateWav(AudioEncodingQuality.Auto);
 				profile.Audio = AudioEncodingProperties.CreatePcm((uint)Parameters.SamplingRate, (uint)Parameters.Channels, 16);
 				
-				//start recording
+				// Start recording
 				isRecording = true;
 				await audioCapture.StartRecordToStreamAsync(profile, buffer);
 				return;
@@ -145,9 +185,9 @@ namespace BP.Shared.AudioRecorder
 				#region ANDROID
 #if __ANDROID__
 
+				// Setup recorder
 				ChannelIn channels = Parameters.Channels == 1 ? ChannelIn.Mono : ChannelIn.Stereo;
-
-				rec = new AudioRecord(
+				recorder = new AudioRecord(
 					AudioSource.Mic,
 					(int)Parameters.SamplingRate,
 					channels,
@@ -155,20 +195,20 @@ namespace BP.Shared.AudioRecorder
 					bufferLimit
 					);
 
-				System.Diagnostics.Debug.WriteLine("[DEBUG] starting to record ...");
-				//Console.Out.WriteLine("[DEBUG] starting to record ...");
+				
+				// Start recording
 				isRecording = true;
 				int totalBytesRead = 0;
-
 				lock (bufferLock)
 				{
 					buffer = new byte[bufferLimit];
-					rec.StartRecording();
+					recorder.StartRecording();
+					// Record audio until buffer is full
 					while (totalBytesRead < bufferLimit)
 					{
 						try
 						{
-							int bytesRead = rec.Read(buffer, 0, bufferLimit);
+							int bytesRead = recorder.Read(buffer, 0, bufferLimit);
 							if (bytesRead < 0)
 							{
 								throw new Exception(String.Format("Exception code: {0}", bytesRead));
@@ -181,20 +221,21 @@ namespace BP.Shared.AudioRecorder
 						catch(Exception e)
 						{
 							System.Diagnostics.Debug.WriteLine("[DEBUG] " + e.Message);
-							Console.Out.WriteLine("[DEBUG] " + e.Message);
+							// Invalidate audio buffer
+							buffer = null;
 							break;
 						}
 					}
 				}
-				System.Diagnostics.Debug.WriteLine("[DEBUG] finished recording");
-				Console.Out.WriteLine("[DEBUG] finished recording");
-
 #endif
-#endregion
+				#endregion
 			}
 		}
 
-		public async Task StopRecording()
+		/// <summary>
+		/// Stops the recording process.
+		/// </summary>
+		private async Task StopRecording()
 		{
 			if (!isRecording)
 			{
@@ -210,8 +251,8 @@ namespace BP.Shared.AudioRecorder
 #endregion
 #region ANDROID
 #if __ANDROID__
-				rec.Stop();
-				rec.Dispose();
+				recorder.Stop();
+				recorder.Dispose();
 #endif
 #endregion
 				isRecording = false;
@@ -220,11 +261,15 @@ namespace BP.Shared.AudioRecorder
 
 		#endregion
 
-
-#if !__WASM__
-		public async Task<byte[]> GetDataFromStream()
-		{
+		#region Platform specific audio data getters
 #if NETFX_CORE
+
+		/// <summary>
+		/// Returns raw audio data.
+		/// </summary>
+		/// <returns>Raw audio data as an array of bytes.</returns>
+		public async Task<byte[]> GetDataFromStream_UWP()
+		{
 			if (buffer == null)
 				throw new InvalidOperationException("Buffer should not be null");
 
@@ -234,18 +279,34 @@ namespace BP.Shared.AudioRecorder
 			await dataReader.LoadAsync((uint)buffer.Size);
 			dataReader.ReadBytes(data);
 			return data;
-#else
-			return buffer;
-#endif
 		}
 #endif
-		//replay functions
-#region UWP
-#if NETFX_CORE
 
+#if __ANDROID__
+		/// <summary>
+		/// Returns raw audio data.
+		/// </summary>
+		/// <returns>Raw audio data as an array of bytes.</returns>
+		public byte[] GetDataFromStream_ANDROID()
+		{
+			return buffer;
+		}
+#endif
+		#endregion
+
+
+		#region Replay audio
+
+		#region UWP
+#if NETFX_CORE
+		
+		/// <summary>
+		/// Replays recorded audio by microphone.
+		/// </summary>
+		/// <param name="UIDispatcher"></param>
 		public async void ReplayRecordingUWP(CoreDispatcher UIDispatcher)
 		{
-			//do nothign without buffer
+			// Do nothign without buffer
 			if (buffer == null)
 				return;
 
@@ -263,20 +324,12 @@ namespace BP.Shared.AudioRecorder
 
 			StorageFolder recordingFolder = ApplicationData.Current.TemporaryFolder;
 
-			//delete if not empty
-			if (!string.IsNullOrEmpty(filename))
-			{
-				StorageFile original = await recordingFolder.GetFileAsync(filename);
-				await original.DeleteAsync();
-			}
-
-			//replay async
+			// Replay async
 			await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 			{
 				StorageFile recordingFile = await recordingFolder.CreateFileAsync(audioFile, CreationCollisionOption.ReplaceExisting);
-				filename = recordingFile.Name;
 
-				//save buffer into file
+				// Save buffer into file
 				using (IRandomAccessStream fs = await recordingFile.OpenAsync(FileAccessMode.ReadWrite))
 				{
 					await RandomAccessStream.CopyAndCloseAsync(audioBuffer.GetInputStreamAt(0), fs.GetOutputStreamAt(0));
@@ -284,7 +337,7 @@ namespace BP.Shared.AudioRecorder
 					audioBuffer.Dispose();
 				}
 
-				//replay actuall recording
+				// Replay actuall recording
 				IRandomAccessStream replayStream = await recordingFile.OpenAsync(FileAccessMode.Read);
 				playback.SetSource(replayStream, recordingFile.FileType);
 				playback.Play();
@@ -292,9 +345,13 @@ namespace BP.Shared.AudioRecorder
 
 		}
 #endif
-#endregion
-#region ANDROID
+		#endregion
+
+		#region ANDROID
 #if __ANDROID__
+		/// <summary>
+		/// Replays recorded audio by microphone.
+		/// </summary>
 		public void ReplayRecordingANDROID()
 		{
 			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
@@ -317,41 +374,48 @@ namespace BP.Shared.AudioRecorder
 				audioTrack.Write(buffer, 0, buffer.Length);
 			}
 		}
-#endif
-#endregion
+		#endif
+		#endregion
+
+		#endregion
+
+		#region Helper methods
 
 
-		// helper functons
-#region UWP - helper functions
+		#region UWP
 #if NETFX_CORE
 
-		private async Task setupRecording()
+		/// <summary>
+		/// Sets audioCapture to proper settings so we get 16 bit PCM audio data at 
+		/// desired sample rate and number of audio channels.
+		/// </summary>
+		/// <returns></returns>
+		private async Task SetupRecording()
 		{
+			// Reset resources
 			if (buffer != null)
 				buffer.Dispose();
 			if (audioCapture != null)
 				audioCapture.Dispose();
-
 			buffer = new InMemoryRandomAccessStream();
+
 
 			try
 			{
-				MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings
-				{
-					StreamingCaptureMode = StreamingCaptureMode.Audio,
-				};
 
+				// Initialization
 				audioCapture = new MediaCapture();
-				//initialize setup
-				await audioCapture.InitializeAsync(settings);
-				//exceed limitation handler
+				await audioCapture.InitializeAsync(new MediaCaptureInitializationSettings { StreamingCaptureMode = StreamingCaptureMode.Audio });
+				
+				// Set exceed limitation handler
 				audioCapture.RecordLimitationExceeded += async (MediaCapture sender) =>
 				{
 					await audioCapture.StopRecordAsync();
 					isRecording = false;
 					throw new Exception("Record limitation exceeded.");
 				};
-				//on fail handler
+
+				// On fail handler
 				audioCapture.Failed += (MediaCapture sender, MediaCaptureFailedEventArgs errorEventArgs) =>
 				{
 					isRecording = false;
@@ -360,21 +424,28 @@ namespace BP.Shared.AudioRecorder
 			}
 			catch(Exception e)
 			{
+				//Propagate the exception
 				throw e;
 			}
 		}
 
 #endif
-#endregion
+		#endregion
 
-#region ANDROID - helper functions
+		#region ANDROID
 #if __ANDROID__
-		private int getBufferLimitFromTime(int recordingLength)
+		/// <summary>
+		/// Computes buffer length needed to capture recordingLength seconds of audio.
+		/// </summary>
+		/// <param name="recordingLength"></param>
+		/// <returns>Desired size of buffer</returns>
+		private int GetBufferLimitFromTime(int recordingLength)
 		{
 			//seconds * (2 bytes per 1 sample) * samplingRate
-			return recordingLength * 2 * 48000;
+			return recordingLength * 2 * (int)Parameters.SamplingRate;
 		}
 #endif
-#endregion
+		#endregion
+		#endregion
 	}
 }

@@ -7,6 +7,9 @@ namespace BP.Shared.Models
 {
 	public class Settings
 	{
+		/// <summary>
+		/// Constructor
+		/// </summary>
 		public Settings()
 		{
 			SetToDefault();
@@ -42,36 +45,44 @@ namespace BP.Shared.Models
 		/// </summary>
 		public int RecordingLength { 
 			get	{
-				return this.recordingLength;
+				return this._recordingLength;
 			}
 			set
 			{
-				this.recordingLength = Math.Max(Math.Min(value, 8), 3); //set min 3, max 8 secs
+				this._recordingLength = Math.Max(Math.Min(value, 8), 3); //set min 3, max 8 secs
 			}
 		}
-		/// <summary>
-		/// Backing field
-		/// </summary>
-		private int recordingLength;
+		private int _recordingLength;
 
+		/// <summary>
+		/// An array of supported number of channels.
+		/// </summary>
 		public int[] SupportedNumbersOfChannels { get; } = new int[] { 1, 2 };
+
+		/// <summary>
+		/// An array of supported sample rates.
+		/// </summary>
 		public int[] SupportedSamplingRates { get; } = new int[] { 48000};
+
+		/// <summary>
+		/// An array of supported Audio Formats
+		/// </summary>
 		public Type[] SupportedAudioFormats { get; } = new Type[] { typeof(WavFormat) };
 
 
-
+		/// <summary>
+		/// Resets settings to default values. <br></br>
+		/// Lyrics - False <br></br>
+		/// DetailedInfo - False <br></br>
+		/// RecordingLength - 5 <br></br>
+		/// UseMicrophone - True
+		/// </summary>
 		public void SetToDefault()
 		{
 			Lyrics = false;
 			DetailedInfo = false;
 			RecordingLength = 5;
 			UseMicrophone = true;
-//#if __WASM__
-//			UseMicrophone = false;
-//#else
-//			UseMicrophone = true;
-//#endif
-
 		}
 
 

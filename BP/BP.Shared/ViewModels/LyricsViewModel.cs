@@ -20,7 +20,7 @@ namespace BP.Shared.ViewModels
 		private MainPageViewModel _mainPageViewModel;
 
 		/// <summary>
-		/// Lyrics
+		/// Lyrics to be edited.
 		/// </summary>
 		public string Lyrics
 		{
@@ -33,7 +33,7 @@ namespace BP.Shared.ViewModels
 		}
 
 		/// <summary>
-		/// Add new line at the end of Lyrics.
+		/// Add new line at the end of the Lyrics.
 		/// </summary>
 		public void AddNewLine()
 		{

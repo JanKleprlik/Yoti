@@ -206,13 +206,6 @@
 			/>
 
 
-		<Button
-			x:Name="TestButton"
-			Content="TEST"
-			Click="{x:Bind MainPageViewModel.TestMethod}"
-			Visibility="Collapsed"
-			/>
-
 		<!-- SECOND ROW -->
 		<Button
 			x:Name="RecognizeBtn"
@@ -223,11 +216,12 @@
 			Margin="0,20,0,0"
 			VerticalAlignment="Top"
 			BorderBrush="{StaticResource SecondaryHighlightedColor}"
-			Click="{x:Bind MainPageViewModel.RecognizeSong}"
+			not_wasm:Click="{x:Bind MainPageViewModel.RecognizeSong}"
+			wasm:Click="{x:Bind MainPageViewModel.RecognizeSong_WASM}"
 			IsEnabled="{x:Bind MainPageViewModel.IsProcessingRecognition, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
 
-		<Button
+		<not_wasm:Button
 			x:Name="PlayBtn"
 			Style="{StaticResource IconStyle}"
 			Content="Play"
@@ -237,7 +231,6 @@
 			not_android:Margin="230,25,0,0"
 			android:Margin="210,25,0,0"
 			not_wasm:Visibility="{x:Bind MainPageViewModel.FinishedRecording, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
-			wasm:Visibility="Collapsed"
 			Click="{x:Bind MainPageViewModel.ReplayRecording}"
 			/>
 
@@ -353,6 +346,7 @@
 			VerticalAlignment="Center"
 			Content="Add new song"
 			Visibility="{x:Bind MainPageViewModel.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
+			IsEnabled="{x:Bind MainPageViewModel.IsRecognizingOrUploading, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			Click="{x:Bind MainPageViewModel.OpenNewSongForm}"
 			/>
 
@@ -365,7 +359,8 @@
 			Content="List songs"
 			Visibility="{x:Bind MainPageViewModel.ShowUploadUI, Converter={StaticResource BooleanToVisibilityInvertedConverter}, Mode=OneWay}"
 			Click="{x:Bind NavigateToSongList}"
-			not_wasm:IsEnabled="{x:Bind MainPageViewModel.IsRecognizingOrUploading, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
+			win:IsEnabled="True"
+			not_win:IsEnabled="{x:Bind MainPageViewModel.IsRecognizingOrUploading, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}"
 			/>
 
 		<Grid
@@ -405,7 +400,8 @@
 				Style="{StaticResource IconStyle}"
 				Content="Audio"
 				HorizontalAlignment="Left"
-				Click="{x:Bind MainPageViewModel.UploadNewSong}"
+				not_wasm:Click="{x:Bind MainPageViewModel.UploadNewSong}"
+				wasm:Click="{x:Bind MainPageViewModel.UploadNewSong_WASM}"
 				/>
 			<TextBlock
 				x:Name="UploadedSongText"

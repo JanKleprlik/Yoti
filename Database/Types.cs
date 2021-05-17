@@ -24,7 +24,7 @@ namespace Database
 		}
 	}
 
-	public class SongWavFormat
+	public class PreprocessedSongData
 	{
 		//public WavFormat Format { get; set; }
 		public List<TimeFrequencyPoint> tfps { get; set; }

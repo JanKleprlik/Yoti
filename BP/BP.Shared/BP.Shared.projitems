@@ -30,10 +30,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\BaseViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\LyricsShowViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\LyricsViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelANDROID.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelWASM.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModel.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ViewModels\MainPageViewModelUWP.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ViewModels\SettingsViewModel.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Views\LyricsDialog.xaml.cs">
       <DependentUpon>LyricsDialog.xaml</DependentUpon>

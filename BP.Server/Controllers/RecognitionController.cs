@@ -34,7 +34,7 @@ namespace BP.Server.Controllers
 		// POST:recognition/AddNewSong
 		#region Upload new song
 		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> AddNewSong(SongWavFormat songToUpload)
+		public async Task<ActionResult<Song>> AddNewSong(PreprocessedSongData songToUpload)
 		{
 			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, lyrics = songToUpload.lyrics, bpm = songToUpload.bpm};
 
@@ -59,7 +59,7 @@ namespace BP.Server.Controllers
 		// POST:recognition/RecognizeSong
 		#region Recognize song
 		[HttpPost("[action]")]
-		public async Task<ActionResult<RecognitionResult>> RecognizeSong(SongWavFormat songToUpload)
+		public async Task<ActionResult<RecognitionResult>> RecognizeSong(PreprocessedSongData songToUpload)
 		{
 			var stringWriter = new StringWriter();
 

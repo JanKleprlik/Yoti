@@ -7,7 +7,10 @@ namespace BP.Shared.ViewModels
 {
     public class LyricsShowViewModel : BaseViewModel
     {
-
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="song">Song whose lyrics are to be displayed.</param>
 		public LyricsShowViewModel(Song song)
 		{
 			_song = song;
@@ -15,13 +18,17 @@ namespace BP.Shared.ViewModels
 
 		private Song _song;
 
+		/// <summary>
+		/// Lyrics of song that is supposed to be displayed.
+		/// </summary>
 		public string Lyrics
 		{
-			get => _song.lyrics.Replace("\r\n", Environment.NewLine);
+			get => _song.lyrics.Replace("\r\n", Environment.NewLine); //unify NewLine according to app enviroment
 			private set	{ /*nothing should happen*/ }
 		}
-
-		private string _name;
+		/// <summary>
+		/// Name of the author of the song that is supposed to be displayed.
+		/// </summary>
 		public string Name
 		{
 			get => _song.name;

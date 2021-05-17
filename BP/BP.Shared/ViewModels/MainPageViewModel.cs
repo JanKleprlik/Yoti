@@ -20,62 +20,98 @@ namespace BP.Shared.ViewModels
 {
 	public partial class MainPageViewModel : BaseViewModel
 	{
-		#region private fields
-
-		private Recorder audioRecorder { get; set; }
-		private AudioRecognizer recognizer { get; set; }
-		private TextBlockTextWriter textWriter { get; set; }
-		private CoreDispatcher UIDispatcher { get; set; }
-		private byte[] uploadedSong { get; set; }
-		private IAudioFormat uploadedSongFormat { get; set; }
-		private object uploadedSongLock = new object();
-
-		#endregion
-
-		public RecognizerApi RecognizerApi = new RecognizerApi();
-
-
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="outputTextBlock">TextBlock control to write Detailed info into.</param>
+		/// <param name="settings">Starting settings for the application.</param>
+		/// <param name="UIDispatcher">CoreDispatcher used for dispatching replay of captured audio.</param>
 		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
 		{
-			//Text writer to write recognition info into
 			textWriter = new TextBlockTextWriter(outputTextBlock);
 			Settings = settings;
-			this.UIDispatcher = UIDispatcher; 
-			
-			audioRecorder = new Recorder();
-			recognizer = new AudioRecognizer(textWriter);
+			this.UIDispatcher = UIDispatcher;
 
+			recognizer = new AudioRecognizer(textWriter);
+#if NETFX_CORE || __ANDROID__
+			audioRecorder = new AudioDataProvider();
+#endif
 		}
+
+
+		#region private fields
+
+		/// <summary>
+		/// Song recognizer
+		/// </summary>
+		private AudioRecognizer recognizer { get; set; }
+
+		/// <summary>
+		/// Text writer used for detailed info output from recognizer.
+		/// </summary>
+		private TextBlockTextWriter textWriter { get; set; }
+
+		/// <summary>
+		/// Audio Format used for song recognition.
+		/// </summary>
+		private IAudioFormat uploadedSong { get; set; }
+
+		/// <summary>
+		/// Lock used for file upload.
+		/// </summary>
+		private object uploadedSongLock { get; set; } = new object();
+
+		/// <summary>
+		/// API provider for communication with server side.
+		/// </summary>
+		private RecognizerApi recognizerApi = new RecognizerApi();
+
+		/// <summary>
+		/// UI dispatcher used to replay audio recording on UWP.
+		/// </summary>
+		private CoreDispatcher UIDispatcher { get; set; }
+
+#if NETFX_CORE || __ANDROID__
+		/// <summary>
+		/// Audio provider used to provide audio data on UWP a ANDROID,
+		/// both by uploading file and recording by microphone.
+		/// </summary>
+		private AudioDataProvider audioRecorder { get; set; }
+#endif
+		#endregion
 
 		#region Commands
 
+#if NETFX_CORE || __ANDROID__
+		/// <summary>
+		/// Starts recording audio or opens filepicker, validates uploaded song format, queries server for song recognition and shows result on the screen. <br></br>
+		/// Also handles necessary UI updates. <br></br>
+		/// UWP and ANDROID only.
+		/// </summary>
 		public async void RecognizeSong()
-		{	
-			//Setup UI
+		{
+			// Update UI
 			bool sucessfullRecordingUpload = true;
 			WasRecognized = false;
 			textWriter.Clear();
 
 
 			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
+			// Use microphone to record audio
 			if (Settings.UseMicrophone)
 			{
 				IsRecording = true;
 				sucessfullRecordingUpload = await Task.Run(() => audioRecorder.RecordAudio(Settings.RecordingLength));
 				IsRecording = false;
 
-
-				//Inform user about fail
+				// Inform user about failure
 				if (!sucessfullRecordingUpload)
-				{
 					InformationText = " Recording failed.";
-				}
-				//Allow recording replay
+				// Allow recording replay
 				else
-				{
 					FinishedRecording = true;
-				}
 			}
+			// Upload recording via FilePicker
 			else
 			{
 				try
@@ -84,33 +120,37 @@ namespace BP.Shared.ViewModels
 				}
 				catch(FileLoadException e)
 				{
+					// Inform user about failure
 					sucessfullRecordingUpload = false;
 					InformationText = "Could not upload file.";
 				}
 			}
 
+			// Update UI
 			if (sucessfullRecordingUpload)
 				FinishedRecording = true;
 
-
+			// Proceed to song recognition
 			if (sucessfullRecordingUpload)
 			{
 				IsRecognizing = true;
 				InformationText = "Looking for a match ...";
 
-				//null if there was problem with the recording
+				// Recognize song
 				RecognitionResult recognitionResult = await RecognizeSongFromRecording();
 
-				//Display result only on Windows and Android
-				//WASM is handled in event see MainPageViewModelWASM.cs
-	#if __ANDROID__ || NETFX_CORE
+				// Update UI
 				if (recognitionResult != null)
-					WriteRecognitionResults(recognitionResult);
-	#endif
+					await WriteRecognitionResults(recognitionResult);
+
 				IsRecognizing = false;
 			}
 		}
 
+		/// <summary>
+		/// Plays last recorded audio by microphone.<br></br>
+		/// Supported on UWP and ANDROID only.
+		/// </summary>
 		public void ReplayRecording()
 		{
 #if NETFX_CORE
@@ -120,11 +160,16 @@ namespace BP.Shared.ViewModels
 			audioRecorder.ReplayRecordingANDROID();
 #endif
 		}
+#endif 
 
+		/// <summary>
+		/// Opens platform specific FilePicker and allows the user to pick audio file. <br></br>
+		/// UWP and ANDROID only.
+		/// </summary>
 		public async void UploadNewSong()
 		{
-#if NETFX_CORE || __ANDROID__
-			byte[] uploadedSong = await FileUpload.pickAndUploadFileAsync(value => UploadedSongText = value, uploadedSongLock, maxSize_Mb:50);
+			// Open platform specific FilePicker
+			byte[] uploadedSong = await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_Mb:50);
 			
 			//file not picked
 			if (uploadedSong == null)
@@ -132,11 +177,11 @@ namespace BP.Shared.ViewModels
 
 			try
 			{
-				uploadedSongFormat = new WavFormat(uploadedSong);
-				if (!IsSupported(uploadedSongFormat))
+				this.uploadedSong = new WavFormat(uploadedSong);
+				if (!IsSupported(this.uploadedSong))
 				{
 					//release resources
-					uploadedSongFormat = null;
+					this.uploadedSong = null;
 					return;
 				}
 			}
@@ -146,19 +191,17 @@ namespace BP.Shared.ViewModels
 				InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
 				return;
 			}
-
-#elif __WASM__
-			await pickAndUploadFileWASM();
-#else
-			throw new NotImplementedException();
-#endif
 		}
 
+		/// <summary>
+		/// Proces picked song and upload it into the server database.
+		/// </summary>
 		public async void AddNewSong()
 		{
-			//Reset UI
+			// Reset UI
 			WasRecognized = false;
-
+			
+			// Check that all form controls are filled.
 			if (NewSongName.IsNullOrEmpty())
 			{
 				InformationText = "Please enter song name.";
@@ -169,63 +212,64 @@ namespace BP.Shared.ViewModels
 				InformationText = "Please enter song author.";
 				return;
 			}
-			if (uploadedSongFormat == null)
-			{
-				InformationText = "Please upload song file.";
-				return;
-			}
-
+			if (uploadedSong == null)
 			if (NewSongLyrics.IsNullOrEmpty())
 			{
 				InformationText = "Please enter the lyrics.";
 				return;
 			}
 
-			if (uploadedSongFormat != null && NewSongName != "" && NewSongAuthor!= "")
-			{
-				string songName = NewSongName;
-				string songAuthor = NewSongAuthor;
-				//unify end of line marks in database as '\r\n' so it can be replaced
-				//by Environment.NewLine in runtime depending on the system
-				string lyrics = NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
+			// Update UI
+			IsUploading = true;
+			InformationText = "Processing song";
 
-				IsUploading = true;
-				InformationText = "Processing song";
+			// Unify end of line marks in database as '\r\n' so it can be replaced
+			// by Environment.NewLine in runtime depending on the system
+			string lyrics = NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
+
+			// Upload song on serever
+			bool wasAdded = await AddNewSongToDatabase(NewSongName, NewSongAuthor, lyrics, uploadedSong);
+
+			// Update UI
+			IsUploading = false;
+			if (wasAdded)
+				InformationText = $"\"{NewSongName}\" by {NewSongAuthor} added";
+			// Close 'Add song' form
+			CloseNewSongForm();
 
 
+			//release resources and reset 'Add song' form data
+			uploadedSong = null;
+			UploadedSongText = "Please upload audio file";
+			NewSongAuthor = string.Empty;
+			NewSongName = string.Empty;
 
-				bool wasAdded = await AddNewSongToDatabase(songName, songAuthor, lyrics);
-				IsUploading = false;
-
-				if (wasAdded)
-					InformationText = $"\"{songName}\" by {songAuthor} added";
-				
-				//close UI form
-				CloseNewSongForm();
-
-				//release resources and reset form input
-				uploadedSongFormat = null;
-				UploadedSongText = "Please upload audio file";
-				NewSongAuthor = string.Empty;
-				NewSongName = string.Empty;
-
-				//Force GC to avoid memory struggles on older phones
-				GC.Collect();
-			}
+			//Force GC to avoid memory struggles on older phones
+			GC.Collect();
 		}
 
+		/// <summary>
+		/// Open form for adding new song into the database.
+		/// </summary>
 		public void OpenNewSongForm()
 		{
 			ShowUploadUI = true;
 		}
 
+		/// <summary>
+		/// Close form for adding new song into the database.
+		/// </summary>
 		public void CloseNewSongForm()
 		{
 			ShowUploadUI = false;
 		}
 
+		/// <summary>
+		/// Show Lyrics dialog for recognized song.
+		/// </summary>
 		public async void ShowLyrics()
 		{
+			// Backup info to show when no song was recognized.
 			if (RecognizedSong == null)
 			{
 				var lyricsShowDialog = new LyricsShowDialog(new Song()
@@ -244,27 +288,31 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Show Settings dialog.
+		/// </summary>
 		public async void ShowSettings()
 		{
 			var settingsDialog = new SettingsDialog(new SettingsViewModel(Settings));
 			ContentDialogResult result = await settingsDialog.ShowAsync();
 		}
 
+		/// <summary>
+		/// Show Lyrics editor dialog.
+		/// </summary>
 		public async void ShowLyricsEditDialog()
 		{
 			var lyricsDialog = new LyricsDialog(this);
 			ContentDialogResult resutl = await lyricsDialog.ShowAsync();
 		}
-
-		public async void TestMethod()
-		{
-			this.Log().LogDebug("DEBUG");
-		}
-		#endregion
+#endregion
 
 		#region Properties
 
 		private Settings _settings;
+		/// <summary>
+		/// Settings of the application
+		/// </summary>
 		public Settings Settings 
 		{ 
 			get => _settings;
@@ -276,6 +324,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private string _informationText = "You can start recording";
+		/// <summary>
+		/// Main text displaying current state of the application.
+		/// </summary>
 		public string InformationText
 		{
 			get => _informationText;
@@ -289,6 +340,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private string _uploadedSongText = "Please upload audio file";
+		/// <summary>
+		/// Name of uploaded song in 'Add song' form.
+		/// </summary>
 		public string UploadedSongText
 		{
 			get => _uploadedSongText;
@@ -302,6 +356,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private string _newSongName;
+		/// <summary>
+		/// Name of the song in 'Add song' form.
+		/// </summary>
 		public string NewSongName
 		{
 			get => _newSongName;
@@ -315,6 +372,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private string _newSongAuthor;
+		/// <summary>
+		/// Name of the author in 'Add song' form.
+		/// </summary>
 		public string NewSongAuthor
 		{
 			get => _newSongAuthor;
@@ -328,6 +388,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private string _newSongLyrics;
+		/// <summary>
+		/// Lyrics of the song in 'Add song' form.
+		/// </summary>
 		public string NewSongLyrics
 		{
 			get => _newSongLyrics;
@@ -341,6 +404,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private Uri _youtubeLink;
+		/// <summary>
+		/// YouTube link redirecting to recognized song.
+		/// </summary>
 		public Uri YouTubeLink
 		{
 			get => _youtubeLink;
@@ -354,6 +420,9 @@ namespace BP.Shared.ViewModels
 		}
 
 		private bool _showUploadUI;
+		/// <summary>
+		/// Controls visibility of 'Add song' form.
+		/// </summary>
 		public bool ShowUploadUI
 		{
 			get => _showUploadUI;
@@ -365,6 +434,10 @@ namespace BP.Shared.ViewModels
 		}
 
 		private bool _isRecording;
+		/// <summary>
+		/// True - Recording via microphone is in progress.<br></br>
+		/// False - Otherwise.
+		/// </summary>
 		public bool IsRecording
 		{
 			get => _isRecording;
@@ -378,6 +451,10 @@ namespace BP.Shared.ViewModels
 		}
 
 		private bool _isRecognizing;
+		/// <summary>
+		/// True - Recognition is in progress.<br></br>
+		/// False - Otherwise.
+		/// </summary>
 		public bool IsRecognizing
 		{
 			get => _isRecognizing;
@@ -391,6 +468,10 @@ namespace BP.Shared.ViewModels
 		}
 
 		private bool _isUploading;
+		/// <summary>
+		/// True - File uploadin is in progress.<br></br>
+		/// False - Otherwise.
+		/// </summary>
 		public bool IsUploading
 		{
 			get => _isUploading;
@@ -403,6 +484,10 @@ namespace BP.Shared.ViewModels
 		}
 
 		private bool _finishedRecording;
+		/// <summary>
+		/// True - At least one microphone recording was finished.<br></br>
+		/// False - Otherwise.
+		/// </summary>
 		public bool FinishedRecording
 		{
 			get => _finishedRecording;
@@ -414,6 +499,10 @@ namespace BP.Shared.ViewModels
 		}
 
 		private bool _wasRecognized;
+		/// <summary>
+		/// True - Recognition was succesfull.<br></br>
+		/// False - Otherwise.
+		/// </summary>
 		public bool WasRecognized
 		{
 			get => _wasRecognized;
@@ -428,39 +517,41 @@ namespace BP.Shared.ViewModels
 
 		public bool IsRecognizingOrUploading => IsRecognizing || IsRecording || IsUploading;
 
+		/// <summary>
+		/// Recognized song.
+		/// </summary>
 		public Song RecognizedSong = null;
 		#endregion
 
-
 		#region private Methods
-
+		/// <summary>
+		/// Platform specific song recognition from recording (either uploaded or captured with microphone).
+		/// </summary>
+		/// <returns></returns>
 		private async Task<RecognitionResult> RecognizeSongFromRecording()
 		{
 			try
 			{
+				// Obtain audio data from recording
 #if NETFX_CORE
-				uploadedSongFormat = await getAudioFormatFromRecodingUWP();
-#elif __ANDROID__
-				uploadedSongFormat= await getAudioFormatFromRecordingANDROID();
-#elif __WASM__
-				recognizeWASM();
-				//Return null just to comply with method (recognition handling is done in recognizeWASM();
-				return null; 
-#else
-				throw new NotImplementedException("RecognizeSongFromRecording feature is not implemented on your platform.");
+				uploadedSong = await GetAudioFormatFromRecoding_UWP();
 #endif
-
-				if (!IsSupported(uploadedSongFormat))
+#if __ANDROID__
+				uploadedSong = GetAudioFormatFromRecording_ANDROID();
+#endif
+				if (!IsSupported(uploadedSong))
 				{
 					//release resources
-					uploadedSongFormat = null;
+					uploadedSong = null;
 					return null;
 				}
 
-				//Name, Author and Lyrics is not important for recognition call
-				SongWavFormat songWavFormat = CreateSongWavFormat("none", "none", "none");
+				// Preprocess audio data for server
+				// Name, Author and Lyrics is not important for recognition
+				PreprocessedSongData preprocessedSong = PreprocessSongData("none", "none", "none", uploadedSong);
 				
-				return await RecognizerApi.RecognizeSong(songWavFormat);
+				// Call server for song recognition
+				return await recognizerApi.RecognizeSong(preprocessedSong);
 			}
 			catch(ArgumentException e)
 			{
@@ -468,13 +559,19 @@ namespace BP.Shared.ViewModels
 				return null;
 			}
 		}
-
-		private void WriteRecognitionResults(RecognitionResult result)
+		
+		/// <summary>
+		/// Write recognition result to adequate properties so it can be displayed to the user.
+		/// </summary>
+		/// <param name="result"></param>
+		private async Task WriteRecognitionResults(RecognitionResult result)
 		{
-			textWriter.WriteLine(result.detailinfo);
+			await textWriter.WriteLineAsync(result.detailinfo);
+
 			if (result.song == null)
 			{
 				InformationText = $"Song was not recognized.";
+				WasRecognized = false;
 				return;
 			}
 
@@ -484,29 +581,41 @@ namespace BP.Shared.ViewModels
 			WasRecognized = true;
 		}
 
+		/// <summary>
+		/// Create YouTube link to given song created by given author
+		/// </summary>
+		/// <param name="songName">Name of the song.</param>
+		/// <param name="songAuthor">Name of the author of the song.</param>
+		/// <returns></returns>
 		private Uri CreateYouTubeLink(string songName, string songAuthor)
 		{
 			return new Uri($"https://music.youtube.com/search?q={songName.Replace(' ','+')}+by+{songAuthor.Replace(' ','+')}");
 		}
 
-		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor, string lyrics)
+		/// <summary>
+		/// Processes and uploads given song into the server database.
+		/// </summary>
+		/// <param name="songName">Name of the song.</param>
+		/// <param name="songAuthor">Name of the author of the song.</param>
+		/// <param name="lyrics">Lyrics of the song.</param>
+		/// <param name="audioData">Supported instance implementing IAudioFormat containing audio data.</param>
+		/// <returns>True if song was sucessfully added, false otherwise.</returns>
+		private async Task<bool> AddNewSongToDatabase(string songName, string songAuthor, string lyrics, IAudioFormat audioData)
 		{
-			this.Log().LogDebug($"[DEBUG] Adding {songName} by {songAuthor} into database.");
 			try
 			{
-				if (!IsSupported(uploadedSongFormat))
+				if (!IsSupported(audioData))
 				{
 					//release resources
-					uploadedSongFormat = null;
+					audioData = null;
 					return false;
 				}
 
-				SongWavFormat songWavFormat = CreateSongWavFormat(songAuthor, songName, lyrics);
+				// Preprocess audio data so it can be uploaded to server
+				PreprocessedSongData preprocessedSong = PreprocessSongData(songAuthor, songName, lyrics, audioData);
 
-				this.Log().LogDebug("Calling rest api");
-				await RecognizerApi.UploadSong(songWavFormat).ConfigureAwait(false);
-
-				this.Log().LogDebug($"[DEBUG] Song {songName} by {songAuthor} added into database.");
+				// Upload to server
+				await recognizerApi.UploadSong(preprocessedSong).ConfigureAwait(false);
 
 				return true;
 			}
@@ -518,6 +627,12 @@ namespace BP.Shared.ViewModels
 			}
 		}
 
+		/// <summary>
+		/// Checks if given instance implementing IAudioFormat is supported. <br></br>
+		/// Checks for type of auioFormat, number of audio channels and sample rate.
+		/// </summary>
+		/// <param name="audioFormat">Audio format instance implementing IAudioFormat.</param>
+		/// <returns>True if audioFormat is supported, false otherwise.</returns>
 		private bool IsSupported(IAudioFormat audioFormat)
 		{
 
@@ -542,22 +657,22 @@ namespace BP.Shared.ViewModels
 			return true;
 		}
 
-		private SongWavFormat CreateSongWavFormat(string songAuthor, string songName, string lyrics)
+		/// <summary>
+		/// Creates Time Frequecy Points, gets BPM of song and wraps it together with song name,author name and lyrics 
+		/// into PreprocessedSongData instance so it can be send to the server.
+		/// </summary>
+		/// <param name="songAuthor">Name of the song.</param>
+		/// <param name="songName">Name of the author of the song.</param>
+		/// <param name="lyrics">Lyrics of the song.</param>
+		/// <param name="audioData">Supported audio format containing audio data.</param>
+		/// <returns></returns>
+		private PreprocessedSongData PreprocessSongData(string songAuthor, string songName, string lyrics, IAudioFormat audioData)
 		{
+			int BPM = recognizer.GetBPM(audioData, approximate: true);
 
-			int BPM = recognizer.GetBPM(uploadedSongFormat, approximate: true);
-			this.Log().LogInformation($"BPM: {BPM}");
+			var tfps = recognizer.GetTimeFrequencyPoints(audioData);
 
-			var tfps = recognizer.GetTimeFrequencyPoints(uploadedSongFormat);
-
-			this.Log().LogDebug($"tfps.Count: {tfps.Count}");
-
-			for(int i = 0; i < Math.Min(10, tfps.Count); i++)
-			{
-				this.Log().LogDebug($"i: {i} freq: {tfps[i].Frequency}, time: {tfps[i].Time}");
-			}
-
-			SongWavFormat songWavFormat = new SongWavFormat
+			PreprocessedSongData songWavFormat = new PreprocessedSongData
 			{
 				author = songAuthor,
 				name = songName,
@@ -570,8 +685,48 @@ namespace BP.Shared.ViewModels
 		}
 
 
+#if __ANDROID__
+		/// <summary>
+		/// Creates IAudioFormat instance from raw recorded audio data.<br></br>
+		/// ANDROID only.
+		/// </summary>
+		/// <returns>Currently supports only WavFormat.</returns>
+		private IAudioFormat GetAudioFormatFromRecording_ANDROID()
+		{
+			// On Android we only get raw data without metadata.
+			// So we have to convert them manually to shorts and then use different 
+			// manual constructor with values from Recorder.Parameters.
 
-#endregion
+			byte[] recordedSong =  audioRecorder.GetDataFromStream_ANDROID();
+			short[] recordedDataShort = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(recordedSong);
+
+			return new WavFormat(
+				AudioRecorder.AudioDataProvider.Parameters.SamplingRate,
+				AudioRecorder.AudioDataProvider.Parameters.Channels,
+				recordedDataShort.Length,
+				recordedDataShort);
+		}
+#endif
+#if NETFX_CORE
+		/// <summary>
+		/// Creates IAudioFormat instance from raw recorded audio data.<br></br>
+		/// UWP only.
+		/// </summary>
+		/// <returns></returns>
+		private async Task<IAudioFormat> GetAudioFormatFromRecoding_UWP()
+		{
+			// In UWP the data in the recording includes the metadata
+			// so we can read information about sample rate, channel count etc.
+			// from the included metadata
+
+			byte[] recordedSong = await audioRecorder.GetDataFromStream_UWP();
+																			
+			return new WavFormat(recordedSong);
+		}
+
+#endif
+
+		#endregion
 	}
 
 
