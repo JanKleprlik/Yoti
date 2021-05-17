@@ -19,10 +19,10 @@ namespace BP.Shared.ViewModels
 		{
 			DeleteDelegates();
 			WasmSongEvent += OnSongToRecognizeEvent;
-			if (settings.UseMicrophone)
+			if (Settings.UseMicrophone)
 			{
 				stringBuilder = new StringBuilder();
-				var escapedRecLength = WebAssemblyRuntime.EscapeJs((settings.RecordingLength * 1000).ToString());
+				var escapedRecLength = WebAssemblyRuntime.EscapeJs((Settings.RecordingLength).ToString());
 				WebAssemblyRuntime.InvokeJS($"record_and_recognize({escapedRecLength});");
 			}
 			else
@@ -57,7 +57,7 @@ namespace BP.Shared.ViewModels
 
 				try
 				{
-					if (!settings.UseMicrophone)
+					if (!Settings.UseMicrophone)
 					{
 						this.Log().LogDebug("Uploaded song");
 						uploadedSongFormat = new WavFormat(binData);
