@@ -6,6 +6,11 @@ using Windows.UI.Xaml.Data;
 
 namespace BP.Shared.Converters
 {
+	/// <summary>
+	/// Converts Bool to Visibility <br></br>
+	/// True - Visible <br></br>
+	/// False - Collapsed
+	/// </summary>
 	class BooleanToVisibilityConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
@@ -26,7 +31,11 @@ namespace BP.Shared.Converters
 			return false;
 		}
 	}
-
+	/// <summary>
+	/// Converts Bool to Visibility <br></br>
+	/// True - Collapsed <br></br>
+	/// False - Visible
+	/// </summary>
 	class BooleanToVisibilityInvertedConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
@@ -48,6 +57,9 @@ namespace BP.Shared.Converters
 		}
 	}
 
+	/// <summary>
+	/// NOT operation over boolean
+	/// </summary>
 	class InverseBooleanConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)

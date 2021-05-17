@@ -6,9 +6,11 @@ using Uno.Extensions.Specialized;
 
 namespace BP.Shared.RestApi
 {
+	/// <summary>
+	/// Base class for WebApi implementing httpRequest wrappers.
+	/// </summary>
 	public abstract class WebApiBase
 	{
-		protected static HttpClient _client;
 
 		static WebApiBase()
 		{
@@ -19,6 +21,8 @@ namespace BP.Shared.RestApi
 #endif
 			_client = new HttpClient(innerHandler);
 		}
+
+		protected static HttpClient _client;
 
 		protected HttpRequestMessage CreateRequestMessage(HttpMethod method, string url, Dictionary<string, string> headers = null)
 		{
@@ -34,6 +38,12 @@ namespace BP.Shared.RestApi
 			return httpRequestMessage;
 		}
 
+		/// <summary>
+		/// GET request
+		/// </summary>
+		/// <param name="url">Request url</param>
+		/// <param name="headers">Dictionary of name and value of the header.</param>
+		/// <returns>Serialized JSON response as string. Null on failure.</returns>
 		protected async Task<string> GetAsync(string url, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Get, url, headers))
@@ -47,6 +57,12 @@ namespace BP.Shared.RestApi
 				return null;
 			}
 		}
+		/// <summary>
+		/// DELETE request
+		/// </summary>
+		/// <param name="url">Request url</param>
+		/// <param name="headers">Dictionary of name and value of the header.</param>
+		/// <returns>Serialized JSON response as string. Null on failure.</returns>
 		protected async Task<string> DeleteAsync(string url, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Delete, url, headers))
@@ -61,6 +77,13 @@ namespace BP.Shared.RestApi
 			}
 		}
 
+		/// <summary>
+		/// DELETE request
+		/// </summary>
+		/// <param name="url">Request url.</param>
+		/// <param name="payload">Payload serialized as JSON.</param>
+		/// <param name="headers">Dictionary of name and value of the header.</param>
+		/// <returns>Serialized JSON response as string. Null on failure.</returns>
 		protected async Task<string> DeleteAsync(string url, string payload, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Delete, url, headers))
@@ -77,7 +100,13 @@ namespace BP.Shared.RestApi
 				}
 			}
 		}
-
+		/// <summary>
+		/// POST request
+		/// </summary>
+		/// <param name="url">Request url.</param>
+		/// <param name="payload">Payload serialized as JSON.</param>
+		/// <param name="headers">Dictionary of name and value of the header.</param>
+		/// <returns>Serialized JSON response as string. Null on failure.</returns>
 		protected async Task<string> PostAsync(string url, string payload, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Post, url, headers))
@@ -95,6 +124,13 @@ namespace BP.Shared.RestApi
 			}
 		}
 
+		/// <summary>
+		/// PUT request
+		/// </summary>
+		/// <param name="url">Request url.</param>
+		/// <param name="payload">Payload serialized as JSON.</param>
+		/// <param name="headers">Dictionary of name and value of the header.</param>
+		/// <returns>Serialized JSON response as string. Null on failure.</returns>
 		protected async Task<string> PutAsync(string url, string payload, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Put, url, headers))
