@@ -13,15 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BP.Wasm", "BP\BP.Wasm\BP.Wa
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "BP.Shared", "BP\BP.Shared\BP.Shared.shproj", "{6279C845-92F8-4333-AB99-3D213163593C}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "AudioProcessing", "AudioProcessing\AudioProcessing.shproj", "{7BB6AAE9-7265-49F6-9D7A-F801CDE914DF}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visualizer", "Visualizer\Visualizer.csproj", "{34C88066-3DD3-402A-AA82-801E2F47FC53}"
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Database", "Database\Database.shproj", "{7358A2C4-04CE-49DA-B95E-1677F2CD54BA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BP.Server", "BP.Server\BP.Server.csproj", "{103D687B-09A6-458D-BC12-C75005E02439}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioRecognitionLibrary", "AudioRecognitionLibrary\AudioRecognitionLibrary.csproj", "{F807730A-349D-4163-9E83-7C71A0ED2160}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioRecognitionLibrary", "AudioRecognitionLibrary\AudioRecognitionLibrary.csproj", "{F807730A-349D-4163-9E83-7C71A0ED2160}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
