@@ -18,8 +18,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Parameters.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)AudioRecorder\Recorder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AudioProvider\Parameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)AudioProvider\AudioProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Converters\BooleanConverters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RestApi\RecognizerApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)RestApi\WebApiBase.cs" />

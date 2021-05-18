@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace BP.Shared.AudioRecorder
+namespace BP.Shared.AudioProvider
 {
 	public partial class AudioDataProvider
 	{

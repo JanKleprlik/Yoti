@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Uno.Extensions;
 using Uno.Foundation;
-using static BP.Shared.AudioRecorder.AudioDataProvider;
+using static BP.Shared.AudioProvider.AudioDataProvider;
 
 namespace BP.Shared.ViewModels
 {
@@ -45,7 +45,7 @@ namespace BP.Shared.ViewModels
 			{
 				IsUploading = true;
 				stringBuilder = new StringBuilder();
-				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioRecorder.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
+				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
 			}
 		}
 

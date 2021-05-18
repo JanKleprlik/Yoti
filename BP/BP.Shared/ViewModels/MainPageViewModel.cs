@@ -1,4 +1,4 @@
-﻿using BP.Shared.AudioRecorder;
+﻿using BP.Shared.AudioProvider;
 using BP.Shared.Utils;
 using Windows.UI.Xaml.Controls;
 using Uno.Extensions;
@@ -706,8 +706,8 @@ namespace BP.Shared.ViewModels
 			short[] recordedDataShort = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(recordedSong);
 
 			return new WavFormat(
-				AudioRecorder.AudioDataProvider.Parameters.SamplingRate,
-				AudioRecorder.AudioDataProvider.Parameters.Channels,
+				AudioProvider.AudioDataProvider.Parameters.SamplingRate,
+				AudioProvider.AudioDataProvider.Parameters.Channels,
 				recordedDataShort.Length,
 				recordedDataShort);
 		}
