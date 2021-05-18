@@ -4,7 +4,7 @@ using System.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace BP.Shared.Converters
+namespace Yoti.Shared.Converters
 {
 	/// <summary>
 	/// Converts Bool to Visibility <br></br>

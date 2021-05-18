@@ -1,9 +1,9 @@
-﻿using BP.Shared.Models;
+﻿using Yoti.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BP.Shared.ViewModels
+namespace Yoti.Shared.ViewModels
 {
 	public class SettingsViewModel : BaseViewModel
 	{

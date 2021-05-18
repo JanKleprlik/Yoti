@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace BP.Shared.ViewModels
+namespace Yoti.Shared.ViewModels
 {
 	/// <summary>
 	/// Base view model abstract class implementing OnPropertyChanged method.

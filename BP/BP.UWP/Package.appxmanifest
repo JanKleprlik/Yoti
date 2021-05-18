@@ -14,8 +14,8 @@
   <mp:PhoneIdentity PhoneProductId="87447eb0-83a8-4b7b-a501-fc7fdb6db51a" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>BP</DisplayName>
-    <PublisherDisplayName>BP</PublisherDisplayName>
+    <DisplayName>Yoti</DisplayName>
+    <PublisherDisplayName>Yoti</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -28,17 +28,17 @@
   </Resources>
 
   <Applications>
-    <Application Id="App"
-      Executable="BP.exe"
-      EntryPoint="BP.App">
+    <Application Id="App" Executable="Yoti.exe" EntryPoint="Yoti.App">
       <uap:VisualElements
-        DisplayName="BP"
+        DisplayName="Yoti"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="BP"
+        Description="Song recognition application"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
+        <uap:InitialRotationPreference>
+          <uap:Rotation Preference="landscape"/></uap:InitialRotationPreference>
       </uap:VisualElements>
     </Application>
   </Applications>

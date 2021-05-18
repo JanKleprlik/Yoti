@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Database;
 
-namespace BP.Server.Models
+namespace Yoti.Server.Models
 {
 	public class SongContext : DbContext
 	{

@@ -1,4 +1,4 @@
-using BP.Server.Models;
+using Yoti.Server.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -15,7 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace BP.Server
+namespace Yoti.Server
 {
 	public class Startup
 	{

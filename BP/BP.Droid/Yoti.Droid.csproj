@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BP.Droid</RootNamespace>
-    <AssemblyName>BP.Droid</AssemblyName>
+    <RootNamespace>Yoti.Droid</RootNamespace>
+    <AssemblyName>Yoti.Droid</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidApplication>true</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
@@ -20,7 +20,7 @@
     <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <AndroidUseIntermediateDesignerFile>True</AndroidUseIntermediateDesignerFile>
-    <ResourcesDirectory>..\BP.Shared\Strings</ResourcesDirectory>
+    <ResourcesDirectory>..\Yoti.Shared\Strings</ResourcesDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -112,8 +112,9 @@
       <Name>AudioRecognitionLibrary</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="..\BP.Shared\BP.Shared.projitems" Label="Shared" Condition="Exists('..\BP.Shared\BP.Shared.projitems')" />
+  <Import Project="..\Yoti.Shared\Yoti.Shared.projitems" Label="Shared" Condition="Exists('..\Yoti.Shared\Yoti.Shared.projitems')" />
   <Import Project="..\..\Database\Database.projitems" Label="Shared" />
+  <Import Project="..\BP.Shared\BP.Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <!-- This will force the generation of the APK when not building inside visual studio -->
   <Target Name="GenerateBuild" DependsOnTargets="SignAndroidPackage" AfterTargets="Build" Condition="'$(BuildingInsideVisualStudio)'==''" />

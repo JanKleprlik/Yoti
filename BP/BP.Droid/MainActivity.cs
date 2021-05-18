@@ -4,7 +4,7 @@ using Android.OS;
 using Android.Content.PM;
 using Android.Views;
 
-namespace BP.Droid
+namespace Yoti.Droid
 {
 	[Activity(
 			MainLauncher = true,

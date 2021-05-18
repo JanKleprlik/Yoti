@@ -5,7 +5,7 @@ using System.Text.Json;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace BP.Shared.RestApi
+namespace Yoti.Shared.RestApi
 {
 	public class RecognizerApi : WebApiBase
 	{

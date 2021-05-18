@@ -2,16 +2,16 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media.Animation;
-using BP.Shared.Models;
-using BP.Shared.ViewModels;
+using Yoti.Shared.Models;
+using Yoti.Shared.ViewModels;
 using Windows.UI.Xaml.Navigation;
 using System.Collections.Generic;
 using Database;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
-using BP.Shared.RestApi;
+using Yoti.Shared.RestApi;
 
-namespace BP.Shared.Views
+namespace Yoti.Shared.Views
 {
     public sealed partial class MainPage : Page
     {

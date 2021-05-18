@@ -1,22 +1,22 @@
-﻿using BP.Shared.AudioProvider;
-using BP.Shared.Utils;
+﻿using Yoti.Shared.AudioProvider;
+using Yoti.Shared.Utils;
 using Windows.UI.Xaml.Controls;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
-using BP.Shared.Models;
+using Yoti.Shared.Models;
 using System.Threading.Tasks;
 using System;
 using AudioRecognitionLibrary.AudioFormats;
 using Windows.UI.Core;
 using System.Collections.Generic;
 using Database;
-using BP.Shared.RestApi;
+using Yoti.Shared.RestApi;
 using AudioRecognitionLibrary.Recognizer;
 using System.Linq;
 using System.IO;
-using BP.Shared.Views;
+using Yoti.Shared.Views;
 
-namespace BP.Shared.ViewModels
+namespace Yoti.Shared.ViewModels
 {
 	public partial class MainPageViewModel : BaseViewModel
 	{

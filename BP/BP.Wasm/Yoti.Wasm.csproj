@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netstandard2.0</TargetFramework>
     <NoWarn>NU1701</NoWarn>
+    <AssemblyName>Yoti.Wasm</AssemblyName>
+    <RootNamespace>Yoti.Wasm</RootNamespace>
+    <StartupObject>Yoti.Wasm.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <MonoRuntimeDebuggerEnabled>true</MonoRuntimeDebuggerEnabled>

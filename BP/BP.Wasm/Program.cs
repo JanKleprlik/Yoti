@@ -1,7 +1,7 @@
 ﻿using System;
 using Windows.UI.Xaml;
 
-namespace BP.Wasm
+namespace Yoti.Wasm
 {
 	public class Program
 	{

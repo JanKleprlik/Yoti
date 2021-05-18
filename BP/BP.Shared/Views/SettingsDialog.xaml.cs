@@ -1,8 +1,8 @@
 ﻿using Windows.UI.Xaml.Controls;
-using BP.Shared.ViewModels;
+using Yoti.Shared.ViewModels;
 
 
-namespace BP.Shared.Views
+namespace Yoti.Shared.Views
 {
 	public sealed partial class SettingsDialog : ContentDialog
 	{

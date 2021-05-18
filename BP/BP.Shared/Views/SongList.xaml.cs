@@ -7,9 +7,9 @@ using System.Collections.ObjectModel;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
 using Database;
-using BP.Shared.RestApi;
+using Yoti.Shared.RestApi;
 
-namespace BP.Shared.Views
+namespace Yoti.Shared.Views
 {
 	/// <summary>
 	/// Page showing list of songs in the database.

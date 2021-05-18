@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Uno.Extensions;
 using Uno.Foundation;
-using static BP.Shared.AudioProvider.AudioDataProvider;
+using static Yoti.Shared.AudioProvider.AudioDataProvider;
 
-namespace BP.Shared.ViewModels
+namespace Yoti.Shared.ViewModels
 {
 	public partial class MainPageViewModel : BaseViewModel
 	{

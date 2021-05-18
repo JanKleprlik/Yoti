@@ -1,4 +1,4 @@
-﻿using BP.Server.Models;
+﻿using Yoti.Server.Models;
 using Database;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +14,7 @@ using AudioRecognitionLibrary;
 using AudioRecognitionLibrary.Recognizer;
 using System.IO;
 
-namespace BP.Server.Controllers
+namespace Yoti.Server.Controllers
 {
 	[Route("[controller]")]
 	[ApiController]

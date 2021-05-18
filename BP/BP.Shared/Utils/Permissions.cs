@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace BP.Shared.Utils
+namespace Yoti.Shared.Utils
 {
 	/// <summary>
 	/// Class for getting permisions in runtime.

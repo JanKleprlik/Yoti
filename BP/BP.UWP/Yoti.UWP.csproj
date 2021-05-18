@@ -30,8 +30,8 @@
     <ProjectGuid>{8262E473-3782-4F26-B5C0-BB900C6245EC}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BP</RootNamespace>
-    <AssemblyName>BP</AssemblyName>
+    <RootNamespace>Yoti</RootNamespace>
+    <AssemblyName>Yoti</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.17763.0</TargetPlatformVersion>
@@ -151,7 +151,6 @@
     <Content Include="..\Assets\Fonts\Sansation\Sansation_Regular.ttf">
       <Link>Assets\Fonts\Sansation_Regular.ttf</Link>
     </Content>
-    <None Include="BP.UWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

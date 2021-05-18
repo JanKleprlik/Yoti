@@ -1,4 +1,4 @@
-using BP.Server.Models;
+using Yoti.Server.Models;
 using Database;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace BP.Server
+namespace Yoti.Server
 {
 	public class Program
 	{

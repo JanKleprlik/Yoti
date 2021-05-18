@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Windows.UI.Xaml;
 
-namespace BP.Shared.ViewModels
+namespace Yoti.Shared.ViewModels
 {
     public class LyricsViewModel : BaseViewModel
     {

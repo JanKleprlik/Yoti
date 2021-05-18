@@ -1,5 +1,5 @@
 ﻿<linker>
-  <assembly fullname="BP.Wasm" />
+  <assembly fullname="Yoti.Wasm" />
   <assembly fullname="Uno.UI" />
 	<assembly fullname="System.Text.Json" />
 

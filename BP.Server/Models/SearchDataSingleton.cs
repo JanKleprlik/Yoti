@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace BP.Server.Models
+namespace Yoti.Server.Models
 {
 	public class SearchDataSingleton
 	{

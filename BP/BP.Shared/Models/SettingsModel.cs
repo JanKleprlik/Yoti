@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace BP.Shared.Models
+namespace Yoti.Shared.Models
 {
 	public class Settings
 	{

@@ -20,7 +20,7 @@ using System.Collections.Generic;
 #endif
 
 
-namespace BP.Shared.AudioProvider
+namespace Yoti.Shared.AudioProvider
 {
 	/// <summary>
 	/// Adapter for obtaining audio both by recording with microphone and by picking file with FilePicker.<br></br>

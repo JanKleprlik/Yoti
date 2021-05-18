@@ -1,4 +1,4 @@
-﻿using BP.Shared.ViewModels;
+﻿using Yoti.Shared.ViewModels;
 using Database;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ using Windows.UI.Xaml.Navigation;
 
 // The Content Dialog item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
 
-namespace BP.Shared.Views
+namespace Yoti.Shared.Views
 {
     public sealed partial class LyricsShowDialog : ContentDialog
     {

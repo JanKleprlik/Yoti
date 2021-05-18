@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 
-namespace BP.Shared.Utils
+namespace Yoti.Shared.Utils
 {
 	/// <summary>
 	/// TextWriter that displays text into assigned TextBlock

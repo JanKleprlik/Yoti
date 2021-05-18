@@ -11,7 +11,7 @@ using Xamarin.Essentials;
 using System.Collections.Generic;
 #endif
 
-namespace BP.Shared.Utils
+namespace Yoti.Shared.Utils
 {
 	public static class FileUpload
 	{

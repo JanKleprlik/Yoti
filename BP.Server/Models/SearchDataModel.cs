@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace BP.Server.Models
+namespace Yoti.Server.Models
 {
 	public class SearchData
 	{

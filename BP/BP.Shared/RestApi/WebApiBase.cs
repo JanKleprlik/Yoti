@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Uno.Extensions.Specialized;
 
-namespace BP.Shared.RestApi
+namespace Yoti.Shared.RestApi
 {
 	/// <summary>
 	/// Base class for WebApi implementing httpRequest wrappers.
