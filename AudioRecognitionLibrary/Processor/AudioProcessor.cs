@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using AudioRecognitionLibrary.AudioFormats;
 using AudioRecognitionLibrary.Tools;
 
-
+[assembly: InternalsVisibleToAttribute("Visualizer")]
 namespace AudioRecognitionLibrary.Processor
 {
 	/// <summary>
 	/// Class with aduio processing methods not tightly related to the recognition algorithm used in song recognition algorithm.
 	/// </summary>
-	public static class AudioProcessor
+	internal static class AudioProcessor
 	{
 		/// <summary>
 		/// Resamples data from multiple channels to single one.

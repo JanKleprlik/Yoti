@@ -7,7 +7,7 @@ namespace AudioRecognitionLibrary.Tools
 	/// <summary>
 	/// Helper class used for debugging.
 	/// </summary>
-	public class Printer
+	internal class Printer
 	{
 		/// <summary>
 		/// Prints maximum of first ten bytes to debug output window.

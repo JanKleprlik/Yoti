@@ -1,5 +1,5 @@
 ﻿using Yoti.Shared.ViewModels;
-using Database;
+using SharedTypes;
 using System;
 using System.Collections.Generic;
 using System.IO;

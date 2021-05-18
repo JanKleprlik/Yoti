@@ -7,7 +7,7 @@ namespace AudioRecognitionLibrary.Tools
 	/// <summary>
 	/// Primitive value converters.
 	/// </summary>
-	public static partial class Converter
+	internal static partial class Converter
 	{
 		/// <summary>
 		/// Converts an array of two bytes to one short.

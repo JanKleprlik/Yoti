@@ -6,7 +6,7 @@ namespace AudioRecognitionLibrary.Recognizer
 {
 	public partial class AudioRecognizer
 	{
-		public static class Parameters
+		internal static class Parameters
 		{
 			public const int TargetSamplingRate = 12000;
 			/// <summary>

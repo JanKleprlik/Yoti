@@ -7,7 +7,7 @@ namespace AudioRecognitionLibrary
 	/// <summary>
 	/// Time Frequecny struct.
 	/// </summary>
-	public struct TimeFrequencyPoint
+	internal struct TimeFrequencyPoint
 	{
 		public uint Time { get; set; }
 		public uint Frequency { get; set; }
@@ -16,7 +16,7 @@ namespace AudioRecognitionLibrary
 	/// <summary>
 	/// Energy peaks used for determining song BPM
 	/// </summary>
-	public struct EnergyPeak
+	internal struct EnergyPeak
 	{
 		public float Energy { get; set; }
 		public int Time { get; set; }

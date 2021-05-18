@@ -8,7 +8,7 @@ namespace AudioRecognitionLibrary.Processor
 	/// <summary>
 	/// Fast Fourier Transformation provider.
 	/// </summary>
-	public class FastFourierTransformation
+	internal class FastFourierTransformation
 	{
 		/// <summary>
 		/// FFT specialized for audio

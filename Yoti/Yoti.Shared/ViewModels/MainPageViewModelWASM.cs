@@ -1,6 +1,6 @@
 ﻿#if __WASM__
 using AudioRecognitionLibrary.AudioFormats;
-using Database;
+using SharedTypes;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text;

@@ -9,7 +9,7 @@ using System;
 using AudioRecognitionLibrary.AudioFormats;
 using Windows.UI.Core;
 using System.Collections.Generic;
-using Database;
+using SharedTypes;
 using Yoti.Shared.RestApi;
 using AudioRecognitionLibrary.Recognizer;
 using System.Linq;
@@ -709,7 +709,9 @@ namespace Yoti.Shared.ViewModels
 			// manual constructor with values from Recorder.Parameters.
 
 			byte[] recordedSong =  audioRecorder.GetDataFromStream_ANDROID();
-			short[] recordedDataShort = AudioRecognitionLibrary.Tools.Converter.BytesToShorts(recordedSong);
+			short[] recordedDataShort = new short[recordedSong.Length / 2];
+			Buffer.BlockCopy(recordedSong, 0, recordedDataShort, 0, recordedSong.Length);
+
 
 			return new WavFormat(
 				AudioProvider.AudioDataProvider.Parameters.SamplingRate,

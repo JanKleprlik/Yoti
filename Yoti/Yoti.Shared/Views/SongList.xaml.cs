@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Navigation;
 using System.Collections.ObjectModel;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
-using Database;
+using SharedTypes;
 using Yoti.Shared.RestApi;
 
 namespace Yoti.Shared.Views

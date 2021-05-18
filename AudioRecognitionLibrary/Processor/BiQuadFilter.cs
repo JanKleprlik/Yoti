@@ -10,7 +10,7 @@ namespace AudioRecognitionLibrary.Processor
 	/// <summary>
 	/// BiQuad filter
 	/// </summary>
-	public class BiQuadFilter
+	internal class BiQuadFilter
 	{
 		// coefficients
 		private double a0;

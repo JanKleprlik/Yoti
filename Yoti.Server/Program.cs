@@ -1,5 +1,5 @@
 using Yoti.Server.Models;
-using Database;
+using SharedTypes;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

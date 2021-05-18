@@ -4,7 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Database
+namespace SharedTypes
 {
 	/// <summary>
 	/// Class keeping information about a song.

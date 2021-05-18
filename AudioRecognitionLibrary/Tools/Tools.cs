@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AudioRecognitionLibrary.Tools
 {
-	public static class Arithmetics
+	internal static class Arithmetics
 	{
 		/// <summary>
 		/// Gets average of two values
@@ -80,7 +80,7 @@ namespace AudioRecognitionLibrary.Tools
 		}
 	}
 
-	public static class Builders
+	internal static class Builders
 	{
 		/// <summary>
 		/// Builds address from parts

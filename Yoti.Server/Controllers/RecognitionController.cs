@@ -1,5 +1,5 @@
 ﻿using Yoti.Server.Models;
-using Database;
+using SharedTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

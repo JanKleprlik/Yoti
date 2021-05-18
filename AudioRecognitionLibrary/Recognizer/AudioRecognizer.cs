@@ -114,7 +114,6 @@ namespace AudioRecognitionLibrary.Recognizer
 			}
 		}
 
-
 		/// <summary>
 		/// Obtains BPM of given audio.
 		/// WARNING: Converts audio into single chanel.

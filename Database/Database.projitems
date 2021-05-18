@@ -6,7 +6,7 @@
     <SharedGUID>7358a2c4-04ce-49da-b95e-1677f2cd54ba</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Database</Import_RootNamespace>
+    <Import_RootNamespace>SharedTypes</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Types.cs" />

@@ -7,7 +7,7 @@ namespace AudioRecognitionLibrary.Processor
 	/// <summary>
 	/// Butterworth filter provider.
 	/// </summary>
-	public static class ButterworthFilter
+	internal static class ButterworthFilter
 	{
 		/// <summary>
 		/// Implementation taken from <see cref="https://www.codeproject.com/Tips/1092012/A-Butterworth-Filter-in-Csharp"/>

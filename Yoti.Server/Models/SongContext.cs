@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Database;
+using SharedTypes;
 
 namespace Yoti.Server.Models
 {
