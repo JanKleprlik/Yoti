@@ -74,6 +74,12 @@ namespace BP.Shared.ViewModels
 		/// </summary>
 		private CoreDispatcher UIDispatcher { get; set; }
 
+		/// <summary>
+		/// Settings View Model connecting Settings Page and Main Page
+		/// So changes in settings pages are immediately shown on Main Page.
+		/// </summary>
+		private SettingsViewModel settingsViewModel { get; set; }
+
 #if NETFX_CORE || __ANDROID__
 		/// <summary>
 		/// Audio provider used to provide audio data on UWP a ANDROID,
@@ -81,11 +87,6 @@ namespace BP.Shared.ViewModels
 		/// </summary>
 		private AudioDataProvider audioRecorder { get; set; }
 
-		/// <summary>
-		/// Settings View Model connecting Settings Page and Main Page
-		/// So changes in settings pages are immediately shown on Main Page.
-		/// </summary>
-		private SettingsViewModel settingsViewModel { get; set; }
 #endif
 		#endregion
 
