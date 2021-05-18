@@ -1,5 +1,5 @@
 ﻿function record_and_recognize(recordingLength) {
-    var processPartFile = Module.mono_bind_static_method("[BP.Wasm] BP.Shared.ViewModels.MainPageViewModel:ProcessEvent");
+    var processPartFile = Module.mono_bind_static_method("[Yoti.Wasm] Yoti.Shared.ViewModels.MainPageViewModel:ProcessEvent");
 
 
     navigator.mediaDevices.getUserMedia({
