@@ -4,8 +4,15 @@ using System.Text;
 
 namespace AudioRecognitionLibrary.Tools
 {
+	/// <summary>
+	/// Helper class used for debugging.
+	/// </summary>
 	public class Printer
 	{
+		/// <summary>
+		/// Prints maximum of first ten bytes to debug output window.
+		/// </summary>
+		/// <param name="data"></param>
 		public static void Print(byte[] data)
 		{
 			int limit = Math.Min(10, data.Length);
@@ -15,6 +22,10 @@ namespace AudioRecognitionLibrary.Tools
 			}
 		}
 
+		/// <summary>
+		/// Prints maximum of first 50 shorts as bytes to debug output window.
+		/// </summary>
+		/// <param name="data"></param>
 		public static void PrintShortAsBytes(short[] data)
 		{
 			int limit = Math.Min(50, data.Length);

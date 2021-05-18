@@ -4,8 +4,16 @@ using System.Text;
 
 namespace AudioRecognitionLibrary.Tools
 {
+	/// <summary>
+	/// Primitive value converters.
+	/// </summary>
 	public static partial class Converter
 	{
+		/// <summary>
+		/// Converts an array of two bytes to one short.
+		/// </summary>
+		/// <param name="bytes">Must be of size 2!</param>
+		/// <returns></returns>
 		public static short BytesToShort(byte[] bytes)
 		{
 			if (bytes.Length != 2)
@@ -16,6 +24,12 @@ namespace AudioRecognitionLibrary.Tools
 			return res;
 		}
 
+		/// <summary>
+		/// Converts an array of four bytes to one int.
+		/// </summary>
+		/// <param name="bytes">Must be of size 4!</param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException">If bytes is not of size 4.</exception>
 		public static int BytesToInt(byte[] bytes)
 		{
 			if (bytes.Length != 4)
@@ -30,6 +44,11 @@ namespace AudioRecognitionLibrary.Tools
 			return res;
 		}
 
+		/// <summary>
+		/// Converts an array of bytes to one uint.
+		/// </summary>
+		/// <param name="bytes"></param>
+		/// <returns></returns>
 		public static uint BytesToUInt(byte[] bytes)
 		{
 			uint res = bytes[bytes.Length - 1];

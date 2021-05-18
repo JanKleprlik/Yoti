@@ -6,6 +6,12 @@ namespace AudioRecognitionLibrary.Tools
 {
 	public static class Arithmetics
 	{
+		/// <summary>
+		/// Gets average of two values
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		/// <returns>Average value of given values.</returns>
 		public static short Average(short left, short right)
 		{
 			return (short)((left + right) / 2);
@@ -51,12 +57,21 @@ namespace AudioRecognitionLibrary.Tools
 		{
 			return _base * _base;
 		}
-
+		/// <summary>
+		/// Get absolute value of complex number.
+		/// </summary>
+		/// <param name="real">Real part of the complex number.</param>
+		/// <param name="img">Imaginary part of the complex number.</param>
+		/// <returns>Absolute value of the complex number.</returns>
 		public static double GetComplexAbs(double real, double img)
 		{
 			return Math.Sqrt(real.Pow2() + img.Pow2());
 		}
-
+		/// <summary>
+		/// Determines if n is a power of two.
+		/// </summary>
+		/// <param name="n"></param>
+		/// <returns>True if it is power of two, false otherwise.</returns>
 		public static bool IsPowOfTwo(int n)
 		{
 			if ((n & (n - 1)) != 0)

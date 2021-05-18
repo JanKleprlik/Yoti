@@ -18,7 +18,7 @@ namespace Visualizer.MusicModes
 			this.downSampleCoef = downSampleCoef;
 
 
-			window = AudioProcessor.GenerateHammingWindow((uint)(BufferSize / downSampleCoef));
+			window = FastFourierTransformation.GenerateHammingWindow((uint)(BufferSize / downSampleCoef));
 			bin = new double[(int)(BufferSize * (2d / downSampleCoef))];
 
 			Song.Loop = true;

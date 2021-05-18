@@ -12,7 +12,7 @@ namespace Visualizer.MusicModes
 		public Spectrogram(SoundBuffer sb, int downSampleCoef) : base(sb)
 		{
 			//windowSize = (int)(BufferSize / downSampleCoef);
-			window = AudioProcessor.GenerateHammingWindow((uint)(BufferSize / downSampleCoef));
+			window = FastFourierTransformation.GenerateHammingWindow((uint)(BufferSize / downSampleCoef));
 			const int secInFrame = 60;
 			rendersTillStop = (int)(secInFrame / ((double)BufferSize / SampleRate));
 			this.downSampleCoef = downSampleCoef;

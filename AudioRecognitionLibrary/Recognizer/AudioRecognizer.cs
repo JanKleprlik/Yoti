@@ -10,20 +10,38 @@ namespace AudioRecognitionLibrary.Recognizer
 {
 	public partial class AudioRecognizer
 	{
-		private TextWriter output { get; set; } = null;
-		private bool IsOutputSet = false;
-
+		/// <summary>
+		/// Information about recognition process is written to given TextWriter.
+		/// </summary>
+		/// <param name="textWriter">TextWriter to write recognition process info into.</param>
 		public AudioRecognizer(TextWriter textWriter)
 		{
 			IsOutputSet = true;
 			output = textWriter;
 		}
 
+		/// <summary>
+		/// Information about recognition process is written to Console.Out.
+		/// </summary>
 		public AudioRecognizer()
 		{
 			IsOutputSet = false;
 			output = Console.Out;
 		}
+
+		#region private properties
+		/// <summary>
+		/// TextWriter to write recognition process information into.
+		/// </summary>
+		private TextWriter output { get; set; } = null;
+		/// <summary>
+		/// Flag determining wether to use special TextWriter at specific methods or use output set at initialization.
+		/// </summary>
+		private bool IsOutputSet { get; set; } = false;
+		#endregion
+
+		#region public API
+
 		/// <summary>
 		/// WARNING: Converts audio into single channel.
 		/// </summary>
@@ -38,7 +56,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate);
 
 			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef; //default: 4096/4 = 1024
-			var TimeFrequencyPoints = AudioProcessor.CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
+			var TimeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
 
 			return TimeFrequencyPoints;
 		}
@@ -58,7 +76,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			return finalSongID;
 		}
 
-		public void AddTFPToDataStructure(List<TimeFrequencyPoint> timeFrequencyPoints, in uint songID, Dictionary<uint, List<ulong>> database)
+		public void AddTFPToGivenDatabase(List<TimeFrequencyPoint> timeFrequencyPoints, in uint songID, Dictionary<uint, List<ulong>> database)
 		{
 			/* spectogram:
 			 *
@@ -104,23 +122,6 @@ namespace AudioRecognitionLibrary.Recognizer
 			}
 		}
 
-		public uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints, out double probability)
-		{
-			//[address;(AbsAnchorTimes)]
-			Dictionary<uint, List<uint>> recordAddresses = CreateRecordAddresses(timeFrequencyPoints);
-			//get quantities of each SongValue to determine wether they make a complete TGZ (5+ points correspond to the same SongValue)
-			var quantities = GetSongValQuantities(recordAddresses, database);
-
-			//filter songs and addresses that only 
-			var filteredSongs = FilterSongs(recordAddresses, quantities, database);
-
-			//get longest delta for each song that says how many notes from recording are time coherent to the song
-			//[sognID, delta]
-			var deltas = GetDeltas(filteredSongs, recordAddresses);
-
-			//pick the songID with highest delta
-			return MaximizeTimeCoherency(deltas, timeFrequencyPoints.Count,out probability);
-		}
 
 		/// <summary>
 		/// WARNING: Converts audio into single chanel.
@@ -141,6 +142,9 @@ namespace AudioRecognitionLibrary.Recognizer
 			return GetMostProbableBPM(energyPeaks, (float)audio.SampleRate, approximate);
 		}
 
+		#endregion
+
+		#region BPM helpers
 		private int GetMostProbableBPM(EnergyPeak[] energyPeaks, float sampleRate,bool approximate)
 		{
 			//<BPM, Count>
@@ -269,9 +273,175 @@ namespace AudioRecognitionLibrary.Recognizer
 
 		}
 
+		#endregion
+
+		#region Song recognition helpers
 
 		/// <summary>
-		/// Picks song with the most notes corresponding to the recording.
+		/// Finds song from database that corresponds the best to the recording represented as timeFrequencyPoints.
+		/// </summary>
+		/// <param name="database">Database to look for matches in.</param>
+		/// <param name="timeFrequencyPoints">TFPs of recording</param>
+		/// <param name="probability">Probability of correct match.</param>
+		/// <returns></returns>
+		private uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints, out double probability)
+		{
+			//[address;(AbsAnchorTimes)]
+			Dictionary<uint, List<uint>> recordAddresses = CreateRecordAddresses(timeFrequencyPoints);
+			
+			// Get quantities of each SongValue to determine wether they make a complete TGZ (5+ points correspond to the same SongValue)
+			var quantities = GetSongValQuantities(recordAddresses, database);
+
+			// Filter songs and addresses that only 
+			var filteredSongs = FilterSongs(recordAddresses, quantities, database);
+
+			// Get longest delta for each song that says how many notes from recording are time coherent to the song
+			//[sognID, delta]
+			var deltas = GetDeltas(filteredSongs, recordAddresses);
+
+			// Pick the songID with highest delta occurance
+			return MaximizeTimeCoherency(deltas, timeFrequencyPoints.Count,out probability);
+		}
+
+		private static List<TimeFrequencyPoint> CreateTimeFrequencyPoints(int bufferSize, double[] data, double sensitivity = 0.9)
+		{
+			List<TimeFrequencyPoint> TimeFrequencyPoitns = new List<TimeFrequencyPoint>();
+			double[] HammingWindow = FastFourierTransformation.GenerateHammingWindow((uint)bufferSize);
+			double Avg = 0d;// = GetBinAverage(data, HammingWindow);
+
+			int offset = 0;
+			var sampleData = new double[bufferSize * 2]; //*2  because of Re + Im
+			uint AbsTime = 0;
+			while (offset < data.Length)
+			{
+				if (offset + bufferSize < data.Length)
+				{
+					for (int i = 0; i < bufferSize; i++) //setup for FFT
+					{
+						sampleData[i * 2] = data[i + offset] * HammingWindow[i];
+						sampleData[i * 2 + 1] = 0d;
+					}
+
+					FastFourierTransformation.FFT(sampleData);
+					double[] maxs =
+					{
+						GetStrongestBin(data, 0, 10),
+						GetStrongestBin(data, 10, 20),
+						GetStrongestBin(data, 20, 40),
+						GetStrongestBin(data, 40, 80),
+						GetStrongestBin(data, 80, 160),
+						GetStrongestBin(data, 160, 512),
+					};
+
+
+					for (int i = 0; i < maxs.Length; i++)
+					{
+						Avg += maxs[i];
+					}
+
+					Avg /= maxs.Length;
+					//get doubles of frequency and time 
+					RegisterTFPoints(sampleData, Avg, AbsTime, ref TimeFrequencyPoitns, sensitivity);
+
+				}
+
+				offset += bufferSize;
+				AbsTime++;
+			}
+
+			return TimeFrequencyPoitns;
+		}
+
+		/// <summary>
+		/// Returns normalized value of the strongest bin in given bounds
+		/// </summary>
+		/// <param name="bins">Complex values alternating Real and Imaginary values</param>
+		/// <param name="from">lower bound</param>
+		/// <param name="to">upper bound</param>
+		/// <returns>Normalized value of the strongest bin</returns>
+		private static double GetStrongestBin(double[] bins, int from, int to)
+		{
+			var max = double.MinValue;
+			for (int i = from; i < to; i++)
+			{
+				var normalized = 2 * Math.Sqrt((bins[i * 2] * bins[i * 2] + bins[i * 2 + 1] * bins[i * 2 + 1]) / 2048);
+				var decibel = 20 * Math.Log10(normalized);
+
+				if (decibel > max)
+				{
+					max = decibel;
+				}
+
+			}
+
+			return max;
+		}
+
+		/// <summary>
+		/// Filter outs the strongest bins of logarithmically scaled parts of bins. Chooses the strongest and remembers it if its value is above average. Those points are
+		/// chornologically added to the <c>timeFrequencyPoints</c> List.
+		/// </summary>
+		/// <param name="data">bins to choose from, alternating real and complex values as doubles. Must contain 512 complex values</param>
+		/// <param name="average">Limit that separates weak spots from important ones.</param>
+		/// <param name="absTime">Absolute time in the song.</param>
+		/// <param name="timeFrequencyPoitns">List to add points to.</param>
+		private static void RegisterTFPoints(double[] data, in double average, in uint absTime, ref List<TimeFrequencyPoint> timeFrequencyPoitns, double coefficient = 0.9)
+		{
+			int[] BinBoundries =
+			{
+				//low   high
+				0 , 10,
+				10, 20,
+				20, 40,
+				40, 80,
+				80, 160,
+				160,512
+			};
+
+			//loop through logarithmically scalled sections of bins
+			for (int i = 0; i < BinBoundries.Length / 2; i++)
+			{
+				//get strongest bin from a section if its above average
+				var idx = GetStrongestBinIndex(data, BinBoundries[i * 2], BinBoundries[i * 2 + 1], average, coefficient);
+				if (idx != null)
+				{
+					//idx is divided by 2 because of (Re + Im)
+					timeFrequencyPoitns.Add(new TimeFrequencyPoint { Time = absTime, Frequency = (uint)idx / 2 });
+				}
+			}
+		}
+
+		/// <summary>
+		/// Finds the strongest bin above limit in given segment.
+		/// </summary>
+		/// <param name="bins">Complex values alternating Real and Imaginary values</param>
+		/// <param name="from">lower bound</param>
+		/// <param name="to">upper bound</param>
+		/// <param name="limit">limit indicating weak bin</param>
+		/// <param name="sensitivity">sensitivity of the limit (the higher the lower sensitivity)</param>
+		/// <returns>index of strongest bin or null if none of the bins is strong enought</returns>
+		private static int? GetStrongestBinIndex(double[] bins, int from, int to, double limit, double sensitivity = 0.9d)
+		{
+			var max = double.MinValue;
+			int? index = null;
+			for (int i = from; i < to; i++)
+			{
+				var normalized = 2 * Math.Sqrt((bins[i * 2] * bins[i * 2] + bins[i * 2 + 1] * bins[i * 2 + 1]) / 2048);
+				var decibel = 20 * Math.Log10(normalized);
+
+				if (decibel > max && decibel * sensitivity > limit)
+				{
+					max = decibel;
+					index = i * 2;
+				}
+
+			}
+
+			return index;
+		}
+
+		/// <summary>
+		/// Picks the song with the most notes setting the recording to the same offset int the original song.
 		/// </summary>
 		/// <param name="deltas">[songID, num of time coherent notes]</param>
 		/// <param name="totalNotes">total number of notes in recording</param>
@@ -508,5 +678,6 @@ namespace AudioRecognitionLibrary.Recognizer
 			return res;
 		}
 
+		#endregion
 	}
 }

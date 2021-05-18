@@ -5,6 +5,9 @@ using System.Text;
 
 namespace AudioRecognitionLibrary.Processor
 {
+	/// <summary>
+	/// Fast Fourier Transformation provider.
+	/// </summary>
 	public class FastFourierTransformation
 	{
 		/// <summary>
@@ -125,5 +128,40 @@ namespace AudioRecognitionLibrary.Processor
 			}
 		}
 
+		#region Window Functions
+		public static double[] GenerateHammingWindow(uint windowSize)
+		{
+			var Window = new double[windowSize];
+
+			for (uint i = 0; i < windowSize; i++)
+			{
+				Window[i] = 0.54 - 0.46 * Math.Cos((2 * Math.PI * i) / windowSize);
+			}
+
+			return Window;
+		}
+		public static double[] GenerateBlackmannHarrisWindow(uint windowSize)
+		{
+			var Window = new double[windowSize];
+
+			for (uint i = 0; i < windowSize; i++)
+			{
+				Window[i] = 0.35875 - (0.48829 * Math.Cos((2 * Math.PI * i) / windowSize)) + (0.14128 * Math.Cos((4 * Math.PI * i) / windowSize)) - (0.01168 * Math.Cos((6 * Math.PI * i) / windowSize));
+			}
+
+			return Window;
+		}
+		public static double[] GenerateHannWindow(uint windowSize)
+		{
+			var Window = new double[windowSize];
+
+			for (uint i = 0; i < windowSize; i++)
+			{
+				Window[i] = 0.5 * (1 - Math.Cos((2 * Math.PI * i) / windowSize));
+			}
+
+			return Window;
+		}
+		#endregion
 	}
 }

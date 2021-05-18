@@ -71,7 +71,7 @@ namespace BP.Server.Controllers
 			uint maxId = _context.Songs.Max(song => song.Id);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddTFPToDataStructure(songToUpload.TFPs, maxId, searchData);
+			_recognizer.AddTFPToGivenDatabase(songToUpload.TFPs, maxId, searchData);
 
 			// Update data in database
 			_searchDataInstance.SaveToDB(songToUpload.BPM);

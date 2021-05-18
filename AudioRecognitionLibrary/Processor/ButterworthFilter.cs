@@ -5,16 +5,16 @@ using System.Text;
 namespace AudioRecognitionLibrary.Processor
 {
 	/// <summary>
-	/// Not my implementation
+	/// Butterworth filter provider.
 	/// </summary>
 	public static class ButterworthFilter
 	{
 		/// <summary>
 		/// Implementation taken from <see cref="https://www.codeproject.com/Tips/1092012/A-Butterworth-Filter-in-Csharp"/>
 		/// </summary>
-		/// <param name="indata"></param>
-		/// <param name="Samplingrate"></param>
-		/// <param name="CutOff"></param>
+		/// <param name="indata">PCM 16bit audio data</param>
+		/// <param name="Samplingrate">Original sample rate</param>
+		/// <param name="CutOff">Cut off frequency</param>
 		/// <returns></returns>
 		public static double[] Butterworth(double[] indata, double Samplingrate, double CutOff)
 		{
