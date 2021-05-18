@@ -71,7 +71,7 @@ namespace BP.Server.Controllers
 			uint maxId = _context.Songs.Max(song => song.Id);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddTFPToGivenDatabase(songToUpload.Fingerprint, maxId, searchData);
+			_recognizer.AddFingerprintToDatabase(songToUpload.Fingerprint, maxId, searchData);
 
 			// Update data in database
 			_searchDataInstance.SaveToDB(songToUpload.BPM);

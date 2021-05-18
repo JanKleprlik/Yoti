@@ -43,10 +43,11 @@ namespace AudioRecognitionLibrary.Recognizer
 		#region public API
 
 		/// <summary>
+		/// Creates fingerprint of given audio.
 		/// WARNING: Converts audio into single channel.
 		/// </summary>
-		/// <param name="audio"></param>
-		/// <returns></returns>
+		/// <param name="audio">Audio whos fingerprint we want.</param>
+		/// <returns>Fingerprint. <br></br>[address; (absolute anchor times)]<br></br>Address is the hash.</returns>
 		public Dictionary<uint, List<uint>> GetAudioFingerprint(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
@@ -64,13 +65,22 @@ namespace AudioRecognitionLibrary.Recognizer
 			return fingerprint;
 		}
 
-		public uint? RecognizeSong(Dictionary<uint, List<uint>> fingerprint, Dictionary<uint, List<ulong>> database, out double probability, int TFPCount, TextWriter textWriter = null)
+		/// <summary>
+		/// Recognizes song in provided database of fingerprints.
+		/// </summary>
+		/// <param name="fingerprint">Fingerprint of audio to be recognized.</param>
+		/// <param name="database">Database of fingerprints to find match at.</param>
+		/// <param name="accuracy">Accuracy of final match.</param>
+		/// <param name="TFPCount">Original count of TFP before fingerprint creation. Needed to compute accuracy.</param>
+		/// <param name="textWriter">TextWriter to write information about recognition process into.</param>
+		/// <returns>Id of recognized song.</returns>
+		public uint? RecognizeSong(Dictionary<uint, List<uint>> fingerprint, Dictionary<uint, List<ulong>> database, out double accuracy, int TFPCount, TextWriter textWriter = null)
 		{
 			//set custom output if not set at initialization
 			if (!IsOutputSet && textWriter != null)
 				output = textWriter;
 
-			uint? finalSongID = FindBestMatch(database, fingerprint, out probability, TFPCount);
+			uint? finalSongID = FindBestMatch(database, fingerprint, out accuracy, TFPCount);
 
 			//unset custom output
 			if (!IsOutputSet)
@@ -79,7 +89,13 @@ namespace AudioRecognitionLibrary.Recognizer
 			return finalSongID;
 		}
 
-		public void AddTFPToGivenDatabase(Dictionary<uint, List<uint>> fingerprint, in uint songID, Dictionary<uint, List<ulong>> database)
+		/// <summary>
+		/// Adds fingerprint into database.
+		/// </summary>
+		/// <param name="fingerprint">Fingerprint to be added.</param>
+		/// <param name="songID">Id of song whose fingerprint is to be added.</param>
+		/// <param name="database">Part of database to add fingerprint into.</param>
+		public void AddFingerprintToDatabase(Dictionary<uint, List<uint>> fingerprint, in uint songID, Dictionary<uint, List<ulong>> database)
 		{
 			// Iterate all hashes in fingerprint and add them to database
 			foreach(KeyValuePair<uint, List<uint>> hash in fingerprint)
@@ -100,27 +116,38 @@ namespace AudioRecognitionLibrary.Recognizer
 
 
 		/// <summary>
+		/// Obtains BPM of given audio.
 		/// WARNING: Converts audio into single chanel.
 		/// </summary>
-		/// <param name="audio"></param>
-		/// <returns></returns>
-		public int GetBPM(IAudioFormat audio,bool approximate = false)
+		/// <param name="song">Audio to get BPM of.</param>
+		/// <param name="approximate">Flag wether to approximate BPM in intervals of size set at <see cref="AudioRecognizer.Parameters"/></param>
+		/// <returns>BPM of the song.</returns>
+		public int GetBPM(IAudioFormat song,bool approximate = false)
 		{
-			AudioProcessor.ConvertToMono(audio);
-			//using floats instead of doubles here because of filters from NAudio library
-			float[] data = Array.ConvertAll(audio.Data, item => (float)item);
+			// Multiple audio channels do not improve BPM identification.
+			AudioProcessor.ConvertToMono(song);
+
+			// Using floats instead of doubles here because of filters from NAudio library
+			float[] data = Array.ConvertAll(song.Data, item => (float)item);
 
 
-			FilterBPMFrequencies(data, (float)audio.SampleRate);
+			FilterBPMFrequencies(data, (float)song.SampleRate);
 
-			EnergyPeak[] energyPeaks = GetEnergyPeaks(data, audio.SampleRate);
+			EnergyPeak[] energyPeaks = GetEnergyPeaks(data, song.SampleRate);
 
-			return GetMostProbableBPM(energyPeaks, (float)audio.SampleRate, approximate);
+			return GetMostProbableBPM(energyPeaks, (float)song.SampleRate, approximate);
 		}
 
 		#endregion
 
 		#region BPM helpers
+		/// <summary>
+		/// Computes most frequent BPM from given EnergyPeaks.
+		/// </summary>
+		/// <param name="energyPeaks">Energy peaks in the original audio.</param>
+		/// <param name="sampleRate">Original sample rate of the audio.</param>
+		/// <param name="approximate">Flag wether to approximate BPM in intervals of size set at <see cref="AudioRecognizer.Parameters"/></param>
+		/// <returns>Song's most probable BPM</returns>
 		private int GetMostProbableBPM(EnergyPeak[] energyPeaks, float sampleRate,bool approximate)
 		{
 			//<BPM, Count>
@@ -163,6 +190,14 @@ namespace AudioRecognitionLibrary.Recognizer
 			return resultBPM;
 		}
 
+		/// <summary>
+		///  Computes most probable BPM of two given peaks.
+		/// </summary>
+		/// <param name="currentPeak">Peak from which we compute the BPM.</param>
+		/// <param name="neighbourPeak">neighbour peak which we take into account when computing BPM.</param>
+		/// <param name="sampleRate">Original sample rate of the audio.</param>
+		/// <param name="approximate">Flag wether to approximate BPM in intervals of size set at <see cref="AudioRecognizer.Parameters"/></param>
+		/// <returns>BPM determined by currentPeak</returns>
 		private int GetPeakBPM(EnergyPeak currentPeak, EnergyPeak neighbourPeak, float sampleRate, bool approximate)
 		{
 			float deltaT = neighbourPeak.Time - currentPeak.Time;
@@ -184,6 +219,11 @@ namespace AudioRecognitionLibrary.Recognizer
 				return GetApproxBPM(potentialBPM);
 		}
 
+		/// <summary>
+		/// Approximates BPM into intervals of size set at <see cref="AudioRecognizer.Parameters"/>.
+		/// </summary>
+		/// <param name="inputBPM">Original BPM</param>
+		/// <returns>Approximated BPM.</returns>
 		private int GetApproxBPM(float inputBPM)
 		{
 			//round inputBPM to closest multiple of 5
@@ -192,6 +232,12 @@ namespace AudioRecognitionLibrary.Recognizer
 			return Math.Min(Math.Max(intervalizedBPM, Convert.ToInt32(Parameters.BPMLowLimit)), Convert.ToInt32(Parameters.BPMHighLimit));
 		}
 
+		/// <summary>
+		/// Creates Energy Peaks form audio data.
+		/// </summary>
+		/// <param name="data">Audio data.</param>
+		/// <param name="sampleRate">Original sample rate of the audio.</param>
+		/// <returns></returns>
 		private EnergyPeak[] GetEnergyPeaks(float[] data, uint sampleRate)
 		{
 			int samplesInPart = (int)sampleRate / Parameters.PartsPerSecond;
@@ -211,9 +257,9 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <summary>
 		/// Get maximum EnergyPeak from data in interval [start, start+steps]
 		/// </summary>
-		/// <param name="data"></param>
-		/// <param name="start"></param>
-		/// <param name="end"></param>
+		/// <param name="data">Audio data.</param>
+		/// <param name="start">Interval start.</param>
+		/// <param name="steps">Size of the interval.</param>
 		/// <returns></returns>
 		private EnergyPeak GetMaxEnergyPeak(float[] data, int start, int steps)
 		{
@@ -236,6 +282,12 @@ namespace AudioRecognitionLibrary.Recognizer
 			return max;
 		}
 
+		/// <summary>
+		/// Filters out frequencies not necessary for BPM recognition.<br></br>
+		/// Frequency limits are set in <see cref="AudioRecognizer.Parameters"/>.
+		/// </summary>
+		/// <param name="data">Audio data.</param>
+		/// <param name="sampleRate">Original sample rate of the audio.</param>
 		private void FilterBPMFrequencies(float[] data, float sampleRate)
 		{
 
@@ -276,6 +328,13 @@ namespace AudioRecognitionLibrary.Recognizer
 			return MaximizeTimeCoherency(deltas, TFPCount, out probability);
 		}
 
+		/// <summary>
+		/// Creates Time Frequency Points from raw audio data.
+		/// </summary>
+		/// <param name="bufferSize">Size of FFT buffer.</param>
+		/// <param name="data">Complex values alternating Real and Imaginary values.</param>
+		/// <param name="sensitivity">Sensitivity coeficient determining wether TFP is strong enought to be used or not.</param>
+		/// <returns>List of Time Frequency Points.</returns>
 		private static List<TimeFrequencyPoint> CreateTimeFrequencyPoints(int bufferSize, double[] data, double sensitivity = 0.9)
 		{
 			List<TimeFrequencyPoint> TimeFrequencyPoitns = new List<TimeFrequencyPoint>();
@@ -328,9 +387,9 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <summary>
 		/// Returns normalized value of the strongest bin in given bounds
 		/// </summary>
-		/// <param name="bins">Complex values alternating Real and Imaginary values</param>
-		/// <param name="from">lower bound</param>
-		/// <param name="to">upper bound</param>
+		/// <param name="bins">Complex values alternating Real and Imaginary values.</param>
+		/// <param name="from">Lower bound.</param>
+		/// <param name="to">Upper bound.</param>
 		/// <returns>Normalized value of the strongest bin</returns>
 		private static double GetStrongestBin(double[] bins, int from, int to)
 		{
@@ -358,6 +417,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="average">Limit that separates weak spots from important ones.</param>
 		/// <param name="absTime">Absolute time in the song.</param>
 		/// <param name="timeFrequencyPoitns">List to add points to.</param>
+		/// <param name="coefficient">Sensitivity coefficien determining wether TFP is strong enought to be registered.</param>
 		private static void RegisterTFPoints(double[] data, in double average, in uint absTime, ref List<TimeFrequencyPoint> timeFrequencyPoitns, double coefficient = 0.9)
 		{
 			int[] BinBoundries =
@@ -439,11 +499,11 @@ namespace AudioRecognitionLibrary.Recognizer
 		}
 
 		/// <summary>
-		/// Returns 
+		/// Computes maximum number of time coherent notes for each song.
 		/// </summary>
-		/// <param name="filteredSongs"></param>
-		/// <param name="recordAddresses"></param>
-		/// <returns></returns>
+		/// <param name="filteredSongs">Filtered songs from database with their fingerprints.<br></br>[songId, [address, (absolute anchor time)]]<br></br>Note: address is eqv. to the hash.</param>
+		/// <param name="recordAddresses">Recording addresses <br></br>[address, (absolute anchor time)]<br></br>Note: address is eqv. to the hash.</param>
+		/// <returns>Dict of songs with their number of maxium coherent notes.<br></br>[songId, timeCoherentNotes]</returns>
 		private static Dictionary<uint, int> GetDeltas(Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs, Dictionary<uint, List<uint>> recordAddresses)
 		{
 			//[songID, delta]
@@ -456,10 +516,6 @@ namespace AudioRecognitionLibrary.Recognizer
 				{
 					if (filteredSongs[songID].ContainsKey(address))
 					{
-						/*
-						 * DEBUG NOTE: at 400Hz song, there are 5 different addresses
-						 * 			- because: each TGZ has 5 samples so 5 offsets must be created
-						 */
 						foreach (var absSongAnchTime in filteredSongs[songID][address]) //foreach AbsSongAnchorTime at specific address 
 						{
 							foreach (var absRecAnchTime in recordAddresses[address]) //foreach AbsRecordAnchorTime at specific address
@@ -473,7 +529,7 @@ namespace AudioRecognitionLibrary.Recognizer
 						}
 					}
 				}
-				//get number of notes that are coherent with the most deltas (each note has same delta from start of the song)
+				// Get number of notes that are coherent with the most deltas (each note has same delta from start of the song)
 				int timeCohNotes = MaximizeDelta(songDeltasQty);
 				maxTimeCoherentNotes.Add(songID, timeCohNotes);
 			}
@@ -537,15 +593,15 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <returns>[songID, [address, (absSongAnchorTime)]]</returns>
 		private Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordAddresses, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
 		{
-			//[songID, [address, (absSongAnchorTime)]]
+			// [songID, [address, (absSongAnchorTime)]]
 			Dictionary<uint, Dictionary<uint, List<uint>>> res = new Dictionary<uint, Dictionary<uint, List<uint>>>();
-			//[songID, common couple amount]
+			// [songID, common couple amount]
 			Dictionary<uint, int> commonCoupleAmount = new Dictionary<uint, int>();
-			//[songID, common couples in TGZ amount]
+			// [songID, common couples in TGZ amount]
 			Dictionary<uint, int> commonTGZAmount = new Dictionary<uint, int>();
 
-			//Create datastructure for fast search in time coherency check
-			//SongID -> Address -> absSongAnchorTime
+			// Create datastructure for fast search in time coherency check
+			// SongID -> Address -> absSongAnchorTime
 			foreach (var address in recordAddresses.Keys)
 			{
 				if (database.ContainsKey(address))
@@ -579,18 +635,6 @@ namespace AudioRecognitionLibrary.Recognizer
 				}
 			}
 
-			//Print number of common couples in each song and record
-			//foreach (uint songID in res.Keys)
-			//{
-			//	int couples = commonCoupleAmount[songID];
-			//	int TGZs = commonTGZAmount[songID];
-			//	//NOTE: result can be more than 100% (some parts of the songs may repeat - refrains)
-			//	if ((double) TGZs / couples > 0.6) //print only songs with over 60 % match
-			//	{
-			//		output.WriteLineAsync($"   Song ID: {songID} has {couples} couples where {TGZs} are in target zones: {Math.Min(100d, (double)TGZs / couples * 100):##.###} %");
-			//	}
-			//}
-
 			Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();
 
 			//remove songs that have low ratio of couples that make a TGZ
@@ -618,8 +662,8 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <summary>
 		/// Creates Address to Absolute time anchor dictionary out of TFPs
 		/// </summary>
-		/// <param name="timeFrequencyPoints"></param>
-		/// <returns></returns>
+		/// <param name="timeFrequencyPoints">Time Frequency points of the aduio.</param>
+		/// <returns>[address (absolute anchor times)]</returns>
 		private static Dictionary<uint, List<uint>> CreateRecordAddresses(List<TimeFrequencyPoint> timeFrequencyPoints)
 		{
 			Dictionary<uint, List<uint>> res = new Dictionary<uint, List<uint>>();
