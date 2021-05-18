@@ -43,12 +43,12 @@ namespace AudioRecognitionLibrary.Recognizer
 		#region public API
 
 		/// <summary>
-		/// Creates fingerprint of given audio.
+		/// Creates fingerprint of given audio and returns it together with number of valid notes. (needed to compute recognition accuracy). <br></br>
 		/// WARNING: Converts audio into single channel.
 		/// </summary>
 		/// <param name="audio">Audio whos fingerprint we want.</param>
-		/// <returns>Fingerprint. <br></br>[address; (absolute anchor times)]<br></br>Address is the hash.</returns>
-		public Dictionary<uint, List<uint>> GetAudioFingerprint(IAudioFormat audio)
+		/// <returns>Tuple where Item1 is fingerprint, Item2 is total number of notes. <br></br>fingerprint: [address; (absolute anchor times)]<br></br>Note: Address is the hash.</returns>
+		public Tuple<Dictionary<uint, List<uint>>, int> GetAudioFingerprint(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
 
@@ -62,7 +62,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			//[address;(AbsAnchorTimes)]
 			Dictionary<uint, List<uint>> fingerprint = CreateRecordAddresses(timeFrequencyPoints);
 
-			return fingerprint;
+			return new Tuple<Dictionary<uint, List<uint>>, int> (fingerprint, timeFrequencyPoints.Count);
 		}
 
 		/// <summary>

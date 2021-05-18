@@ -680,7 +680,7 @@ namespace BP.Shared.ViewModels
 		{
 			int BPM = recognizer.GetBPM(audioData, approximate: true);
 
-			var fingerprint = recognizer.GetAudioFingerprint(audioData);
+			var fingerprintNoteCountTuple = recognizer.GetAudioFingerprint(audioData);
 
 			PreprocessedSongData songWavFormat = new PreprocessedSongData
 			{
@@ -688,7 +688,8 @@ namespace BP.Shared.ViewModels
 				Name = songName,
 				Lyrics = lyrics,
 				BPM = BPM,
-				Fingerprint = fingerprint
+				Fingerprint = fingerprintNoteCountTuple.Item1,
+				TFPCount = fingerprintNoteCountTuple.Item2
 			};
 
 			return songWavFormat;
