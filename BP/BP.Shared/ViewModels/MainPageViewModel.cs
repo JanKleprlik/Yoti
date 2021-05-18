@@ -274,10 +274,10 @@ namespace BP.Shared.ViewModels
 			{
 				var lyricsShowDialog = new LyricsShowDialog(new Song()
 					{
-						lyrics = "No record.",
-						author = "Unknown",
-						name = "Lyrics",
-						bpm = 0
+						Lyrics = "No record.",
+						Author = "Unknown",
+						Name = "Lyrics",
+						BPM = 0
 					});
 				await lyricsShowDialog.ShowAsync();
 			}
@@ -566,18 +566,18 @@ namespace BP.Shared.ViewModels
 		/// <param name="result"></param>
 		private async Task WriteRecognitionResults(RecognitionResult result)
 		{
-			await textWriter.WriteLineAsync(result.detailinfo);
+			await textWriter.WriteLineAsync(result.DetailInfo);
 
-			if (result.song == null)
+			if (result.Song == null)
 			{
 				InformationText = $"Song was not recognized.";
 				WasRecognized = false;
 				return;
 			}
 
-			InformationText = $"\"{result.song.name}\" by {result.song.author}";
-			YouTubeLink = CreateYouTubeLink(result.song.name, result.song.author);
-			RecognizedSong = result.song;
+			InformationText = $"\"{result.Song.Name}\" by {result.Song.Author}";
+			YouTubeLink = CreateYouTubeLink(result.Song.Name, result.Song.Author);
+			RecognizedSong = result.Song;
 			WasRecognized = true;
 		}
 
@@ -672,13 +672,18 @@ namespace BP.Shared.ViewModels
 
 			var tfps = recognizer.GetTimeFrequencyPoints(audioData);
 
+			for (int i = 0; i < 10; i++)
+			{
+				this.Log().LogInformation($"F: {tfps[i].Frequency}\tT: {tfps[i].Time}");
+			}
+
 			PreprocessedSongData songWavFormat = new PreprocessedSongData
 			{
-				author = songAuthor,
-				name = songName,
-				lyrics = lyrics,
-				bpm = BPM,
-				tfps = tfps
+				Author = songAuthor,
+				Name = songName,
+				Lyrics = lyrics,
+				BPM = BPM,
+				TFPs = tfps
 			};
 
 			return songWavFormat;

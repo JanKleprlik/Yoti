@@ -61,7 +61,7 @@
 						<TextBlock
 							x:Name="SongID"
 							Grid.Column="0"
-							Text="{Binding id}"
+							Text="{Binding Id}"
 							VerticalAlignment="Center"
 							HorizontalAlignment="Left"
 							Style="{StaticResource DefaultTextBlock}"
@@ -69,7 +69,7 @@
 						<TextBlock
 							x:Name="SongName"
 							Grid.Column="1"
-							Text="{Binding name}"
+							Text="{Binding Name}"
 							Margin="0,0,0,0"
 							VerticalAlignment="Center"
 							HorizontalAlignment="Left"
@@ -78,7 +78,7 @@
 						<TextBlock
 							x:Name="SongAuthor"
 							Grid.Column="2"
-							Text="{Binding author}"
+							Text="{Binding Author}"
 							VerticalAlignment="Center"
 							HorizontalAlignment="Left"
 							Style="{StaticResource DefaultTextBlock}"

@@ -13,25 +13,41 @@ namespace BP.Server.Models
 {
 	public class SearchDataSingleton
 	{
-		//[BMP, [address, (songValue)]]
+		/// <summary>
+		/// Search data in memory.<br></br>
+		/// [BMP, [address, (songValue)]] <br></br>
+		/// </summary>
 		private readonly Dictionary<int ,Dictionary<uint, List<ulong>>> _searchData;
+
+		/// <summary>
+		/// Scope facotry for creating database scopes.
+		/// </summary>
 		private readonly IServiceScopeFactory scopeFactory;
 
+		/// <summary>
+		/// Base JSON serializer options
+		/// </summary>
+		private JsonSerializerOptions serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		/// <param name="scopeFactory"></param>
 		public SearchDataSingleton(IServiceScopeFactory scopeFactory)
 		{
 			this.scopeFactory = scopeFactory;
 
-			//populate scopeFactory with data
+			// Populate scopeFactory with data
 			using (var scope = scopeFactory.CreateScope())
 			{
 				var songContext = scope.ServiceProvider.GetRequiredService<SongContext>();
 
-				//upload searchData form database to memory
+				// Upload searchData form database to memory
 				List<SearchData> searchDatas = songContext.SearchDatas.ToList();
 				_searchData = new Dictionary<int, Dictionary<uint, List<ulong>>>();
 				foreach(SearchData searchData in searchDatas)
 				{
-					var songData = JsonSerializer.Deserialize<Dictionary<uint, List<ulong>>>(searchData.SongDataSerialized);
+					var songData = JsonSerializer.Deserialize<Dictionary<uint, List<ulong>>>(searchData.SongDataSerialized, serializerOptions);
 					_searchData.Add(searchData.BPM, songData);
 				}				
 			}
@@ -40,52 +56,28 @@ namespace BP.Server.Models
 		public Dictionary<int, Dictionary<uint, List<ulong>>> SearchData => _searchData;
 
 
-		public void SaveToDB()
-		{
-			using (var scope = scopeFactory.CreateScope())
-			{
-				var songContext = scope.ServiceProvider.GetRequiredService<SongContext>();
-				//Delete old records
-				songContext.SearchDatas.RemoveRange(songContext.SearchDatas);
-				songContext.SaveChanges();
-
-				var searchDatas = new SearchData[_searchData.Count];
-				int index = 0;
-
-				//Upload new records
-				foreach (KeyValuePair<int, Dictionary<uint, List<ulong>>> entry in _searchData)
-				{
-					searchDatas[index] = new SearchData
-					{
-						BPM = entry.Key,
-						SongDataSerialized = JsonSerializer.Serialize(entry.Value),
-					};
-
-					index++;
-				}
-				songContext.SearchDatas.AddRange(searchDatas);
-				songContext.SaveChanges();
-			}
-		}
-
+		/// <summary>
+		/// Save search data with given BPM from memory to database.
+		/// </summary>
+		/// <param name="BPM">BPM section to save to database</param>
 		public void SaveToDB(int BPM)
 		{
 			using (var scope = scopeFactory.CreateScope())
 			{
 				var songContext = scope.ServiceProvider.GetRequiredService<SongContext>();
 
-				//delete existing data first
+				// Delete existing data first
 				SearchData dataToDelete = songContext.SearchDatas.Where(sData => sData.BPM == BPM).FirstOrDefault();
 				if (dataToDelete != null)
 				{
-					//Remove SearchData with correct BPM
+					// Remove SearchData with correct BPM
 					songContext.SearchDatas.Remove(dataToDelete);
 					songContext.SaveChanges();
 				}
 				SearchData searchDataToSave = new SearchData
 				{
 					BPM = BPM,
-					SongDataSerialized = JsonSerializer.Serialize(_searchData[BPM]),
+					SongDataSerialized = JsonSerializer.Serialize(_searchData[BPM], serializerOptions),
 				};
 
 				songContext.SearchDatas.Add(searchDataToSave);

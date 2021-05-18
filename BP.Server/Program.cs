@@ -34,11 +34,11 @@ namespace BP.Server
 				try
 				{
 					var songContext = services.GetRequiredService<SongContext>();
-					//Delete database if exists
+					// Delete database if exists
 					//songContext.Database.EnsureDeleted();
-					//Create database
+					
+					// Create database
 					songContext.Database.EnsureCreated();
-					//DbInitializer.Initialize(songContext);
 				}
 				catch (Exception ex)
 				{
@@ -59,53 +59,5 @@ namespace BP.Server
 				{
 					webBuilder.UseStartup<Startup>();
 				});
-	}
-
-	public static class DbInitializer
-	{
-		public static void Initialize(SongContext context)
-		{
-
-			context.Songs.RemoveRange(context.Songs);
-			context.SearchDatas.RemoveRange(context.SearchDatas);
-
-			//WavFormat wavFormat = new WavFormat(outputArray);
-
-
-			#region COMMENTED
-			// Look for any students.
-			if (context.Songs.Any())
-			{
-				return;   // DB has been seeded
-			}
-
-			var songs = new Song[]
-			{
-				new Song{name="1", author="1", bpm = 0},
-				new Song{name="2", author="2", bpm = 0},
-				new Song{name="3", author="3", bpm = 0},
-				new Song{name="4", author="4", bpm = 0},
-				new Song{name="5", author="5", bpm = 0},
-				new Song{name="6", author="6", bpm = 0},
-				new Song{name="7", author="7", bpm = 0},
-				new Song{name="8", author="8", bpm = 0},
-				new Song{name="9", author="9", bpm = 0},
-				new Song{name="10", author="10", bpm = 0},
-
-			};
-
-			context.Songs.AddRange(songs);
-			context.SaveChanges();
-
-			//var searchData = new SearchData
-			//{
-			//	BPM = 0,
-			//	SongDataSerialized = JsonSerializer.Serialize(new Dictionary<uint, List<ulong>>()),
-			//};
-
-			//context.SearchDatas.Add(searchData);
-			//context.SaveChanges();
-			#endregion
-		}
 	}
 }

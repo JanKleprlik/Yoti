@@ -20,10 +20,6 @@ namespace BP.Server.Controllers
 	[ApiController]
 	public class RecognitionController : ControllerBase
 	{
-		private readonly SongContext _context;
-		private readonly SearchDataSingleton _searchDataInstance;
-		private readonly ILogger _logger;
-		private readonly AudioRecognizer _recognizer = new AudioRecognizer();
 		public RecognitionController(SongContext context, SearchDataSingleton searchDataCollection, ILogger<RecognitionController> logger)
 		{
 			_context = context;
@@ -31,32 +27,65 @@ namespace BP.Server.Controllers
 			_logger = logger;
 		}
 
-		// POST:recognition/AddNewSong
+		#region private fields
+
+		/// <summary>
+		/// Database context.
+		/// </summary>
+		private readonly SongContext _context;
+
+		/// <summary>
+		/// In memory search data.
+		/// </summary>
+		private readonly SearchDataSingleton _searchDataInstance;
+
+		/// <summary>
+		/// Logger.
+		/// </summary>
+		private readonly ILogger _logger;
+
+		/// <summary>
+		/// Recognizer algorithm .
+		/// </summary>
+		private readonly AudioRecognizer _recognizer = new AudioRecognizer();
+		#endregion
+
+
+		/// <summary>
+		/// POST: recognition/AddNewSong
+		/// </summary>
+		/// <param name="songToUpload">Preprocessed song to be added into the database.</param>
+		/// <returns>Uploaded song.</returns>
 		#region Upload new song
 		[HttpPost("[action]")]
-		public async Task<ActionResult<Song>> AddNewSong(PreprocessedSongData songToUpload)
+		public ActionResult<Song> AddNewSong(PreprocessedSongData songToUpload)
 		{
-			Song newSong = new Song { author = songToUpload.author, name = songToUpload.name, lyrics = songToUpload.lyrics, bpm = songToUpload.bpm};
+			Song newSong = new Song { Author = songToUpload.Author, Name = songToUpload.Name, Lyrics = songToUpload.Lyrics, BPM = songToUpload.BPM };
 
 			_logger.LogInformation("Getting correct searchdata");
-			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
-			
+			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
+
+			// Save song metadata
 			_context.Songs.Add(newSong);
 			_context.SaveChanges();
-			uint maxId = _context.Songs.Max(song => song.id);
+			uint maxId = _context.Songs.Max(song => song.Id);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddTFPToDataStructure(songToUpload.tfps, maxId, searchData);
+			_recognizer.AddTFPToDataStructure(songToUpload.TFPs, maxId, searchData);
 
-			//Update data in database
-			_searchDataInstance.SaveToDB(songToUpload.bpm);
+			// Update data in database
+			_searchDataInstance.SaveToDB(songToUpload.BPM);
 			_context.SaveChanges();
 
-			return CreatedAtAction(nameof(GetSong), new { id = newSong.id }, newSong);
+			return CreatedAtAction(nameof(GetSong), new { id = newSong.Id }, newSong);
 		}
 		#endregion
 
-		// POST:recognition/RecognizeSong
+		/// <summary>
+		/// POST: recognition/RecognizeSong
+		/// </summary>
+		/// <param name="songToUpload">Preprocessed audio to be recognized.</param>
+		/// <returns>Wrapped recognized song with info about recognition process.</returns>
 		#region Recognize song
 		[HttpPost("[action]")]
 		public async Task<ActionResult<RecognitionResult>> RecognizeSong(PreprocessedSongData songToUpload)
@@ -64,26 +93,26 @@ namespace BP.Server.Controllers
 			var stringWriter = new StringWriter();
 
 			_logger.LogDebug("Getting correct searchdata");
-			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.bpm);
+			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
 
 			_logger.LogDebug("Recognizing song");
 			double maxProbability = 0;
-			uint? songId = _recognizer.RecognizeSong(songToUpload.tfps, searchData, out maxProbability, stringWriter);
+			uint? songId = _recognizer.RecognizeSong(songToUpload.TFPs, searchData, out maxProbability, stringWriter);
 
 			if (songId == null)
 			{
 				_logger.LogDebug("Song not found by BPM");
 				foreach(KeyValuePair<int, Dictionary<uint, List<ulong>>> entry in _searchDataInstance.SearchData)
 				{
-					if (entry.Key == songToUpload.bpm)
+					if (entry.Key == songToUpload.BPM)
 						continue; //skip searchdata that was already searched through
 
 
 					searchData = GetSearchDataByBPM(entry.Key);
-					uint? potentialSongId = _recognizer.RecognizeSong(songToUpload.tfps, searchData, out double probability, stringWriter);
+					uint? potentialSongId = _recognizer.RecognizeSong(songToUpload.TFPs, searchData, out double probability, stringWriter);
 
-					//if result is not null and probabilty is higher than current max
-					//remember the id and new max probability
+					// If result is not null and probabilty is higher than current max
+					// remember the id and new max probability
 					if (potentialSongId != null && probability > maxProbability)
 					{
 						_logger.LogDebug($"New potential song id found: {potentialSongId} with proba: {probability} in BPM: {entry.Key}");
@@ -92,7 +121,7 @@ namespace BP.Server.Controllers
 					}
 				}
 			}
-			//write result probability
+			// Write result probability
 			if (songId != null)
 				await stringWriter.WriteLineAsync($"Recognized song with ID: {songId} is a {Math.Min(100d, maxProbability):##.#}% match.");
 
@@ -102,23 +131,28 @@ namespace BP.Server.Controllers
 			{
 				return new RecognitionResult
 				{
-					song = null,
-					detailinfo = stringWriter.ToString()
+					Song = null,
+					DetailInfo = stringWriter.ToString()
 				};
 			}
 			else
 			{
 				return new RecognitionResult
 				{
-					song = await _context.Songs.FindAsync((uint)songId),
-					detailinfo = stringWriter.ToString()
+					Song = await _context.Songs.FindAsync((uint)songId),
+					DetailInfo = stringWriter.ToString()
 				};
 
 			}
 		}
 		#endregion
 
-		// DELETE:recognition/DeleteSong
+
+		/// <summary>
+		/// DELETE: recognition/DeleteSong
+		/// </summary>
+		/// <param name="song">Song to delete.</param>
+		/// <returns>Deleted song.</returns>
 		#region Delete test
 		[HttpDelete("[action]")]
 		public async Task<ActionResult<Song>> DeleteSong(Song song)
@@ -137,7 +171,11 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
-		// GET: recognition/getsongs
+
+		/// <summary>
+		/// GET: recognition/getsongs
+		/// </summary>
+		/// <returns>List of songs in the database.</returns>
 		#region Get all songs
 		[HttpGet("[action]")]
 		public async Task<ActionResult<List<Song>>> GetSongs()
@@ -146,7 +184,12 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
-		// GET: recognition/getsong/{id}
+
+		/// <summary>
+		/// GET: recognition/getsong/{id}
+		/// </summary>
+		/// <param name="id">Id of the song to return.</param>
+		/// <returns>Song with corresponding Id.</returns>
 		#region Get song by Id
 		[HttpGet("[action]/{id}")]
 		public async Task<ActionResult<Song>> GetSong(uint id)
@@ -161,7 +204,12 @@ namespace BP.Server.Controllers
 		}
 		#endregion
 
-		// DELETE:recognition/deletesongbyid/{id}
+
+		/// <summary>
+		/// DELETE: recognition/deletesongbyid/{id}
+		/// </summary>
+		/// <param name="id">Id of the song to be deleted.</param>
+		/// <returns>Deleted song.</returns>
 		#region Delete test by Id
 		[HttpDelete("[action]/{id}")]
 		public async Task<ActionResult<Song>> DeleteSongById(uint id)
@@ -186,6 +234,12 @@ namespace BP.Server.Controllers
 		#endregion
 
 		#region Private helpers
+
+		/// <summary>
+		/// Obtain search data from database by BPM.
+		/// </summary>
+		/// <param name="BPM">BPM determining search data to be returned.</param>
+		/// <returns>Search data of songs with given BPM.</returns>
 		private Dictionary<uint, List<ulong>> GetSearchDataByBPM(int BPM)
 		{
 			if (!_searchDataInstance.SearchData.ContainsKey(BPM)) //doesnt contains the BPM yet -> add it
@@ -197,16 +251,21 @@ namespace BP.Server.Controllers
 			return _searchDataInstance.SearchData[BPM];
 		}
 
+		/// <summary>
+		/// Set search data by given BPM.
+		/// </summary>
+		/// <param name="BPM">BPM of the search data</param>
+		/// <param name="searchData">Search data to be set</param>
 		private void SetSearchDataByBPM(int BPM, Dictionary<uint, List<ulong>> searchData)
 		{
-			//doesnt contains the BPM yet -> add it
+			// It doesnt contains the BPM yet -> add it
 			if (!_searchDataInstance.SearchData.ContainsKey(BPM)) 
 			{
 				_searchDataInstance.SearchData.TryAdd(
 					BPM, //BPM
 					searchData); //empty SongData
 			}
-			//replace current search data on the BPM
+			// Replace current search data on the BPM
 			else
 			{
 				_searchDataInstance.SearchData[BPM] = searchData;
@@ -214,41 +273,48 @@ namespace BP.Server.Controllers
 			
 		}
 
+		/// <summary>
+		/// Delete search data of given song from database.
+		/// </summary>
+		/// <param name="song">Song whose search data are to be deleted.</param>
 		private void DeleteSongFromSearchData(Song song)
 		{
-			uint deleteSongId= song.id;
+			uint deleteSongId= song.Id;
 
-			Dictionary<uint, List<ulong>> oldSearchData = GetSearchDataByBPM(song.bpm);
+			Dictionary<uint, List<ulong>> oldSearchData = GetSearchDataByBPM(song.BPM);
 			Dictionary<uint, List<ulong>> newSearchData = new Dictionary<uint, List<ulong>>();
 
-
+			// Iterate over all entries in old search data
 			foreach (KeyValuePair<uint, List<ulong>> entry in oldSearchData)
 			{
 				List<ulong> songDataList = new List<ulong>();
 
+				// Iterate over all songDatas (Abs data & songID).
 				foreach (ulong songData in entry.Value)
 				{
-					//do not add into new searchData if songID is same as deleteSongID
-					//cast type to int is because ulong songID consists of:
-					//32 bits of Absolute time of Anchor
-					//32 bits of songID
+					// If deleteSongId is different from the Id in current songData
+					// add it to new songDataList that will be in new search data.
+					// Cast songData int is because ulong songID consists of:
+					// 32 bits of Absolute time of Anchor
+					// 32 bits of songID
 					if (deleteSongId != (uint)songData)
 					{
-						//add songData to new search Data
+						// Add songData to new search Data
 						songDataList.Add(songData);
 					}
 				}
 
-				//if some songs live on entry.Key 
-				//put them into newSearchData
+				// If some songData survive on entry.Key 
+				// put them into newSearchData
 				if (songDataList.Count != 0)
 				{
 					newSearchData.Add(entry.Key, songDataList);
 				}
 			}
 
-			_searchDataInstance.SearchData[song.bpm] = newSearchData;
-			_searchDataInstance.SaveToDB(song.bpm);
+			// Replace new search Data
+			_searchDataInstance.SearchData[song.BPM] = newSearchData;
+			_searchDataInstance.SaveToDB(song.BPM);
 
 		}
 

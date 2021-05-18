@@ -6,39 +6,77 @@ using System.Collections.Generic;
 
 namespace Database
 {
+	/// <summary>
+	/// Class keeping information about a song.
+	/// </summary>
 	public class Song
 	{
-		public uint id { get; set; }
-
-		public string name { get; set; }
-
-		public string author { get; set; }
-
-		public string lyrics { get; set; }
-
-		public int bpm { get; set; }
+		/// <summary>
+		/// Id of the song.
+		/// </summary>
+		public uint Id { get; set; }
+		/// <summary>
+		/// Name of the song.
+		/// </summary>
+		public string Name { get; set; }
+		/// <summary>
+		/// Name of the author of the song.
+		/// </summary>
+		public string Author { get; set; }
+		/// <summary>
+		/// Lyrics of the song.
+		/// </summary>
+		public string Lyrics { get; set; }
+		/// <summary>
+		/// BPM of the song.
+		/// </summary>
+		public int BPM { get; set; }
 
 		public override string ToString()
 		{
-			return $"{id} ----  {name} ---- {author} ---- {bpm}";
+			return $"{Id} ----  {Name} ---- {Author} ---- {BPM}";
 		}
 	}
-
+	/// <summary>
+	/// Preprocessed song wrapper used for client-server comunication.
+	/// </summary>
 	public class PreprocessedSongData
 	{
-		//public WavFormat Format { get; set; }
-		public List<TimeFrequencyPoint> tfps { get; set; }
-		public string name { get; set; }
-		public string author { get; set; }
-		public string lyrics { get; set; }
-		public int bpm {get; set;}
+		/// <summary>
+		/// List of Time Frequency Points representing the song.
+		/// </summary>
+		public List<TimeFrequencyPoint> TFPs { get; set; }
+		/// <summary>
+		/// Name of the song.
+		/// </summary>
+		public string Name { get; set; }
+		/// <summary>
+		/// Name of the author of the song.
+		/// </summary>
+		public string Author { get; set; }
+		/// <summary>
+		/// Lyrics of the song.
+		/// </summary>
+		public string Lyrics { get; set; }
+		/// <summary>
+		/// BPM of the song.
+		/// </summary>
+		public int BPM {get; set;}
 	}
 
+	/// <summary>
+	/// Recognition result wrapper used for client-server comunication..
+	/// </summary>
 	public class RecognitionResult
 	{
-		public Song song { get; set; }
-
-		public string detailinfo { get; set; }
+		/// <summary>
+		/// Recognized song.
+		/// </summary>
+		public Song Song { get; set; }
+		/// <summary>
+		/// Detailed information about recognition process.
+		/// </summary>
+		public string DetailInfo { get; set; }
 	}
 
 }

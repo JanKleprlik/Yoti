@@ -23,7 +23,7 @@ namespace BP.Shared.ViewModels
 		/// </summary>
 		public string Lyrics
 		{
-			get => _song.lyrics.Replace("\r\n", Environment.NewLine); //unify NewLine according to app enviroment
+			get => _song.Lyrics.Replace("\r\n", Environment.NewLine); //unify NewLine according to app enviroment
 			private set	{ /*nothing should happen*/ }
 		}
 		/// <summary>
@@ -31,7 +31,7 @@ namespace BP.Shared.ViewModels
 		/// </summary>
 		public string Name
 		{
-			get => _song.name;
+			get => _song.Name;
 			private set { /*nothing should happen*/ }
 		}
 	}
