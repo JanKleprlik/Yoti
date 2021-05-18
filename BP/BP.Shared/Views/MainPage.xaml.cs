@@ -23,8 +23,10 @@ namespace BP.Shared.Views
         {
             this.InitializeComponent();
 
-			MainPageViewModel = new MainPageViewModel(outputTextBox, new Settings(), Dispatcher);
+			Settings appSettings = new Settings();
 
+			SettingsViewModel = new SettingsViewModel(appSettings);
+			MainPageViewModel = new MainPageViewModel(outputTextBox, appSettings, SettingsViewModel, Dispatcher);
 			setupFlickerAnimation();
 		}
 
@@ -32,6 +34,8 @@ namespace BP.Shared.Views
 		/// Main page view model.
 		/// </summary>
 		public MainPageViewModel MainPageViewModel;
+
+		public SettingsViewModel SettingsViewModel;
 
 		/// <summary>
 		/// Animation indicating recording process.
@@ -49,6 +53,20 @@ namespace BP.Shared.Views
 			List<Song> songs = await recognizerApi.GetSongs();
 
 			Frame.Navigate(typeof(SongList), songs);
+		}
+
+		/// <summary>
+		/// Updates settings if naviaget to from Settings page..
+		/// </summary>
+		/// <param name="e"></param>
+		protected override void OnNavigatedTo(NavigationEventArgs e)
+		{
+			if (e.Parameter is Settings)
+			{
+				MainPageViewModel.Settings = e.Parameter as Settings;
+			}
+
+			base.OnNavigatedTo(e);
 		}
 
 

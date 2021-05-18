@@ -325,7 +325,7 @@
 				not_android:FontSize="20"
 				android:FontSize="10"
 				Foreground="{StaticResource SecondaryHighlightedColor}"
-				Visibility="{x:Bind MainPageViewModel.Settings.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+				Visibility="{x:Bind SettingsViewModel.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}"
 				/>
 			<TextBlock
 				x:Name="outputTextBox"
@@ -333,7 +333,7 @@
 				Height="Auto"
 				android:FontSize="10"
 				TextWrapping="Wrap"
-				Visibility="{x:Bind MainPageViewModel.Settings.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"
+				Visibility="{x:Bind SettingsViewModel.DetailedInfo, Converter={StaticResource BooleanToVisibilityConverter}, Mode=TwoWay}"
 				/>
 		</StackPanel>
 		</ScrollViewer>

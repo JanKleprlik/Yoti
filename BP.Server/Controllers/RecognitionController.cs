@@ -71,7 +71,7 @@ namespace BP.Server.Controllers
 			uint maxId = _context.Songs.Max(song => song.Id);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddTFPToGivenDatabase(songToUpload.TFPs, maxId, searchData);
+			_recognizer.AddTFPToGivenDatabase(songToUpload.Fingerprint, maxId, searchData);
 
 			// Update data in database
 			_searchDataInstance.SaveToDB(songToUpload.BPM);
@@ -97,7 +97,7 @@ namespace BP.Server.Controllers
 
 			_logger.LogDebug("Recognizing song");
 			double maxProbability = 0;
-			uint? songId = _recognizer.RecognizeSong(songToUpload.TFPs, searchData, out maxProbability, stringWriter);
+			uint? songId = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, out maxProbability, songToUpload.TFPCount, stringWriter);
 
 			if (songId == null)
 			{
@@ -109,7 +109,7 @@ namespace BP.Server.Controllers
 
 
 					searchData = GetSearchDataByBPM(entry.Key);
-					uint? potentialSongId = _recognizer.RecognizeSong(songToUpload.TFPs, searchData, out double probability, stringWriter);
+					uint? potentialSongId = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, out double probability, songToUpload.TFPCount, stringWriter);
 
 					// If result is not null and probabilty is higher than current max
 					// remember the id and new max probability

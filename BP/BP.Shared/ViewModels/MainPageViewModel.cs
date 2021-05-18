@@ -26,20 +26,23 @@ namespace BP.Shared.ViewModels
 		/// <param name="outputTextBlock">TextBlock control to write Detailed info into.</param>
 		/// <param name="settings">Starting settings for the application.</param>
 		/// <param name="UIDispatcher">CoreDispatcher used for dispatching replay of captured audio.</param>
-		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, CoreDispatcher UIDispatcher)
+		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, SettingsViewModel settingsViewModel, CoreDispatcher UIDispatcher)
 		{
 			textWriter = new TextBlockTextWriter(outputTextBlock);
 			Settings = settings;
 			this.UIDispatcher = UIDispatcher;
+			this.settingsViewModel = settingsViewModel;
 
 			recognizer = new AudioRecognizer(textWriter);
+
+			// Audio Provider on WASM is handled in javascript
 #if NETFX_CORE || __ANDROID__
 			audioRecorder = new AudioDataProvider();
 #endif
 		}
 
 
-		#region private fields
+		#region private properties
 
 		/// <summary>
 		/// Song recognizer
@@ -64,7 +67,7 @@ namespace BP.Shared.ViewModels
 		/// <summary>
 		/// API provider for communication with server side.
 		/// </summary>
-		private RecognizerApi recognizerApi = new RecognizerApi();
+		private RecognizerApi recognizerApi { get; set; } = new RecognizerApi();
 
 		/// <summary>
 		/// UI dispatcher used to replay audio recording on UWP.
@@ -77,6 +80,12 @@ namespace BP.Shared.ViewModels
 		/// both by uploading file and recording by microphone.
 		/// </summary>
 		private AudioDataProvider audioRecorder { get; set; }
+
+		/// <summary>
+		/// Settings View Model connecting Settings Page and Main Page
+		/// So changes in settings pages are immediately shown on Main Page.
+		/// </summary>
+		private SettingsViewModel settingsViewModel { get; set; }
 #endif
 		#endregion
 
@@ -293,7 +302,7 @@ namespace BP.Shared.ViewModels
 		/// </summary>
 		public async void ShowSettings()
 		{
-			var settingsDialog = new SettingsDialog(new SettingsViewModel(Settings));
+			var settingsDialog = new SettingsDialog(settingsViewModel);
 			ContentDialogResult result = await settingsDialog.ShowAsync();
 		}
 
@@ -658,7 +667,7 @@ namespace BP.Shared.ViewModels
 		}
 
 		/// <summary>
-		/// Creates Time Frequecy Points, gets BPM of song and wraps it together with song name,author name and lyrics 
+		/// Creates song fingerprint, gets BPM of the song and wraps it together with song name,author name and lyrics 
 		/// into PreprocessedSongData instance so it can be send to the server.
 		/// </summary>
 		/// <param name="songAuthor">Name of the song.</param>
@@ -670,12 +679,7 @@ namespace BP.Shared.ViewModels
 		{
 			int BPM = recognizer.GetBPM(audioData, approximate: true);
 
-			var tfps = recognizer.GetTimeFrequencyPoints(audioData);
-
-			for (int i = 0; i < 10; i++)
-			{
-				this.Log().LogInformation($"F: {tfps[i].Frequency}\tT: {tfps[i].Time}");
-			}
+			var fingerprint = recognizer.GetAudioFingerprint(audioData);
 
 			PreprocessedSongData songWavFormat = new PreprocessedSongData
 			{
@@ -683,7 +687,7 @@ namespace BP.Shared.ViewModels
 				Name = songName,
 				Lyrics = lyrics,
 				BPM = BPM,
-				TFPs = tfps
+				Fingerprint = fingerprint
 			};
 
 			return songWavFormat;

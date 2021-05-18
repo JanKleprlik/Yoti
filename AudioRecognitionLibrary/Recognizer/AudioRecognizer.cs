@@ -47,7 +47,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// </summary>
 		/// <param name="audio"></param>
 		/// <returns></returns>
-		public List<TimeFrequencyPoint> GetTimeFrequencyPoints(IAudioFormat audio)
+		public Dictionary<uint, List<uint>> GetAudioFingerprint(IAudioFormat audio)
 		{
 			AudioProcessor.ConvertToMono(audio);
 
@@ -56,18 +56,21 @@ namespace AudioRecognitionLibrary.Recognizer
 			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate);
 
 			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef; //default: 4096/4 = 1024
-			var TimeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
+			var timeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
 
-			return TimeFrequencyPoints;
+			//[address;(AbsAnchorTimes)]
+			Dictionary<uint, List<uint>> fingerprint = CreateRecordAddresses(timeFrequencyPoints);
+
+			return fingerprint;
 		}
 
-		public uint? RecognizeSong(List<TimeFrequencyPoint> timeFrequencyPoints, Dictionary<uint, List<ulong>> database, out double probability, TextWriter textWriter = null)
+		public uint? RecognizeSong(Dictionary<uint, List<uint>> fingerprint, Dictionary<uint, List<ulong>> database, out double probability, int TFPCount, TextWriter textWriter = null)
 		{
 			//set custom output if not set at initialization
 			if (!IsOutputSet && textWriter != null)
 				output = textWriter;
 
-			uint? finalSongID = FindBestMatch(database, timeFrequencyPoints, out probability);
+			uint? finalSongID = FindBestMatch(database, fingerprint, out probability, TFPCount);
 
 			//unset custom output
 			if (!IsOutputSet)
@@ -76,49 +79,22 @@ namespace AudioRecognitionLibrary.Recognizer
 			return finalSongID;
 		}
 
-		public void AddTFPToGivenDatabase(List<TimeFrequencyPoint> timeFrequencyPoints, in uint songID, Dictionary<uint, List<ulong>> database)
+		public void AddTFPToGivenDatabase(Dictionary<uint, List<uint>> fingerprint, in uint songID, Dictionary<uint, List<ulong>> database)
 		{
-			/* spectogram:
-			 *
-			 * |
-			 * |       X X
-			 * |         X
-			 * |     X     X
-			 * |   X         X
-			 * | X X X     X
-			 * x----------------
-			 */
-
-
-			// -targetZoneSize: because of end limit 
-			// -1: because of anchor point at -2 position target zone
-			int stopIdx = timeFrequencyPoints.Count - Parameters.TargetZoneSize - Parameters.AnchorOffset;
-			for (int i = 0; i < stopIdx; i++)
+			// Iterate all hashes in fingerprint and add them to database
+			foreach(KeyValuePair<uint, List<uint>> hash in fingerprint)
 			{
-				//anchor is at idx i
-				//1st in TZ is at idx i+3
-				//5th in TZ is at idx i+7
+				// Create entry in database with given Address (hash.key) if it does not exist yet.
+				if (!database.ContainsKey(hash.Key))
+					database.Add(hash.Key, new List<ulong>());
 
-				uint anchorFreq = timeFrequencyPoints[i].Frequency;
-				uint anchorTime = timeFrequencyPoints[i].Time;
-				ulong SongValue = Tools.Builders.BuildSongValue(anchorTime, songID);
-				for (int pointNum = 3; pointNum < Parameters.TargetZoneSize + 3; pointNum++)
+				// For each absolute anchor time create songValue (32 bits anchorTime & 32 bits songID)
+				// and add it to database.
+				foreach(uint anchorTime in hash.Value)
 				{
-					uint pointFreq = timeFrequencyPoints[i + pointNum].Frequency;
-					uint pointTime = timeFrequencyPoints[i + pointNum].Time;
-
-					uint address = Tools.Builders.BuildAddress(anchorFreq, pointFreq, pointTime - anchorTime);
-
-					if (!database.ContainsKey(address)) //create new instance if it doesnt exist
-					{
-						database.Add(address, new List<ulong>() { SongValue });
-					}
-					else //add SongValue to the list of
-					{
-						database[address].Add(SongValue);
-					}
+					ulong songValue = Tools.Builders.BuildSongValue(anchorTime, songID);
+					database[hash.Key].Add(songValue);
 				}
-
 			}
 		}
 
@@ -284,23 +260,20 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="timeFrequencyPoints">TFPs of recording</param>
 		/// <param name="probability">Probability of correct match.</param>
 		/// <returns></returns>
-		private uint? FindBestMatch(Dictionary<uint, List<ulong>> database, List<TimeFrequencyPoint> timeFrequencyPoints, out double probability)
+		private uint? FindBestMatch(Dictionary<uint, List<ulong>> database, Dictionary<uint, List<uint>> fingerprint, out double probability, int TFPCount)
 		{
-			//[address;(AbsAnchorTimes)]
-			Dictionary<uint, List<uint>> recordAddresses = CreateRecordAddresses(timeFrequencyPoints);
-			
 			// Get quantities of each SongValue to determine wether they make a complete TGZ (5+ points correspond to the same SongValue)
-			var quantities = GetSongValQuantities(recordAddresses, database);
+			var quantities = GetSongValQuantities(fingerprint, database);
 
 			// Filter songs and addresses that only 
-			var filteredSongs = FilterSongs(recordAddresses, quantities, database);
+			var filteredSongs = FilterSongs(fingerprint, quantities, database);
 
 			// Get longest delta for each song that says how many notes from recording are time coherent to the song
 			//[sognID, delta]
-			var deltas = GetDeltas(filteredSongs, recordAddresses);
+			var deltas = GetDeltas(filteredSongs, fingerprint);
 
 			// Pick the songID with highest delta occurance
-			return MaximizeTimeCoherency(deltas, timeFrequencyPoints.Count,out probability);
+			return MaximizeTimeCoherency(deltas, TFPCount, out probability);
 		}
 
 		private static List<TimeFrequencyPoint> CreateTimeFrequencyPoints(int bufferSize, double[] data, double sensitivity = 0.9)
@@ -650,7 +623,16 @@ namespace AudioRecognitionLibrary.Recognizer
 		private static Dictionary<uint, List<uint>> CreateRecordAddresses(List<TimeFrequencyPoint> timeFrequencyPoints)
 		{
 			Dictionary<uint, List<uint>> res = new Dictionary<uint, List<uint>>();
-
+			/* spectogram:
+			 *
+			 * |
+			 * |       X X
+			 * |         X
+			 * |     X     X
+			 * |   X         X
+			 * | X X X     X
+			 * x----------------
+			 */
 
 			// -targetZoneSize: because of end limit 
 			// -1: because of anchor point at -2 position target zone

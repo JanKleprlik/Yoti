@@ -43,9 +43,16 @@ namespace Database
 	public class PreprocessedSongData
 	{
 		/// <summary>
-		/// List of Time Frequency Points representing the song.
+		/// Fingerprint of the song.<br></br>
+		/// [address;(AbsAnchorTimes)]
 		/// </summary>
-		public List<TimeFrequencyPoint> TFPs { get; set; }
+		public Dictionary<uint, List<uint>> Fingerprint { get; set; }
+		
+		/// <summary>
+		/// Number of TPFs to determine match accuracy on recognition.
+		/// </summary>
+		public int TFPCount { get; set; }
+
 		/// <summary>
 		/// Name of the song.
 		/// </summary>
