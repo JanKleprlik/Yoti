@@ -14,6 +14,12 @@ namespace Visualizer.MusicModes
 
 		protected VertexArray VA { get; set; }
 
+		/// <summary>
+		/// Render one window of spectrogram.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="basePosition"></param>
+		/// <param name="binsToRender"></param>
 		public abstract void Render(double[] data, Vector2f basePosition, int binsToRender);
 
 		/// <summary>
@@ -22,7 +28,7 @@ namespace Visualizer.MusicModes
 		/// <para>High: White</para>
 		/// </summary>
 		/// <param name="n">Size of the fft window.</param>
-		/// <returns></returns>
+		/// <returns>Color of the pixel.</returns>
 		protected static Color IntensityToColor(double real, double imaginary, int n)
 		{
 			//Black : 0,0,0

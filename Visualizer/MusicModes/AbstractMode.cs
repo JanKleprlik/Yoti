@@ -4,6 +4,10 @@ using SFML.Graphics;
 
 namespace Visualizer.MusicModes
 {
+	/// <summary>
+	/// Abstract class of Visualisation. <br></br>
+	/// All visualization modes must inherit this class.
+	/// </summary>
 	abstract class AbstractMode : IVisualiserMode
 	{
 		#region Constructors
@@ -33,9 +37,19 @@ namespace Visualizer.MusicModes
 		#endregion
 
 		#region  API
+		/// <summary>
+		/// Render visualisation.
+		/// </summary>
+		/// <param name="window">Window to render to.</param>
 		public abstract void Draw(RenderWindow window);
+		/// <summary>
+		/// Update visualisation step.
+		/// </summary>
 		public abstract void Update();
 
+		/// <summary>
+		/// End visualisation.
+		/// </summary>
 		public virtual void Quit()
 		{
 			if (Song != null)

@@ -44,7 +44,7 @@ namespace Visualizer.MusicModes
 			timeText.DisplayedString = Song.PlayingOffset.AsSeconds().ToString();
 			double[] samples = new double[BufferSize]; //allocate array taht will be used at downsampling
 
-			Task t1 = Task.Factory.StartNew(() => setImaginaryAsync());
+			Task t1 = Task.Factory.StartNew(() => SetImaginary());
 
 			if (offset + BufferSize < SampleCount)
 			{
@@ -85,7 +85,7 @@ namespace Visualizer.MusicModes
 
 		}
 
-		private void setImaginaryAsync()
+		private void SetImaginary()
 		{
 			for (int i = 0; i < BufferSize / downSampleCoef; i++)
 			{

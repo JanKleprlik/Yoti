@@ -29,18 +29,25 @@ namespace Visualizer
 
 		#endregion
 
-		private static IVisualiserMode CreateMode(SoundBuffer sb, VisualisationModes vm, int downSampleCoef)
+		/// <summary>
+		/// Create concrete Visualisation mode.
+		/// </summary>
+		/// <param name="soundBuffer">Sound buffer reference.</param>
+		/// <param name="visualisationMode">Visualisation mode to be created.</param>
+		/// <param name="downSampleCoef">Coefficient to downsample audio when visualisating.</param>
+		/// <returns></returns>
+		private static IVisualiserMode CreateMode(SoundBuffer soundBuffer, VisualisationModes visualisationMode, int downSampleCoef)
 		{
-			switch (vm)
+			switch (visualisationMode)
 			{
 				case VisualisationModes.Amplitude:
-					return new AmplitudeMode(sb);
+					return new AmplitudeMode(soundBuffer);
 				case VisualisationModes.Frequencies:
-					return new FrequenciesMode(sb, downSampleCoef);
+					return new FrequenciesMode(soundBuffer, downSampleCoef);
 				case VisualisationModes.Spectrogram:
-					return new Spectrogram(sb, downSampleCoef);
+					return new Spectrogram(soundBuffer, downSampleCoef);
 				default:
-					throw new ArgumentException($"Mode {vm.ToString()} is not supported");
+					throw new ArgumentException($"Mode {visualisationMode.ToString()} is not supported");
 			}
 		}
 
@@ -50,6 +57,10 @@ namespace Visualizer
 		private const int width = 1224;
 		private const int height = 800;
 
+
+		/// <summary>
+		/// Runs main Visualisation loop.
+		/// </summary>
 		public void Run()
 		{
 			var mode = new SFML.Window.VideoMode(width, height);
@@ -75,6 +86,11 @@ namespace Visualizer
 			window.Close();
 		}
 
+		/// <summary>
+		/// User input handler.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void Window_KeyPressed(object sender, SFML.Window.KeyEventArgs e)
 		{
 			var window = (SFML.Window.Window)sender;

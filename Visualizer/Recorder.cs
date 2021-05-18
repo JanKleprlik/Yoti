@@ -8,11 +8,17 @@ namespace Visualizer
 {
 	public static class Recorder
 	{
+		/// <summary>
+		/// Creates concrete audio format from file.
+		/// </summary>
+		/// <param name="path">File Path.</param>
+		/// <returns>Concrete implementation of IAudioFormat</returns>
 		public static IAudioFormat GetAudio(string path)
 		{
 			byte[] data = File.ReadAllBytes(path);
 			IAudioFormat Sound;
 
+			// Currently only .wav files are supported.
 			if (path.EndsWith(".wav"))
 			{
 				//Check if the beginning starts with RIFF (currently only supported format of wav files)
