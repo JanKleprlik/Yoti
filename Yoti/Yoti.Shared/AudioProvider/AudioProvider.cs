@@ -17,6 +17,7 @@ using System.IO;
 using System.Threading;
 using Xamarin.Essentials;
 using System.Collections.Generic;
+using Windows.UI.Core;
 #endif
 
 
@@ -125,9 +126,6 @@ namespace Yoti.Shared.AudioProvider
 			return false;
 		}
 
-
-		#region RECORDING
-
 		/// <summary>
 		/// Platform specific audio recording using microphone.
 		/// </summary>
@@ -158,6 +156,107 @@ namespace Yoti.Shared.AudioProvider
 		}
 
 		/// <summary>
+		/// Returns raw audio data.
+		/// </summary>
+		/// <returns>Raw audio data as an array of bytes.</returns>
+		public async Task<byte[]> GetDataFromStream()
+		{
+			#region UWP
+#if NETFX_CORE
+			if (buffer == null)
+				throw new InvalidOperationException("Buffer should not be null");
+
+			byte[] data = new byte[buffer.Size];
+			DataReader dataReader = new DataReader(buffer.GetInputStreamAt(0));
+
+			await dataReader.LoadAsync((uint)buffer.Size);
+			dataReader.ReadBytes(data);
+			return data;
+#endif
+			#endregion
+
+			#region ANDROID
+#if __ANDROID__
+			return buffer;
+#endif
+			#endregion
+
+		}
+
+		/// <summary>
+		/// Replays recorded audio by microphone.
+		/// </summary>
+		/// <param name="UIDispatcher">UIDispatcher needed for UWP platform.</param>
+		public async void ReplayRecording(CoreDispatcher UIDispatcher)
+		{
+			#region UWP
+#if NETFX_CORE
+			// Do nothign without buffer
+			if (buffer == null)
+				return;
+
+
+			MediaElement playback = new MediaElement();
+			IRandomAccessStream audioBuffer;
+
+			lock (bufferLock)
+			{
+				audioBuffer = buffer.CloneStream();
+			}
+
+			if (audioBuffer == null)
+				throw new ArgumentNullException("buffer");
+
+			StorageFolder recordingFolder = ApplicationData.Current.TemporaryFolder;
+
+			// Replay async
+			await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+			{
+				StorageFile recordingFile = await recordingFolder.CreateFileAsync(audioFile, CreationCollisionOption.ReplaceExisting);
+
+				// Save buffer into file
+				using (IRandomAccessStream fs = await recordingFile.OpenAsync(FileAccessMode.ReadWrite))
+				{
+					await RandomAccessStream.CopyAndCloseAsync(audioBuffer.GetInputStreamAt(0), fs.GetOutputStreamAt(0));
+					await audioBuffer.FlushAsync();
+					audioBuffer.Dispose();
+				}
+
+				// Replay actuall recording
+				IRandomAccessStream replayStream = await recordingFile.OpenAsync(FileAccessMode.Read);
+				playback.SetSource(replayStream, recordingFile.FileType);
+				playback.Play();
+			});
+#endif
+			#endregion
+			#region ANDROID
+#if __ANDROID__
+			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
+			lock (bufferLock)
+			{
+				AudioTrack audioTrack = new AudioTrack.Builder()
+					.SetAudioAttributes(new AudioAttributes.Builder()
+						.SetUsage(AudioUsageKind.Media)
+						.SetContentType(AudioContentType.Music)
+						.Build())
+					.SetAudioFormat(new AudioFormat.Builder()
+						.SetEncoding(Encoding.Pcm16bit)
+						.SetSampleRate((int)Parameters.SamplingRate)
+						.SetChannelMask(channels)
+						.Build())
+					.SetBufferSizeInBytes(buffer.Length)
+					.Build();
+
+				audioTrack.Play();
+				audioTrack.Write(buffer, 0, buffer.Length);
+			}
+#endif
+				#endregion
+
+		}
+
+		#region Helper methods
+		/// <summary>
 		/// Starts the recording process.
 		/// </summary>
 		private async Task StartRecording()
@@ -175,7 +274,7 @@ namespace Yoti.Shared.AudioProvider
 				await SetupRecording();
 				var profile = MediaEncodingProfile.CreateWav(AudioEncodingQuality.Auto);
 				profile.Audio = AudioEncodingProperties.CreatePcm((uint)Parameters.SamplingRate, (uint)Parameters.Channels, 16);
-				
+
 				// Start recording
 				isRecording = true;
 				await audioCapture.StartRecordToStreamAsync(profile, buffer);
@@ -244,142 +343,20 @@ namespace Yoti.Shared.AudioProvider
 			}
 			else
 			{
-#region UWP
+				#region UWP
 #if NETFX_CORE
 				await audioCapture.StopRecordAsync();
 #endif
-#endregion
-#region ANDROID
+				#endregion
+				#region ANDROID
 #if __ANDROID__
 				recorder.Stop();
 				recorder.Dispose();
 #endif
-#endregion
+				#endregion
 				isRecording = false;
 			}
 		}
-
-		#endregion
-
-		#region Platform specific audio data getters
-#if NETFX_CORE
-
-		/// <summary>
-		/// Returns raw audio data.
-		/// </summary>
-		/// <returns>Raw audio data as an array of bytes.</returns>
-		public async Task<byte[]> GetDataFromStream_UWP()
-		{
-			if (buffer == null)
-				throw new InvalidOperationException("Buffer should not be null");
-
-			byte[] data = new byte[buffer.Size];
-			DataReader dataReader = new DataReader(buffer.GetInputStreamAt(0));
-
-			await dataReader.LoadAsync((uint)buffer.Size);
-			dataReader.ReadBytes(data);
-			return data;
-		}
-#endif
-
-#if __ANDROID__
-		/// <summary>
-		/// Returns raw audio data.
-		/// </summary>
-		/// <returns>Raw audio data as an array of bytes.</returns>
-		public byte[] GetDataFromStream_ANDROID()
-		{
-			return buffer;
-		}
-#endif
-		#endregion
-
-
-		#region Replay audio
-
-		#region UWP
-#if NETFX_CORE
-		
-		/// <summary>
-		/// Replays recorded audio by microphone.
-		/// </summary>
-		/// <param name="UIDispatcher"></param>
-		public async void ReplayRecordingUWP(CoreDispatcher UIDispatcher)
-		{
-			// Do nothign without buffer
-			if (buffer == null)
-				return;
-
-
-			MediaElement playback = new MediaElement();
-			IRandomAccessStream audioBuffer;
-
-			lock (bufferLock)
-			{
-				audioBuffer = buffer.CloneStream();
-			}
-
-			if (audioBuffer == null)
-				throw new ArgumentNullException("buffer");
-
-			StorageFolder recordingFolder = ApplicationData.Current.TemporaryFolder;
-
-			// Replay async
-			await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-			{
-				StorageFile recordingFile = await recordingFolder.CreateFileAsync(audioFile, CreationCollisionOption.ReplaceExisting);
-
-				// Save buffer into file
-				using (IRandomAccessStream fs = await recordingFile.OpenAsync(FileAccessMode.ReadWrite))
-				{
-					await RandomAccessStream.CopyAndCloseAsync(audioBuffer.GetInputStreamAt(0), fs.GetOutputStreamAt(0));
-					await audioBuffer.FlushAsync();
-					audioBuffer.Dispose();
-				}
-
-				// Replay actuall recording
-				IRandomAccessStream replayStream = await recordingFile.OpenAsync(FileAccessMode.Read);
-				playback.SetSource(replayStream, recordingFile.FileType);
-				playback.Play();
-			});
-
-		}
-#endif
-		#endregion
-
-		#region ANDROID
-#if __ANDROID__
-		/// <summary>
-		/// Replays recorded audio by microphone.
-		/// </summary>
-		public void ReplayRecordingANDROID()
-		{
-			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
-			lock (bufferLock)
-			{
-				AudioTrack audioTrack = new AudioTrack.Builder()
-					.SetAudioAttributes(new AudioAttributes.Builder()
-						.SetUsage(AudioUsageKind.Media)
-						.SetContentType(AudioContentType.Music)
-						.Build())
-					.SetAudioFormat(new AudioFormat.Builder()
-						.SetEncoding(Encoding.Pcm16bit)
-						.SetSampleRate((int) Parameters.SamplingRate)
-						.SetChannelMask(channels)
-						.Build())
-					.SetBufferSizeInBytes(buffer.Length)
-					.Build();
-
-				audioTrack.Play();
-				audioTrack.Write(buffer, 0, buffer.Length);
-			}
-		}
-		#endif
-		#endregion
-
-		#endregion
-
-		#region Helper methods
 
 
 		#region UWP

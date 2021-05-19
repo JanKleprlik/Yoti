@@ -163,12 +163,7 @@ namespace Yoti.Shared.ViewModels
 		/// </summary>
 		public void ReplayRecording()
 		{
-#if NETFX_CORE
-			audioRecorder.ReplayRecordingUWP(UIDispatcher);
-#endif
-#if __ANDROID__
-			audioRecorder.ReplayRecordingANDROID();
-#endif
+			audioRecorder.ReplayRecording(UIDispatcher);
 		}
 #endif 
 
@@ -543,12 +538,9 @@ namespace Yoti.Shared.ViewModels
 			try
 			{
 				// Obtain audio data from recording
-#if NETFX_CORE
-				uploadedSong = await GetAudioFormatFromRecoding_UWP();
-#endif
-#if __ANDROID__
-				uploadedSong = GetAudioFormatFromRecording_ANDROID();
-#endif
+				uploadedSong = await GetAudioFormatFromRecording();
+
+
 				if (!IsSupported(uploadedSong))
 				{
 					//release resources
@@ -696,19 +688,31 @@ namespace Yoti.Shared.ViewModels
 		}
 
 
-#if __ANDROID__
 		/// <summary>
 		/// Creates IAudioFormat instance from raw recorded audio data.<br></br>
-		/// ANDROID only.
+		/// UWP only.
 		/// </summary>
-		/// <returns>Currently supports only WavFormat.</returns>
-		private IAudioFormat GetAudioFormatFromRecording_ANDROID()
+		/// <returns></returns>
+		private async Task<IAudioFormat> GetAudioFormatFromRecording()
 		{
+			#region UWP
+#if NETFX_CORE
+			// In UWP the data in the recording includes the metadata
+			// so we can read information about sample rate, channel count etc.
+			// from the included metadata
+
+			byte[] recordedSong = await audioRecorder.GetDataFromStream();
+																			
+			return new WavFormat(recordedSong);
+#endif
+			#endregion
+			#region ANDROID
+#if __ANDROID__
 			// On Android we only get raw data without metadata.
 			// So we have to convert them manually to shorts and then use different 
 			// manual constructor with values from Recorder.Parameters.
 
-			byte[] recordedSong =  audioRecorder.GetDataFromStream_ANDROID();
+			byte[] recordedSong =  await audioRecorder.GetDataFromStream();
 			short[] recordedDataShort = new short[recordedSong.Length / 2];
 			Buffer.BlockCopy(recordedSong, 0, recordedDataShort, 0, recordedSong.Length);
 
@@ -718,27 +722,9 @@ namespace Yoti.Shared.ViewModels
 				AudioProvider.AudioDataProvider.Parameters.Channels,
 				recordedDataShort.Length,
 				recordedDataShort);
-		}
 #endif
-#if NETFX_CORE
-		/// <summary>
-		/// Creates IAudioFormat instance from raw recorded audio data.<br></br>
-		/// UWP only.
-		/// </summary>
-		/// <returns></returns>
-		private async Task<IAudioFormat> GetAudioFormatFromRecoding_UWP()
-		{
-			// In UWP the data in the recording includes the metadata
-			// so we can read information about sample rate, channel count etc.
-			// from the included metadata
-
-			byte[] recordedSong = await audioRecorder.GetDataFromStream_UWP();
-																			
-			return new WavFormat(recordedSong);
+			#endregion
 		}
-
-#endif
-
 		#endregion
 	}
 
