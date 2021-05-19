@@ -207,24 +207,10 @@ namespace Yoti.Shared.AudioProvider
 			if (audioBuffer == null)
 				throw new ArgumentNullException("buffer");
 
-			StorageFolder recordingFolder = ApplicationData.Current.TemporaryFolder;
-
 			// Replay async
 			await UIDispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
 			{
-				StorageFile recordingFile = await recordingFolder.CreateFileAsync(audioFile, CreationCollisionOption.ReplaceExisting);
-
-				// Save buffer into file
-				using (IRandomAccessStream fs = await recordingFile.OpenAsync(FileAccessMode.ReadWrite))
-				{
-					await RandomAccessStream.CopyAndCloseAsync(audioBuffer.GetInputStreamAt(0), fs.GetOutputStreamAt(0));
-					await audioBuffer.FlushAsync();
-					audioBuffer.Dispose();
-				}
-
-				// Replay actuall recording
-				IRandomAccessStream replayStream = await recordingFile.OpenAsync(FileAccessMode.Read);
-				playback.SetSource(replayStream, recordingFile.FileType);
+				playback.SetSource(audioBuffer, "");
 				playback.Play();
 			});
 #endif
@@ -251,7 +237,7 @@ namespace Yoti.Shared.AudioProvider
 				audioTrack.Write(buffer, 0, buffer.Length);
 			}
 #endif
-				#endregion
+			#endregion
 
 		}
 
