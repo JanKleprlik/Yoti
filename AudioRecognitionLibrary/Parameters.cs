@@ -33,7 +33,6 @@ namespace AudioRecognitionLibrary.Recognizer
 			/// Obligated portion of time coherent notes
 			/// </summary>
 			public static double CoherentNotesCoef = 0.4;
-
 			/// <summary>e
 			/// Low frequency limit for BPM detection
 			/// </summary>

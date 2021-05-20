@@ -57,7 +57,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate);
 
 			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef; //default: 4096/4 = 1024
-			var timeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData, sensitivity: 1);
+			var timeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData);
 
 			//[address;(AbsAnchorTimes)]
 			Dictionary<uint, List<uint>> fingerprint = CreateRecordAddresses(timeFrequencyPoints);
@@ -332,9 +332,8 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// </summary>
 		/// <param name="bufferSize">Size of FFT buffer.</param>
 		/// <param name="data">Complex values alternating Real and Imaginary values.</param>
-		/// <param name="sensitivity">Sensitivity coeficient determining wether TFP is strong enought to be used or not.</param>
 		/// <returns>List of Time Frequency Points.</returns>
-		private static List<TimeFrequencyPoint> CreateTimeFrequencyPoints(int bufferSize, double[] data, double sensitivity = 0.9)
+		private static List<TimeFrequencyPoint> CreateTimeFrequencyPoints(int bufferSize, double[] data)
 		{
 			List<TimeFrequencyPoint> TimeFrequencyPoitns = new List<TimeFrequencyPoint>();
 			double[] HammingWindow = FastFourierTransformation.GenerateHammingWindow((uint)bufferSize);
@@ -372,7 +371,7 @@ namespace AudioRecognitionLibrary.Recognizer
 
 					Avg /= maxs.Length;
 					//get doubles of frequency and time 
-					RegisterTFPoints(sampleData, Avg, AbsTime, ref TimeFrequencyPoitns, sensitivity);
+					RegisterTFPoints(sampleData, Avg, AbsTime, ref TimeFrequencyPoitns);
 
 				}
 
@@ -417,7 +416,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="absTime">Absolute time in the song.</param>
 		/// <param name="timeFrequencyPoitns">List to add points to.</param>
 		/// <param name="coefficient">Sensitivity coefficien determining wether TFP is strong enought to be registered.</param>
-		private static void RegisterTFPoints(double[] data, in double average, in uint absTime, ref List<TimeFrequencyPoint> timeFrequencyPoitns, double coefficient = 0.9)
+		private static void RegisterTFPoints(double[] data, in double average, in uint absTime, ref List<TimeFrequencyPoint> timeFrequencyPoitns)
 		{
 			int[] BinBoundries =
 			{
@@ -434,7 +433,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			for (int i = 0; i < BinBoundries.Length / 2; i++)
 			{
 				//get strongest bin from a section if its above average
-				var idx = GetStrongestBinIndex(data, BinBoundries[i * 2], BinBoundries[i * 2 + 1], average, coefficient);
+				var idx = GetStrongestBinIndex(data, BinBoundries[i * 2], BinBoundries[i * 2 + 1], average);
 				if (idx != null)
 				{
 					//idx is divided by 2 because of (Re + Im)
@@ -452,7 +451,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="limit">limit indicating weak bin</param>
 		/// <param name="sensitivity">sensitivity of the limit (the higher the lower sensitivity)</param>
 		/// <returns>index of strongest bin or null if none of the bins is strong enought</returns>
-		private static int? GetStrongestBinIndex(double[] bins, int from, int to, double limit, double sensitivity = 0.9d)
+		private static int? GetStrongestBinIndex(double[] bins, int from, int to, double limit)
 		{
 			var max = double.MinValue;
 			int? index = null;
@@ -461,7 +460,7 @@ namespace AudioRecognitionLibrary.Recognizer
 				var normalized = 2 * Math.Sqrt((bins[i * 2] * bins[i * 2] + bins[i * 2 + 1] * bins[i * 2 + 1]) / 2048);
 				var decibel = 20 * Math.Log10(normalized);
 
-				if (decibel > max && decibel * sensitivity > limit)
+				if (decibel > max)
 				{
 					max = decibel;
 					index = i * 2;
