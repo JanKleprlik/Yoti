@@ -724,9 +724,16 @@ namespace Yoti.Shared.ViewModels
 				recordedDataShort);
 #endif
 			#endregion
+			#region WASM
+#if __WASM__
+			// This method is not supposed to be called from WASM project
+			// because it gets audioformat from recording via AudioDataProvider
+			// which is not used in WASM project.
+			throw new PlatformNotSupportedException("GetAudioFromRecording method is not supported on WASM");
+#endif
+			#endregion
 		}
 		#endregion
 	}
-
 
 }

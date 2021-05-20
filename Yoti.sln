@@ -15,22 +15,22 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Yoti.Shared", "Yoti\Yoti.Sh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Visualizer", "Visualizer\Visualizer.csproj", "{34C88066-3DD3-402A-AA82-801E2F47FC53}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Database", "Database\Database.shproj", "{7358A2C4-04CE-49DA-B95E-1677F2CD54BA}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yoti.Server", "Yoti.Server\Yoti.Server.csproj", "{103D687B-09A6-458D-BC12-C75005E02439}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioRecognitionLibrary", "AudioRecognitionLibrary\AudioRecognitionLibrary.csproj", "{F807730A-349D-4163-9E83-7C71A0ED2160}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedTypes", "SharedTypes\SharedTypes.shproj", "{7358A2C4-04CE-49DA-B95E-1677F2CD54BA}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Database\Database.projitems*{103d687b-09a6-458d-bc12-c75005e02439}*SharedItemsImports = 5
+		SharedTypes\SharedTypes.projitems*{103d687b-09a6-458d-bc12-c75005e02439}*SharedItemsImports = 5
 		Yoti\Yoti.Shared\BP.Shared.projitems*{6279c845-92f8-4333-ab99-3d213163593c}*SharedItemsImports = 13
-		Database\Database.projitems*{7358a2c4-04ce-49da-b95e-1677f2cd54ba}*SharedItemsImports = 13
-		Database\Database.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
+		SharedTypes\SharedTypes.projitems*{7358a2c4-04ce-49da-b95e-1677f2cd54ba}*SharedItemsImports = 13
+		SharedTypes\SharedTypes.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
 		Yoti\Yoti.Shared\BP.Shared.projitems*{8262e473-3782-4f26-b5c0-bb900c6245ec}*SharedItemsImports = 4
-		Database\Database.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
+		SharedTypes\SharedTypes.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
 		Yoti\Yoti.Shared\BP.Shared.projitems*{c2ebfa08-c767-4c20-b9a1-abed9bc6b901}*SharedItemsImports = 5
-		Database\Database.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
+		SharedTypes\SharedTypes.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
 		Yoti\Yoti.Shared\BP.Shared.projitems*{d58aad15-a837-4e7a-9bca-b97aedbba55c}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

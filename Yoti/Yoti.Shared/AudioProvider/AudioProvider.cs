@@ -1,5 +1,9 @@
-﻿using System;
+﻿// AudioDataProvider is for UWP and ANDROID only
+// so we hide implementation from WASM to avoid compilation errors.
+#if NETFX_CORE || __ANDROID__
+using System;
 using System.Threading.Tasks;
+
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -20,7 +24,6 @@ using System.Collections.Generic;
 using Windows.UI.Core;
 #endif
 
-
 namespace Yoti.Shared.AudioProvider
 {
 	/// <summary>
@@ -29,6 +32,8 @@ namespace Yoti.Shared.AudioProvider
 	/// </summary>
 	public sealed partial class AudioDataProvider
 	{
+
+
 		#region private properties
 		/// <summary>
 		/// Lock used for audio buffers.
@@ -410,5 +415,7 @@ namespace Yoti.Shared.AudioProvider
 #endif
 		#endregion
 		#endregion
+
 	}
 }
+#endif

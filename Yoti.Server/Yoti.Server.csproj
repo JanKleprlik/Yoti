@@ -15,6 +15,6 @@
     <ProjectReference Include="..\AudioRecognitionLibrary\AudioRecognitionLibrary.csproj" />
   </ItemGroup>
 
-  <Import Project="..\Database\Database.projitems" Label="Shared" />
+  <Import Project="..\SharedTypes\SharedTypes.projitems" Label="Shared" />
 
 </Project>

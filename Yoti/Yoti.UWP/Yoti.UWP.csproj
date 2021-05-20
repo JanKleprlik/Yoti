@@ -162,7 +162,7 @@
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <Import Project="..\BP.Shared\BP.Shared.projitems" Label="Shared" Condition="Exists('..\BP.Shared\BP.Shared.projitems')" />
-  <Import Project="..\..\Database\Database.projitems" Label="Shared" />
+  <Import Project="..\..\SharedTypes\SharedTypes.projitems" Label="Shared" />
   <Import Project="..\Yoti.Shared\BP.Shared.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
