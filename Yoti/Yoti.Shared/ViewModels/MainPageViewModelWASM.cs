@@ -146,13 +146,13 @@ namespace Yoti.Shared.ViewModels
 				byte[] binData = Convert.FromBase64String(stringBuilder.ToString()); 
 				
 				try 
-				{ 
+				{
 					// Convert byte array to wav format
-					uploadedSong = new WavFormat(binData);
-					if (!IsSupported(uploadedSong))
+					songToBeAddedToDatabase = new WavFormat(binData);
+					if (!IsSupported(songToBeAddedToDatabase))
 					{
 						// Release resources
-						uploadedSong = null;
+						songToBeAddedToDatabase = null;
 						return;
 					}
 				}

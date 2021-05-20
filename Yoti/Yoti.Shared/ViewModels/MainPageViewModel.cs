@@ -60,6 +60,11 @@ namespace Yoti.Shared.ViewModels
 		private IAudioFormat uploadedSong { get; set; }
 
 		/// <summary>
+		/// Audio Format used for adding new song to database.
+		/// </summary>
+		private IAudioFormat songToBeAddedToDatabase { get; set; }
+
+		/// <summary>
 		/// Lock used for file upload.
 		/// </summary>
 		private object uploadedSongLock { get; set; } = new object();
@@ -182,11 +187,11 @@ namespace Yoti.Shared.ViewModels
 
 			try
 			{
-				this.uploadedSong = new WavFormat(uploadedSong);
-				if (!IsSupported(this.uploadedSong))
+				songToBeAddedToDatabase = new WavFormat(uploadedSong);
+				if (!IsSupported(songToBeAddedToDatabase))
 				{
 					//release resources
-					this.uploadedSong = null;
+					songToBeAddedToDatabase = null;
 					return;
 				}
 			}
@@ -217,7 +222,11 @@ namespace Yoti.Shared.ViewModels
 				InformationText = "Please enter song author.";
 				return;
 			}
-			if (uploadedSong == null)
+			if (songToBeAddedToDatabase == null)
+			{
+				InformationText = "Please upload the song.";
+				return;
+			}
 			if (NewSongLyrics.IsNullOrEmpty())
 			{
 				InformationText = "Please enter the lyrics.";
@@ -233,7 +242,7 @@ namespace Yoti.Shared.ViewModels
 			string lyrics = NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
 
 			// Upload song on serever
-			bool wasAdded = await AddNewSongToDatabase(NewSongName, NewSongAuthor, lyrics, uploadedSong);
+			bool wasAdded = await AddNewSongToDatabase(NewSongName, NewSongAuthor, lyrics, songToBeAddedToDatabase);
 
 			// Update UI
 			IsUploading = false;
@@ -244,7 +253,7 @@ namespace Yoti.Shared.ViewModels
 
 
 			//release resources and reset 'Add song' form data
-			uploadedSong = null;
+			songToBeAddedToDatabase = null;
 			UploadedSongText = "Please upload audio file";
 			NewSongAuthor = string.Empty;
 			NewSongName = string.Empty;
