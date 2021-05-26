@@ -284,10 +284,10 @@ namespace Yoti.Shared.AudioProvider
 					Android.Media.Encoding.Pcm16bit,
 					bufferLimit
 					);
+			}
 
-				
-				// Start recording
-				isRecording = true;
+			// Start recording
+			isRecording = true;
 				int totalBytesRead = 0;
 				lock (bufferLock)
 				{

@@ -23,6 +23,7 @@ namespace Yoti.Shared.ViewModels
 			set
 			{
 				_settings = value;
+				// string.Empty ensures all properties of _settings are notified
 				OnPropertyChanged(string.Empty);
 			}
 		}

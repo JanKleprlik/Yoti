@@ -485,7 +485,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			foreach (var pair in deltas)
 			{
 				output.WriteLineAsync($"Song ID: {pair.Key} is {Math.Min(100d, (double)pair.Value / totalNotes * 100):##.#} % time coherent.");
-				if (pair.Value > longestCoherency && pair.Value > Parameters.CoherentNotesCoef * totalNotes)
+				if (pair.Value > longestCoherency && pair.Value > Parameters.TimeCoherentCoef * totalNotes)
 				{
 					longestCoherency = pair.Value;
 					probability = (double)longestCoherency / totalNotes * 100;
@@ -635,7 +635,7 @@ namespace AudioRecognitionLibrary.Recognizer
 
 			Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();
 
-			//remove songs that have low ratio of couples that make a TGZ
+			// Remove songs that have low ratio of couples that make a TGZ
 			// also remove songs that have low amount of samples common with recording
 			foreach (var songID in res.Keys)
 			{
