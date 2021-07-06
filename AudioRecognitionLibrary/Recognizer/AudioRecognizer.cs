@@ -54,9 +54,12 @@ namespace AudioRecognitionLibrary.Recognizer
 
 			double[] data = Array.ConvertAll(audio.Data, item => (double)item);
 
-			double[] downsampledData = AudioProcessor.DownSample(data, Parameters.DownSampleCoef, audio.SampleRate);
+			//compute downsample coeficient for resampling to Parameters.TargetSamplingRate
+			int downsampleCoef = (int) audio.SampleRate / Parameters.TargetSamplingRate;
 
-			int bufferSize = Parameters.WindowSize / Parameters.DownSampleCoef; //default: 4096/4 = 1024
+			double[] downsampledData = AudioProcessor.DownSample(data, downsampleCoef, audio.SampleRate);
+
+			int bufferSize = Parameters.WindowSize / downsampleCoef; //default: 4096/4 = 1024
 			var timeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData);
 
 			//[address;(AbsAnchorTimes)]

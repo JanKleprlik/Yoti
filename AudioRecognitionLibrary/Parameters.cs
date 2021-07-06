@@ -8,59 +8,58 @@ namespace AudioRecognitionLibrary.Recognizer
 	{
 		internal static class Parameters
 		{
-			public const int TargetSamplingRate = 12000;
+			/// <summary>
+			/// Target sampling rate of audio used in recognition algorithm
+			/// </summary>
+			public static int TargetSamplingRate { get; set; } = 11025;
 			/// <summary>
 			/// Default size of FFT window
 			/// </summary>
-			public static int WindowSize = 4096;
-			/// <summary>
-			/// Default downsample coeficient
-			/// </summary>
-			public static int DownSampleCoef = 4;
+			public static int WindowSize { get; set; } = 4096;
 			/// <summary>
 			/// Default size of target zone
 			/// </summary>
-			public static int TargetZoneSize = 5;
+			public static int TargetZoneSize { get; set; } = 5;
 			/// <summary>
 			/// Default offset of anchor from first actual point
 			/// </summary>
-			public static int AnchorOffset = 2;
+			public static int AnchorOffset { get; set; } = 2;
 			/// <summary>
 			/// Obligated portion of samples in TGZ
 			/// </summary>
-			public static double SamplesInTgzCoef = 0.55;
+			public static double SamplesInTgzCoef { get; set; } = 0.55;
 			/// <summary>
 			/// Obligated portion of time coherent notes
 			/// </summary>
-			public static double TimeCoherentCoef = 0.4;
+			public static double TimeCoherentCoef { get; set; } = 0.4;
 			/// <summary>e
 			/// Low frequency limit for BPM detection
 			/// </summary>
-			public static float BPMLowFreq = 60f;
+			public static float BPMLowFreq { get; set; } = 60f;
 			/// <summary>
 			/// High frequency liimt for BPM detection
 			/// </summary>
-			public static float BPMHighFreq = 180f;
+			public static float BPMHighFreq { get; set; } = 180f;
 			/// <summary>
 			/// Nubmer of parts in a second for EnergyPeakDetection
 			/// </summary>
-			public static int PartsPerSecond = 2;
+			public static int PartsPerSecond { get; set; } = 2;
 			/// <summary>
 			/// Lowest allowed BPM
 			/// </summary>
-			public static float BPMLowLimit = 80f;
+			public static float BPMLowLimit { get; set; } = 80f;
 			/// <summary>
 			/// Highest allowed BPM
 			/// </summary>
-			public static float BPMHighLimit= 170;
+			public static float BPMHighLimit { get; set; } = 170;
 			/// <summary>
 			/// Number of fllowing peaks to consider when getting BPM
 			/// </summary>
-			public static int PeakNeighbourRange = 10;
+			public static int PeakNeighbourRange { get; set; } = 10;
 			/// <summary>
 			/// Size of interval when approximating BPM
 			/// </summary>
-			public static int ApproximateIntervalSize = 5;
+			public static int ApproximateIntervalSize { get; set; } = 5;
 		}
 	}
 }

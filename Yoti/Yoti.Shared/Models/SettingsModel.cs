@@ -57,12 +57,18 @@ namespace Yoti.Shared.Models
 		/// <summary>
 		/// An array of supported number of channels.
 		/// </summary>
-		public int[] SupportedNumbersOfChannels { get; } = new int[] { 1, 2 };
+		public int[] SupportedNumbersOfChannels { get; } = new int[] { 
+			1, // Mono
+			2 // Stereo
+		};
 
 		/// <summary>
 		/// An array of supported sample rates.
 		/// </summary>
-		public int[] SupportedSamplingRates { get; } = new int[] { (int)AudioProvider.AudioDataProvider.Parameters.SamplingRate };
+		public int[] SupportedSamplingRates { get; } = new int[] { 
+			(int)AudioProvider.AudioDataProvider.Parameters.SamplingRate, // 44100 Hz
+			(int)AudioProvider.AudioDataProvider.Parameters.SamplingRate/2 // 22050 Hz
+		};
 
 		/// <summary>
 		/// An array of supported Audio Formats
