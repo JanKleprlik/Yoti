@@ -81,9 +81,9 @@ namespace SharedTypes
 		/// </summary>
 		public Song Song { get; set; }
 		/// <summary>
-		/// Detailed information about recognition process.
+		/// Recognition accuracies of the songs
 		/// </summary>
-		public string DetailInfo { get; set; }
+		public List<Tuple<uint, double>> SongAccuracies {get; set;}
 	}
 
 }

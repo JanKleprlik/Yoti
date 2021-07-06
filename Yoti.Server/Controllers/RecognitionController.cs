@@ -90,15 +90,21 @@ namespace Yoti.Server.Controllers
 		[HttpPost("[action]")]
 		public async Task<ActionResult<RecognitionResult>> RecognizeSong(PreprocessedSongData songToUpload)
 		{
-			var stringWriter = new StringWriter();
-
 			_logger.LogDebug("Getting correct searchdata");
 			Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
 
+			// recognize song
 			_logger.LogDebug("Recognizing song");
-			double maxProbability = 0;
-			uint? songId = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, out maxProbability, songToUpload.TFPCount, stringWriter);
+			var recognitionResult = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, songToUpload.TFPCount);
 
+			// parse recognition result
+			uint? songId = recognitionResult.Item1;
+			List<Tuple<uint, double>> songAccuracies = recognitionResult.Item2;
+
+			//find accuracy of recognition result song
+			double maxAccuracy = GetSongAccuracy(songId, songAccuracies);
+
+			// song was not found in chosen BPM sector
 			if (songId == null)
 			{
 				_logger.LogDebug("Song not found by BPM");
@@ -109,30 +115,31 @@ namespace Yoti.Server.Controllers
 
 
 					searchData = GetSearchDataByBPM(entry.Key);
-					uint? potentialSongId = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, out double probability, songToUpload.TFPCount, stringWriter);
+					var potentialRecognitionResult = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, songToUpload.TFPCount);
 
-					// If result is not null and probabilty is higher than current max
-					// remember the id and new max probability
-					if (potentialSongId != null && probability > maxProbability)
+					uint? potentialSongId = potentialRecognitionResult.Item1;
+					double accuracy = GetSongAccuracy(potentialSongId, potentialRecognitionResult.Item2);
+
+					// If result is not null and accuracy is higher than current max
+					// remember the id and new max accuracy and accuracies of other songs
+					if (potentialSongId != null && accuracy > maxAccuracy)
 					{
-						_logger.LogDebug($"New potential song id found: {potentialSongId} with proba: {probability} in BPM: {entry.Key}");
-						songId = potentialSongId;
-						maxProbability = probability;
+						_logger.LogDebug($"New potential song id found: {potentialSongId} with proba: {accuracy} in BPM: {entry.Key}");
+						songId = potentialSongId; //remember songId
+						maxAccuracy = accuracy; //remember max accuracy
+						songAccuracies = potentialRecognitionResult.Item2; //remember accuracies of other song in BPM batch
 					}
 				}
 			}
-			// Write result probability
-			if (songId != null)
-				await stringWriter.WriteLineAsync($"Recognized song with ID: {songId} is a {Math.Min(100d, maxProbability):##.#}% match.");
 
-			stringWriter.Close();
+			songAccuracies.Sort((a, b) => b.Item2.CompareTo(a.Item2)); //sort by descending accuracy so it is sent that way to the client
 
 			if (songId == null)
 			{
 				return new RecognitionResult
 				{
 					Song = null,
-					DetailInfo = stringWriter.ToString()
+					SongAccuracies = songAccuracies,
 				};
 			}
 			else
@@ -140,7 +147,7 @@ namespace Yoti.Server.Controllers
 				return new RecognitionResult
 				{
 					Song = await _context.Songs.FindAsync((uint)songId),
-					DetailInfo = stringWriter.ToString()
+					SongAccuracies = songAccuracies,
 				};
 
 			}
@@ -316,6 +323,29 @@ namespace Yoti.Server.Controllers
 			_searchDataInstance.SearchData[song.BPM] = newSearchData;
 			_searchDataInstance.SaveToDB(song.BPM);
 
+		}
+
+		/// <summary>
+		/// Get accuracy of specific song by its id
+		/// </summary>
+		/// <param name="songId">Id of the song</param>
+		/// <param name="songAccuracies">List of song accuracies</param>
+		/// <returns>Accuracy of the song. 0 if songId is null</returns>
+		private double GetSongAccuracy(uint? songId, List<Tuple<uint, double>> songAccuracies)
+		{
+			//find probability of recognition result song
+			if (songId != null)
+			{
+				foreach (var accurs in songAccuracies)
+				{
+					if (accurs.Item1 == songId)
+					{
+						return accurs.Item2;
+					}
+				}
+			}
+
+			return 0d;
 		}
 
 		#endregion

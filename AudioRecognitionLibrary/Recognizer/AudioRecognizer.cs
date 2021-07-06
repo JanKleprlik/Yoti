@@ -10,36 +10,6 @@ namespace AudioRecognitionLibrary.Recognizer
 {
 	public partial class AudioRecognizer
 	{
-		/// <summary>
-		/// Information about recognition process is written to given TextWriter.
-		/// </summary>
-		/// <param name="textWriter">TextWriter to write recognition process info into.</param>
-		public AudioRecognizer(TextWriter textWriter)
-		{
-			IsOutputSet = true;
-			output = textWriter;
-		}
-
-		/// <summary>
-		/// Information about recognition process is written to Console.Out.
-		/// </summary>
-		public AudioRecognizer()
-		{
-			IsOutputSet = false;
-			output = Console.Out;
-		}
-
-		#region private properties
-		/// <summary>
-		/// TextWriter to write recognition process information into.
-		/// </summary>
-		private TextWriter output { get; set; } = null;
-		/// <summary>
-		/// Flag determining wether to use special TextWriter at specific methods or use output set at initialization.
-		/// </summary>
-		private bool IsOutputSet { get; set; } = false;
-		#endregion
-
 		#region public API
 
 		/// <summary>
@@ -73,23 +43,16 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// </summary>
 		/// <param name="fingerprint">Fingerprint of audio to be recognized.</param>
 		/// <param name="database">Database of fingerprints to find match at.</param>
-		/// <param name="accuracy">Accuracy of final match.</param>
 		/// <param name="TFPCount">Original count of TFP before fingerprint creation. Needed to compute accuracy.</param>
-		/// <param name="textWriter">TextWriter to write information about recognition process into.</param>
-		/// <returns>Id of recognized song.</returns>
-		public uint? RecognizeSong(Dictionary<uint, List<uint>> fingerprint, Dictionary<uint, List<ulong>> database, out double accuracy, int TFPCount, TextWriter textWriter = null)
+		/// <returns>Id of recognized song with list of accuracies of each considered song in recognition.</returns>
+		public Tuple<uint?,List<Tuple<uint, double>>> RecognizeSong(Dictionary<uint, List<uint>> fingerprint, Dictionary<uint, List<ulong>> database, int TFPCount)
 		{
-			//set custom output if not set at initialization
-			if (!IsOutputSet && textWriter != null)
-				output = textWriter;
+			// create song accuracy list
+			var songAccuracies = new List<Tuple<uint, double>>();
 
-			uint? finalSongID = FindBestMatch(database, fingerprint, out accuracy, TFPCount);
+			uint? finalSongID = FindBestMatch(database, fingerprint, songAccuracies, TFPCount);
 
-			//unset custom output
-			if (!IsOutputSet)
-				output = null;
-
-			return finalSongID;
+			return new Tuple<uint?, List<Tuple<uint, double>>>(finalSongID, songAccuracies);
 		}
 
 		/// <summary>
@@ -124,7 +87,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="song">Audio to get BPM of.</param>
 		/// <param name="approximate">Flag wether to approximate BPM in intervals of size set at <see cref="AudioRecognizer.Parameters"/></param>
 		/// <returns>BPM of the song.</returns>
-		public int GetBPM(IAudioFormat song,bool approximate = false)
+		public int GetBPM(IAudioFormat song, bool approximate = false)
 		{
 			// Multiple audio channels do not improve BPM identification.
 			AudioProcessor.ConvertToMono(song);
@@ -314,7 +277,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="timeFrequencyPoints">TFPs of recording</param>
 		/// <param name="probability">Probability of correct match.</param>
 		/// <returns></returns>
-		private uint? FindBestMatch(Dictionary<uint, List<ulong>> database, Dictionary<uint, List<uint>> fingerprint, out double probability, int TFPCount)
+		private uint? FindBestMatch(Dictionary<uint, List<ulong>> database, Dictionary<uint, List<uint>> fingerprint, List<Tuple<uint, double>> songAccuracies, int TFPCount)
 		{
 			// Get quantities of each SongValue to determine wether they make a complete TGZ (5+ points correspond to the same SongValue)
 			var quantities = GetSongValQuantities(fingerprint, database);
@@ -327,7 +290,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			var deltas = GetDeltas(filteredSongs, fingerprint);
 
 			// Pick the songID with highest delta occurance
-			return MaximizeTimeCoherency(deltas, TFPCount, out probability);
+			return MaximizeTimeCoherency(deltas, TFPCount, songAccuracies);
 		}
 
 		/// <summary>
@@ -480,18 +443,19 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <param name="deltas">[songID, num of time coherent notes]</param>
 		/// <param name="totalNotes">total number of notes in recording</param>
 		/// <returns></returns>
-		private uint? MaximizeTimeCoherency(Dictionary<uint, int> deltas, int totalNotes, out double probability)
+		private uint? MaximizeTimeCoherency(Dictionary<uint, int> deltas, int totalNotes, List<Tuple<uint, double>> songAccuracies)
 		{
 			uint? songID = null;
 			int longestCoherency = 0;
-			probability = 0d;
 			foreach (var pair in deltas)
-			{
-				output.WriteLineAsync($"Song ID: {pair.Key} is {Math.Min(100d, (double)pair.Value / totalNotes * 100):##.#} % time coherent.");
+			{				
+				// Add current song accuracy into list
+				songAccuracies.Add(new Tuple<uint, double>(pair.Key, (double)pair.Value / totalNotes * 100));
+
+				// Pick song with longest time coherency
 				if (pair.Value > longestCoherency && pair.Value > Parameters.TimeCoherentCoef * totalNotes)
 				{
 					longestCoherency = pair.Value;
-					probability = (double)longestCoherency / totalNotes * 100;
 					songID = pair.Key;
 				}
 			}

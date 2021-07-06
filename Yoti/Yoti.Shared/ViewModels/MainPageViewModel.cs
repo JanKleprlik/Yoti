@@ -33,7 +33,7 @@ namespace Yoti.Shared.ViewModels
 			this.UIDispatcher = UIDispatcher;
 			this.settingsViewModel = settingsViewModel;
 
-			recognizer = new AudioRecognizer(textWriter);
+			recognizer = new AudioRecognizer();
 
 			// Audio Provider on WASM is handled in javascript
 #if NETFX_CORE || __ANDROID__
@@ -577,7 +577,11 @@ namespace Yoti.Shared.ViewModels
 		/// <param name="result"></param>
 		private async Task WriteRecognitionResults(RecognitionResult result)
 		{
-			await textWriter.WriteLineAsync(result.DetailInfo);
+			//Write result of song accuracies
+			foreach(var songAccur in result.SongAccuracies)
+			{
+				await textWriter.WriteLineAsync($"Song ID: {songAccur.Item1} is {songAccur.Item2:##.#} % time coherent.");
+			}
 
 			if (result.Song == null)
 			{
@@ -625,7 +629,7 @@ namespace Yoti.Shared.ViewModels
 				// Preprocess audio data so it can be uploaded to server
 				PreprocessedSongData preprocessedSong = PreprocessSongData(songAuthor, songName, lyrics, audioData);
 
-				// Upload to server
+				// Upload to server - dont wait for response
 				await recognizerApi.UploadSong(preprocessedSong).ConfigureAwait(false);
 
 				return true;
