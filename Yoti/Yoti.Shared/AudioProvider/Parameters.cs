@@ -11,17 +11,17 @@ namespace Yoti.Shared.AudioProvider
 			/// <summary>
 			/// Audio sampling rate.
 			/// </summary>
-			public static uint SamplingRate = 48000;
+			public static uint SamplingRate { get; set; } = 44100;
 
 			/// <summary>
 			/// Number of audio channels.
 			/// </summary>
-			public static uint Channels = 1;
+			public static uint Channels { get; set; } = 1;
 
 			/// <summary>
 			/// Maximum size of file that can be recorded.
 			/// </summary>
-			public static ulong MaxRecordingUploadSize_Mb = 1;
+			public static ulong MaxRecordingUploadSize_Mb { get; set; } = 1;
 		}
 
 	}

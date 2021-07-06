@@ -62,7 +62,7 @@ namespace Yoti.Shared.Models
 		/// <summary>
 		/// An array of supported sample rates.
 		/// </summary>
-		public int[] SupportedSamplingRates { get; } = new int[] { 48000};
+		public int[] SupportedSamplingRates { get; } = new int[] { (int)AudioProvider.AudioDataProvider.Parameters.SamplingRate };
 
 		/// <summary>
 		/// An array of supported Audio Formats
