@@ -31,7 +31,8 @@ namespace Yoti.Server
 		{
 
 			services.AddDbContext<SongContext>(opt =>
-								   opt.UseSqlite("SongContext"));
+				opt.UseSqlServer("Data Source=tcp:yotisongdatabaseserver.database.windows.net,1433;Initial Catalog=YotiSongDatabase;User Id=YotiAdmin@yotisongdatabaseserver;Password=AdminPassword."));
+				//opt.UseSqlite("SongContext"));
 
 			services.AddSingleton<SearchDataSingleton>();
 

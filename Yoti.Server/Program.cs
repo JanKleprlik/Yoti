@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Azure.Identity;
 
 namespace Yoti.Server
 {
@@ -35,7 +36,7 @@ namespace Yoti.Server
 				{
 					var songContext = services.GetRequiredService<SongContext>();
 					// Delete database if exists
-					//songContext.Database.EnsureDeleted();
+					// songContext.Database.EnsureDeleted();
 					
 					// Create database
 					songContext.Database.EnsureCreated();
@@ -50,6 +51,13 @@ namespace Yoti.Server
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
+				.ConfigureAppConfiguration((context, config) =>
+				{
+				var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("YotiValutUri"));
+				config.AddAzureKeyVault(
+				keyVaultEndpoint,
+				new DefaultAzureCredential());
+				})
 				.ConfigureLogging(logging =>
 				{
 					logging.ClearProviders();

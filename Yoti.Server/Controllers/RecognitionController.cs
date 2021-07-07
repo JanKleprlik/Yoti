@@ -68,6 +68,8 @@ namespace Yoti.Server.Controllers
 			// Save song metadata
 			_context.Songs.Add(newSong);
 			_context.SaveChanges();
+
+			// Get Id manually so we can use it at fingerprint creation
 			uint maxId = _context.Songs.Max(song => song.Id);
 
 			_logger.LogInformation("Addding TFPs to database");

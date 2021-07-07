@@ -1,5 +1,4 @@
-﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
+{
   "iisSettings": {
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
@@ -8,24 +7,25 @@
       "sslPort": 44378
     }
   },
+  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-		"IIS Express": {
-			"commandName": "IISExpress",
-			"launchBrowser": false,
-			"launchUrl": "recognition/getsongs",
-			"environmentVariables": {
-				"ASPNETCORE_ENVIRONMENT": "Development"
-			}
-		},
-		"BP.Server": {
-			"commandName": "Project",
-			"dotnetRunMessages": "true",
-			"launchBrowser": false,
-			"launchUrl": "recognition/getsongs",
-			"applicationUrl": "https://localhost:5001;http://localhost:5000",
-			"environmentVariables": {
-				"ASPNETCORE_ENVIRONMENT": "Development"
-			}
-		}
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchUrl": "recognition/getsongs",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "BP.Server": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "recognition/getsongs",
+      "environmentVariables": {
+        "YotiValutUri": "https://yotiservervault.vault.azure.net/",
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": "true",
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    }
   }
 }
