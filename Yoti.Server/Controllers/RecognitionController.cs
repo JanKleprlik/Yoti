@@ -70,16 +70,18 @@ namespace Yoti.Server.Controllers
 			_context.SaveChanges();
 
 			// Get Id manually so we can use it at fingerprint creation
-			uint maxId = _context.Songs.Max(song => song.Id);
+			int maxId = _context.Songs.Max(song => song.SongId);
 
 			_logger.LogInformation("Addding TFPs to database");
-			_recognizer.AddFingerprintToDatabase(songToUpload.Fingerprint, maxId, searchData);
+			// Conversion of maxId from int to uint is safe because SongId is always positive and smaller than max value of int
+			_recognizer.AddFingerprintToDatabase(songToUpload.Fingerprint, Convert.ToUInt32(maxId), searchData);
 
 			// Update data in database
 			_searchDataInstance.SaveToDB(songToUpload.BPM);
 			_context.SaveChanges();
 
-			return CreatedAtAction(nameof(GetSong), new { id = newSong.Id }, newSong);
+			// Conversion of newSong.Id from int to uint is safe because SongId is always positive and smaller than max value of int
+			return CreatedAtAction(nameof(GetSong), new { id =newSong.Id }, newSong);
 		}
 		#endregion
 
@@ -148,7 +150,9 @@ namespace Yoti.Server.Controllers
 			{
 				return new RecognitionResult
 				{
-					Song = await _context.Songs.FindAsync((uint)songId),
+					// Conversion of songId from uint to int is safe, because ids are smaller than max value of int
+					//also songId is checked to not be null
+					Song = await _context.Songs.FindAsync((int)songId),
 					SongAccuracies = songAccuracies,
 				};
 
@@ -203,7 +207,9 @@ namespace Yoti.Server.Controllers
 		[HttpGet("[action]/{id}")]
 		public async Task<ActionResult<Song>> GetSong(uint id)
 		{
-			var song = await _context.Songs.FindAsync(id);
+			// Conversion of id from uint to int is safe because
+			// all ids are smaller than max value of int
+			var song = await _context.Songs.FindAsync((int)id);
 			if (song == null)
 			{
 				return NotFound();
@@ -223,7 +229,9 @@ namespace Yoti.Server.Controllers
 		[HttpDelete("[action]/{id}")]
 		public async Task<ActionResult<Song>> DeleteSongById(uint id)
 		{
-			var song = await _context.Songs.FindAsync(id);
+			// Conversion of id from uint to int is safe because
+			// all ids are smaller than max value of int
+			var song = await _context.Songs.FindAsync((int)id);
 			if (song == null)
 			{
 				return NotFound();

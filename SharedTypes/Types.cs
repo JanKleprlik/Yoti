@@ -3,6 +3,7 @@ using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SharedTypes
 {
@@ -12,9 +13,21 @@ namespace SharedTypes
 	public class Song
 	{
 		/// <summary>
-		/// Id of the song.
+		/// unsigned verison of Id of the song used throughout the application because
+		/// the recognition algorithm uses unsigned int.
+		/// Conversion from int at SongId property is safe because all ids are postive and smaller than max value of int.
 		/// </summary>
-		public uint Id { get; set; }
+		[NotMapped]
+		public uint Id { 
+			get => (uint)SongId;
+			set => SongId = (int)value;
+		}
+		/// <summary>
+		/// Id wrapper for SQLServer as it does not support
+		/// unsigned types
+		/// Conversion to uint at Id property is safe because all ids are postive and smaller than max value of int.
+		/// </summary>
+		public int SongId {	get; set; }
 		/// <summary>
 		/// Name of the song.
 		/// </summary>
