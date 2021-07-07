@@ -57,12 +57,12 @@
             },
             {
               "sku": {
-                "name": "GP_S_Gen5",
+                "name": "GP_Gen5",
                 "tier": "GeneralPurpose",
                 "family": "Gen5",
-                "capacity": 1
+                "capacity": 2
               },
-              "kind": "v12.0,user,vcore,serverless",
+              "kind": "v12.0,user,vcore",
               "location": "[parameters('resourceLocation')]",
               "name": "yotisongdatabaseserver/YotiSongDatabase",
               "type": "Microsoft.Sql/servers/databases",

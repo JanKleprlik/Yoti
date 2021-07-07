@@ -35,6 +35,7 @@ namespace Yoti.Server
 				try
 				{
 					var songContext = services.GetRequiredService<SongContext>();
+					
 					// Delete database if exists
 					//songContext.Database.EnsureDeleted();
 					
@@ -53,10 +54,10 @@ namespace Yoti.Server
 			Host.CreateDefaultBuilder(args)
 				.ConfigureAppConfiguration((context, config) =>
 				{
-				var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("YotiValutUri"));
-				config.AddAzureKeyVault(
-				keyVaultEndpoint,
-				new DefaultAzureCredential());
+					var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("YotiValutUri"));
+					config.AddAzureKeyVault(
+					keyVaultEndpoint,
+					new DefaultAzureCredential());
 				})
 				.ConfigureLogging(logging =>
 				{
