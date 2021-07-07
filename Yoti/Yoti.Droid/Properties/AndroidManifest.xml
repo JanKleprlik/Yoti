@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="Yoti.Yoti" android:versionCode="1" android:versionName="1.0" android:installLocation="preferExternal">
-	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="29" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="Yoti.app" android:versionCode="1" android:versionName="1.0" android:installLocation="internalOnly">
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="29" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<application android:label="Yoti"></application>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<application android:label="Yoti" android:icon="@drawable/Icon"></application>
 </manifest>

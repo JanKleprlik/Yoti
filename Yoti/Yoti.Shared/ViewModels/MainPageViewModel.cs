@@ -137,6 +137,7 @@ namespace Yoti.Shared.ViewModels
 				{
 					// Inform user about failure
 					sucessfullRecordingUpload = false;
+
 					InformationText = "Could not upload file.";
 				}
 			}
@@ -566,6 +567,7 @@ namespace Yoti.Shared.ViewModels
 			}
 			catch(ArgumentException e)
 			{
+				this.Log().LogError(e.Message);
 				InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + " Please try a different audio file.";
 				return null;
 			}

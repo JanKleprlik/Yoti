@@ -3,7 +3,7 @@
 #if NETFX_CORE || __ANDROID__
 using System;
 using System.Threading.Tasks;
-
+#endif
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -284,11 +284,14 @@ namespace Yoti.Shared.AudioProvider
 					Android.Media.Encoding.Pcm16bit,
 					bufferLimit
 					);
-			}
+			
 
-			// Start recording
-			isRecording = true;
+				// Start recording
+				isRecording = true;
 				int totalBytesRead = 0;
+				
+				// lock buffer so that no other thread can acces the buffer
+				// and create inconsistent audio data
 				lock (bufferLock)
 				{
 					buffer = new byte[bufferLimit];
@@ -418,4 +421,4 @@ namespace Yoti.Shared.AudioProvider
 
 	}
 }
-#endif
+

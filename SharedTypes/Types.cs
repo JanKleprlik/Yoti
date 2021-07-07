@@ -3,7 +3,9 @@ using AudioRecognitionLibrary.AudioFormats;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+#if !__WASM__ && !__ANDROID__
 using System.ComponentModel.DataAnnotations.Schema;
+#endif
 
 namespace SharedTypes
 {
@@ -14,17 +16,19 @@ namespace SharedTypes
 	{
 		/// <summary>
 		/// unsigned verison of Id of the song used throughout the application because
-		/// the recognition algorithm uses unsigned int.
+		/// the recognition algorithm uses unsigned int. <br></br>
 		/// Conversion from int at SongId property is safe because all ids are postive and smaller than max value of int.
 		/// </summary>
+		// Mapping is only for Server part of the application - database
+		#if !__WASM__ && !__ANDROID__ && !NETFX_CORE
 		[NotMapped]
+		#endif
 		public uint Id { 
 			get => (uint)SongId;
 			set => SongId = (int)value;
 		}
 		/// <summary>
-		/// Id wrapper for SQLServer as it does not support
-		/// unsigned types
+		/// Id wrapper for SQLServer as it does not support unsigned types. <br></br>
 		/// Conversion to uint at Id property is safe because all ids are postive and smaller than max value of int.
 		/// </summary>
 		public int SongId {	get; set; }
