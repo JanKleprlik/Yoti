@@ -12,7 +12,7 @@
         var file = e.target.files[0];
         //size cannot be bigger than limit
         if ((file.size / 1024 / 1024) > limit) {
-            alert('File size exceeds size limit of ' + limit + ' Mb');
+            alert('File size exceeds size limit of ' + limit + ' MB');
             processPartFile(file.name, true);
         }
         else {

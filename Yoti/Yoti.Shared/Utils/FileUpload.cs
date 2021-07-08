@@ -19,9 +19,9 @@ namespace Yoti.Shared.Utils
 		/// Opens File Picker and returns picked file as an array of bytes.
 		/// </summary>
 		/// <param name="writeResult">Action accepting string with FilePicker state description.</param>
-		/// <param name="maxSize_Mb"></param>
+		/// <param name="maxSize_MB"></param>
 		/// <returns></returns>
-		public static async Task<byte[]> PickAndUploadFileAsync(Action<string> writeResult,  ulong maxSize_Mb)
+		public static async Task<byte[]> PickAndUploadFileAsync(Action<string> writeResult,  ulong maxSize_MB)
 		{
 			byte[] outputArray;
 			#region UWP
@@ -40,9 +40,9 @@ namespace Yoti.Shared.Utils
 			{
 				var audioFileData = await file.OpenStreamForReadAsync();
 
-				if ((ulong)audioFileData.Length > maxSize_Mb * 1024 * 1024)
+				if ((ulong)audioFileData.Length > maxSize_MB * 1024 * 1024)
 				{
-					writeResult($"File is too large." + Environment.NewLine + "Maximum allowed size is {maxSize_Mb} Mb.");
+					writeResult($"File is too large." + Environment.NewLine + $"Maximum allowed size is {maxSize_MB} MB.");
 					return null;
 				}
 
@@ -84,9 +84,9 @@ namespace Yoti.Shared.Utils
 				if (result != null)
 				{
 					var audioFileData = await result.OpenReadAsync();
-					if ((ulong)audioFileData.Length > maxSize_Mb * 1024 * 1024)
+					if ((ulong)audioFileData.Length > maxSize_MB * 1024 * 1024)
 					{
-						writeResult($"File is too large." + Environment.NewLine + "Maximum allowed size is {maxSize_Mb} Mb.");
+						writeResult($"File is too large." + Environment.NewLine + $"Maximum allowed size is {maxSize_MB} MB.");
 						return null;
 					}
 

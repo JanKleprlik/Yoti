@@ -177,7 +177,7 @@ namespace Yoti.Shared.ViewModels
 		public async void UploadNewSong()
 		{
 			// Open platform specific FilePicker
-			byte[] uploadedSong = await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_Mb:AudioDataProvider.Parameters.MaxUploadSize_Mb);
+			byte[] uploadedSong = await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_MB:AudioDataProvider.Parameters.MaxUploadSize_MB);
 			
 			//file not picked
 			if (uploadedSong == null)

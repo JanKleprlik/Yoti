@@ -21,12 +21,12 @@ namespace Yoti.Shared.AudioProvider
 			/// <summary>
 			/// Maximum size of file that can be uploaded for recognition.
 			/// </summary>
-			public static ulong MaxRecordingUploadSize_Mb { get; set; } = 1;
+			public static ulong MaxRecordingUploadSize_MB { get; set; } = 1;
 
 			/// <summary>
 			/// Maximum size of file that can be uploaded to database.
 			/// </summary>
-			public static ulong MaxUploadSize_Mb { get; set; } = 50;
+			public static ulong MaxUploadSize_MB { get; set; } = 50;
 		}
 
 	}

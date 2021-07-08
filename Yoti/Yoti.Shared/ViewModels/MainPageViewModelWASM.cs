@@ -43,7 +43,7 @@ namespace Yoti.Shared.ViewModels
 			else
 			{
 				stringBuilder = new StringBuilder();
-				await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
+				await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_MB}, 0);"); //(size_limit, js metadata offset)
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace Yoti.Shared.ViewModels
 			// so we should give user some feedback before hand.
 			InformationText = "Processing uploaded file." + Environment.NewLine + " Please wait ...";
 
-			await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxUploadSize_Mb});");
+			await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxUploadSize_MB});");
 		}
 		#endregion
 

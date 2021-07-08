@@ -105,9 +105,9 @@ namespace Yoti.Shared.AudioProvider
 			
 			// Check size of uploaded file
 			var fileProperties = await file.GetBasicPropertiesAsync();
-			if (fileProperties.Size > Parameters.MaxRecordingUploadSize_Mb * 1024 * 1024)
+			if (fileProperties.Size > Parameters.MaxRecordingUploadSize_MB * 1024 * 1024)
 			{
-				writeResult($"Selected file is too big." + Environment.NewLine + "Maximum allowed size is {Parameters.MaxRecordingUploadSize_Mb} Mb.");
+				writeResult($"Selected file is too big." + Environment.NewLine + $"Maximum allowed size is {Parameters.MaxRecordingUploadSize_MB} MB.");
 				return false;
 			}
 			else 
@@ -123,7 +123,7 @@ namespace Yoti.Shared.AudioProvider
 			#region ANDROID
 #if __ANDROID__
 
-			buffer = await Utils.FileUpload.PickAndUploadFileAsync(writeResult, AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb);
+			buffer = await Utils.FileUpload.PickAndUploadFileAsync(writeResult, AudioDataProvider.Parameters.MaxRecordingUploadSize_MB);
 			return buffer != null;
 #endif
 			#endregion
