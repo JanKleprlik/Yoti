@@ -9,6 +9,8 @@
     <Import_RootNamespace>SharedTypes</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PreprocessedSongData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RecognitionResult.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Song.cs" />
   </ItemGroup>
 </Project>

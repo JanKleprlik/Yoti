@@ -27,7 +27,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			/// <summary>
 			/// Obligated portion of samples in TGZ
 			/// </summary>
-			public static double SamplesInTgzCoef { get; set; } = 0.55;
+			public static double SamplesInTgzCoef { get; set; } = 0.6;
 			/// <summary>
 			/// Obligated portion of time coherent notes
 			/// </summary>
