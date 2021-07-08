@@ -3,7 +3,7 @@
 #if NETFX_CORE || __ANDROID__
 using System;
 using System.Threading.Tasks;
-#endif
+
 
 #if NETFX_CORE
 using Windows.Media.Capture;
@@ -421,4 +421,4 @@ namespace Yoti.Shared.AudioProvider
 
 	}
 }
-
+#endif

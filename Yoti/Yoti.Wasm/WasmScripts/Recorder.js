@@ -9,8 +9,7 @@
             type: 'audio',
             mimeType: 'audio/wav',
             recorderType: StereoAudioRecorder,
-            sampleRate: 48000,
-            desiredSampRate: 48000,
+            desiredSampRate: 44100,
             numberOfAudioChannels: 1
 
         });
@@ -37,7 +36,6 @@
                 let start = 0;
                 let step = 500000;
                 let part = data.substring(start, start + step);
-                console.log(part);
                 while (part !== "") {
                     processPartFile(part, false);
                     start = start + step;

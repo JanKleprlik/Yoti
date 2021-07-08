@@ -3,13 +3,17 @@
     var input = document.createElement('input');
     input.type = 'file';
     input.accept = '.wav';
+
+    //C# method to get audio binary data from js to c#
+    var processPartFile = Module.mono_bind_static_method("[Yoti.Wasm] Yoti.Shared.ViewModels.MainPageViewModel:ProcessEvent");
+
     //on file selected
     input.oninput = e => {
-
         var file = e.target.files[0];
-        //size cannot be bigger than 50  Mbs
+        //size cannot be bigger than limit
         if ((file.size / 1024 / 1024) > limit) {
             alert('File size exceeds size limit of ' + limit + ' Mb');
+            processPartFile(file.name, true);
         }
         else {
             var reader = new FileReader();
@@ -17,8 +21,6 @@
             reader.onload = readerEvent => {
                 //this is the binary uploaded content
                 var data = readerEvent.target.result;
-                //invoke C# method to get audio binary data
-                var processPartFile = Module.mono_bind_static_method("[Yoti.Wasm] Yoti.Shared.ViewModels.MainPageViewModel:ProcessEvent");
 
                 if (!data.startsWith('data:audio/wav;base64,')) {
                     console.log('Unsupported format.');
@@ -43,9 +45,6 @@
         };
     };
 
-    //on canceled
-    input.oncancel = e => {
-        htmlElement.dispatchEvent(new Event("CancelEvent"));
-    }
+    //call click event manually
     input.click();
 }

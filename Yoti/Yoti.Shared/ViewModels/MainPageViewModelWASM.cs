@@ -43,7 +43,6 @@ namespace Yoti.Shared.ViewModels
 			}
 			else
 			{
-				IsUploading = true;
 				stringBuilder = new StringBuilder();
 				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
 			}
@@ -105,18 +104,19 @@ namespace Yoti.Shared.ViewModels
 				{
 					this.Log().LogError(ex.Message);
 					InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
+					IsRecognizing = false;
 					return;
 				}
 
+				//Debug print recorded audio properties
 				this.Log().LogDebug("[DEBUG] Channels: " + uploadedSong.Channels);
 				this.Log().LogDebug("[DEBUG] SampleRate: " + uploadedSong.SampleRate);
 				this.Log().LogDebug("[DEBUG] NumOfData: " + uploadedSong.NumOfDataSamples);
 				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSong.Data.Length);
-
+				
 				//Name, Author and Lyrics is not important for recognition call
 				PreprocessedSongData songWavFormat = PreprocessSongData("none", "none", "none", uploadedSong);
 				RecognitionResult result = await recognizerApi.RecognizeSong(songWavFormat);
-
 
 				// Update UI
 				await WriteRecognitionResults(result);
