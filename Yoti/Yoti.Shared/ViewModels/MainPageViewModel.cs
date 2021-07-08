@@ -107,11 +107,8 @@ namespace Yoti.Shared.ViewModels
 		{
 			// Update UI
 			bool sucessfullRecordingUpload = true;
-			WasRecognized = false;
-			textWriter.Clear();
+			UpdateRecognitionUI();
 
-
-			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
 			// Use microphone to record audio
 			if (Settings.UseMicrophone)
 			{
@@ -574,6 +571,16 @@ namespace Yoti.Shared.ViewModels
 		}
 		
 		/// <summary>
+		/// Setups UI for recognition process
+		/// </summary>
+		private void UpdateRecognitionUI()
+		{
+			WasRecognized = false;
+			textWriter.Clear();
+			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
+		}
+
+		/// <summary>
 		/// Write recognition result to adequate properties so it can be displayed to the user.
 		/// </summary>
 		/// <param name="result"></param>
@@ -582,7 +589,7 @@ namespace Yoti.Shared.ViewModels
 			//Write result of song accuracies
 			foreach(var songAccur in result.SongAccuracies)
 			{
-				await textWriter.WriteLineAsync($"Song ID: {songAccur.Item1} is {songAccur.Item2:##.#} % time coherent.");
+				await textWriter.WriteLineAsync($"Song ID: {songAccur.Item1} is {Math.Min(100d,songAccur.Item2):##.#} % time coherent.");
 			}
 
 			if (result.Song == null)

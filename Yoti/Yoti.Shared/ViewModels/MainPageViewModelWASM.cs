@@ -31,8 +31,7 @@ namespace Yoti.Shared.ViewModels
 			WasmSongEvent += OnSongToRecognizeEvent;
 
 			// Update UI
-			WasRecognized = false;
-			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
+			UpdateRecognitionUI();
 
 			if (Settings.UseMicrophone)
 			{
