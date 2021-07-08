@@ -48,7 +48,8 @@ namespace Yoti.Server.Models
 				foreach(SearchData searchData in searchDatas)
 				{
 					var songData = JsonSerializer.Deserialize<Dictionary<uint, List<ulong>>>(searchData.SongDataSerialized, serializerOptions);
-					_searchData.Add(searchData.BPM, songData);
+					//TryAdd in case there is corrupted database with multiple instances of the same BPM sector
+					_searchData.TryAdd(searchData.BPM, songData);
 				}				
 			}
 		}
