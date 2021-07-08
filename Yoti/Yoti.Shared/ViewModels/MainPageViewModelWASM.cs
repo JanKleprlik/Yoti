@@ -38,12 +38,12 @@ namespace Yoti.Shared.ViewModels
 				IsRecording = true;
 				stringBuilder = new StringBuilder();
 				var escapedRecLength = WebAssemblyRuntime.EscapeJs((Settings.RecordingLength).ToString());
-				WebAssemblyRuntime.InvokeJS($"record_and_recognize({escapedRecLength});");
+				WebAssemblyRuntime.InvokeJS($"recordAndUploadAudio({escapedRecLength}, {AudioProvider.AudioDataProvider.Parameters.SamplingRate}, {AudioProvider.AudioDataProvider.Parameters.Channels});");
 			}
 			else
 			{
 				stringBuilder = new StringBuilder();
-				await WebAssemblyRuntime.InvokeAsync($"pick_and_upload_file_by_parts({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
+				await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_Mb}, 0);"); //(size_limit, js metadata offset)
 			}
 		}
 
@@ -62,7 +62,8 @@ namespace Yoti.Shared.ViewModels
 			// In WASM UI Thread will be blocked while uploading
 			// so we should give user some feedback before hand.
 			InformationText = "Processing uploaded file." + Environment.NewLine + " Please wait ...";
-			await WebAssemblyRuntime.InvokeAsync("pick_and_upload_file_by_parts(50, 22);"); //(size_limit, js metadata offset)
+
+			await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxUploadSize_Mb});");
 		}
 		#endregion
 
@@ -84,12 +85,12 @@ namespace Yoti.Shared.ViewModels
 				IsRecognizing = true;
 				InformationText = "Looking for a match ...";
 
-				// Convert audio data from Base64 string to byteArray
-				string base64Data = Regex.Match(stringBuilder.ToString(), @"data:((audio)|(application))/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
-				byte[] binData = Convert.FromBase64String(base64Data); //this is the data I want byte[]
-
 				try
 				{
+					// Convert audio data from Base64 string to byteArray
+					//string base64Data = Regex.Match(stringBuilder.ToString(), @"data:((audio)|(application))/(?<type>.+?),(?<data>.+)").Groups["data"].Value;
+					byte[] binData = Convert.FromBase64String(stringBuilder.ToString()); //this is the data I want byte[]
+
 					// Convert byte array to wav format
 					uploadedSong = new WavFormat(binData);
 					if (!IsSupported(uploadedSong))
@@ -99,10 +100,14 @@ namespace Yoti.Shared.ViewModels
 						return;
 					}
 				}
-				catch(ArgumentException ex)
+
+				// catch error that caused by faulty binData
+				// ArgumentException at WavFormat(binData)
+				// NullReferenceException at Regex.Match().Groups[]-Value
+				catch(Exception ex)
 				{
 					this.Log().LogError(ex.Message);
-					InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
+					InformationText = "Error occured, please try again.";
 					IsRecognizing = false;
 					return;
 				}
@@ -114,7 +119,7 @@ namespace Yoti.Shared.ViewModels
 				this.Log().LogDebug("[DEBUG] ActualNumOfData: " + uploadedSong.Data.Length);
 				
 				//Name, Author and Lyrics is not important for recognition call
-				PreprocessedSongData songWavFormat = PreprocessSongData("none", "none", "none", uploadedSong);
+				PreprocessedSongData songWavFormat = PreprocessSongData(uploadedSong);
 				RecognitionResult result = await recognizerApi.RecognizeSong(songWavFormat);
 
 				// Update UI

@@ -1,4 +1,4 @@
-﻿async function pick_and_upload_file_by_parts(limit, initial_start) {
+﻿async function pickAndUploadAudioFile(limit) {
     console.log('Uploading file in javascript');
     var input = document.createElement('input');
     input.type = 'file';
@@ -23,14 +23,15 @@
                 var data = readerEvent.target.result;
 
                 if (!data.startsWith('data:audio/wav;base64,')) {
-                    console.log('Unsupported format.');
-                    alert('Unsupported format.');
+                    //abortJavaScript defined at Recorder.js
+                    abortJavaScript('unsupported format.');
                     return;
                 }
 
-                //start ... audio metadata of uploaded file
-                let start = initial_start;
-                let step = 500000;
+                //audioMetadataOffset defined at Recorder.js
+                let start = audioMetadataOffset;
+                //uploadStepSize defined at Recorder.js
+                let step = uploadStepSize;
                 let part = data.substring(start, start + step);
                 while (part !== "") {
                     processPartFile(part, false);

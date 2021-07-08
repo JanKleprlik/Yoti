@@ -19,9 +19,14 @@ namespace Yoti.Shared.AudioProvider
 			public static uint Channels { get; set; } = 1;
 
 			/// <summary>
-			/// Maximum size of file that can be recorded.
+			/// Maximum size of file that can be uploaded for recognition.
 			/// </summary>
 			public static ulong MaxRecordingUploadSize_Mb { get; set; } = 1;
+
+			/// <summary>
+			/// Maximum size of file that can be uploaded to database.
+			/// </summary>
+			public static ulong MaxUploadSize_Mb { get; set; } = 50;
 		}
 
 	}

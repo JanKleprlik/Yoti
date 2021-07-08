@@ -177,7 +177,7 @@ namespace Yoti.Shared.ViewModels
 		public async void UploadNewSong()
 		{
 			// Open platform specific FilePicker
-			byte[] uploadedSong = await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_Mb:50);
+			byte[] uploadedSong = await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_Mb:AudioDataProvider.Parameters.MaxUploadSize_Mb);
 			
 			//file not picked
 			if (uploadedSong == null)
@@ -556,8 +556,7 @@ namespace Yoti.Shared.ViewModels
 				}
 
 				// Preprocess audio data for server
-				// Name, Author and Lyrics is not important for recognition
-				PreprocessedSongData preprocessedSong = PreprocessSongData("none", "none", "none", uploadedSong);
+				PreprocessedSongData preprocessedSong = PreprocessSongData(uploadedSong);
 				
 				// Call server for song recognition
 				return await recognizerApi.RecognizeSong(preprocessedSong);
@@ -636,7 +635,7 @@ namespace Yoti.Shared.ViewModels
 				}
 
 				// Preprocess audio data so it can be uploaded to server
-				PreprocessedSongData preprocessedSong = PreprocessSongData(songAuthor, songName, lyrics, audioData);
+				PreprocessedSongData preprocessedSong = PreprocessSongData(audioData, songAuthor, songName, lyrics);
 
 				// Upload to server - dont wait for response
 				await recognizerApi.UploadSong(preprocessedSong).ConfigureAwait(false);
@@ -683,14 +682,15 @@ namespace Yoti.Shared.ViewModels
 
 		/// <summary>
 		/// Creates song fingerprint, gets BPM of the song and wraps it together with song name,author name and lyrics 
-		/// into PreprocessedSongData instance so it can be send to the server.
+		/// into PreprocessedSongData instance so it can be send to the server.<br></br>
+		/// songAuthor, songName and lyrics are not mandatory if we only need the fingerprint, BPM and TFPCount
 		/// </summary>
-		/// <param name="songAuthor">Name of the song.</param>
-		/// <param name="songName">Name of the author of the song.</param>
-		/// <param name="lyrics">Lyrics of the song.</param>
 		/// <param name="audioData">Supported audio format containing audio data.</param>
+		/// <param name="songAuthor">Name of the song - default = "none"</param>
+		/// <param name="songName">Name of the author of the song - default = "none"</param>
+		/// <param name="lyrics">Lyrics of the song - default = "none"</param>
 		/// <returns></returns>
-		private PreprocessedSongData PreprocessSongData(string songAuthor, string songName, string lyrics, IAudioFormat audioData)
+		private PreprocessedSongData PreprocessSongData(IAudioFormat audioData, string songAuthor = "none", string songName = "none", string lyrics = "none")
 		{
 			int BPM = recognizer.GetBPM(audioData, approximate: true);
 
