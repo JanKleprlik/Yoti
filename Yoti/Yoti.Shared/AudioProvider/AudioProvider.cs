@@ -288,37 +288,14 @@ namespace Yoti.Shared.AudioProvider
 
 				// Start recording
 				isRecording = true;
-				int totalBytesRead = 0;
 				
-				// lock buffer so that no other thread can acces the buffer
+				// lock buffer so that no other thread can acces the buffer (ie. replay while recording)
 				// and create inconsistent audio data
 				lock (bufferLock)
 				{
 					buffer = new byte[bufferLimit];
 					recorder.StartRecording();
-					// Record audio until buffer is full
-					while (totalBytesRead < bufferLimit)
-					{
-						try
-						{
-							int bytesRead = recorder.Read(buffer, 0, bufferLimit);
-							if (bytesRead < 0)
-							{
-								throw new Exception(String.Format("Exception code: {0}", bytesRead));
-							}
-							else
-							{
-								totalBytesRead += bytesRead;
-							}
-						}
-						catch(Exception e)
-						{
-							System.Diagnostics.Debug.WriteLine("[DEBUG] " + e.Message);
-							// Invalidate audio buffer
-							buffer = null;
-							break;
-						}
-					}
+					recorder.Read(buffer, 0, bufferLimit);
 				}
 #endif
 				#endregion

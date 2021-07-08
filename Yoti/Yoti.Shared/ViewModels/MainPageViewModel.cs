@@ -128,6 +128,8 @@ namespace Yoti.Shared.ViewModels
 			{
 				try
 				{
+					// UploadRecording accepts Action that sets InformationText string
+					// so results can be shown to user throughout the process of uploading. 
 					sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value);
 				}
 				catch(FileLoadException e)
