@@ -585,10 +585,14 @@ namespace Yoti.Shared.ViewModels
 		/// <param name="result"></param>
 		private async Task WriteRecognitionResults(RecognitionResult result)
 		{
-			//Write result of song accuracies
-			foreach(var songAccur in result.SongAccuracies)
+
+			//Write result of top 10 song accuracies
+			for (int i = 0; i < Math.Min(10,result.SongAccuracies.Count); i++)
 			{
-				await textWriter.WriteLineAsync($"Song ID: {songAccur.Item1} is {Math.Min(100d,songAccur.Item2):##.#} % time coherent.");
+				var songAccuracy = result.SongAccuracies[i];
+				Song song = await recognizerApi.GetSongById(songAccuracy.Item1);
+
+				await textWriter.WriteLineAsync($"Song \"{song?.Name ?? "Unknown"}\" is a {Math.Min(100d,songAccuracy.Item2):##.#}% match.");
 			}
 
 			if (result.Song == null)

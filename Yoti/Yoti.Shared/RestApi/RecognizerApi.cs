@@ -87,6 +87,18 @@ namespace Yoti.Shared.RestApi
 			return new List<Song>();
 		}
 		
+		public async Task<Song> GetSongById(uint id)
+		{
+			var result = await GetAsync(
+				baseUrl + $"/getsong/{id}",
+				defaultHeaders);
+			if (result != null)
+			{
+				return JsonSerializer.Deserialize<Song>(result, serializerOptions);
+			}
+			return null;
+		}
+
 		/// <summary>
 		/// Delete song from database.
 		/// </summary>
