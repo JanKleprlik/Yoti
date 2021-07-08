@@ -6,7 +6,6 @@
 		<ResourceDictionary Source="Buttons.xaml"/>
 		<ResourceDictionary Source="TextBox.xaml"/>
 		<ResourceDictionary Source="TextBlock.xaml"/>
-		<ResourceDictionary Source="DropDownButton.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 	
 </ResourceDictionary>

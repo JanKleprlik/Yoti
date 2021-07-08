@@ -5,7 +5,6 @@
 	<ResourceDictionary.MergedDictionaries>
 		<ResourceDictionary Source="Fonts.xaml"/>
 		<ResourceDictionary Source="Colors.xaml"/>
-		<ResourceDictionary Source="DataTemplates.xaml"/>
 	</ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

@@ -87,6 +87,11 @@ namespace Yoti.Shared.RestApi
 			return new List<Song>();
 		}
 		
+		/// <summary>
+		/// Get song by its id.
+		/// </summary>
+		/// <param name="id">Id of the song</param>
+		/// <returns>Song if it is in database. Null otherwise</returns>
 		public async Task<Song> GetSongById(uint id)
 		{
 			var result = await GetAsync(
