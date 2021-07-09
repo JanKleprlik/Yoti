@@ -28,12 +28,12 @@ namespace Yoti.Shared.Views
 		public LyricsDialog(MainPageViewModel mainPageVM)
         {
             this.InitializeComponent();
-			LyricsViewModel = new LyricsViewModel(mainPageVM);
+			MainPageViewModel = mainPageVM;
 		}
 
 		/// <summary>
 		/// Main page view model
 		/// </summary>
-		public LyricsViewModel LyricsViewModel;
+		public MainPageViewModel MainPageViewModel;
     }
 }

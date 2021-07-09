@@ -241,12 +241,8 @@ namespace Yoti.Shared.ViewModels
 			IsUploading = true;
 			InformationText = "Processing song";
 
-			// Unify end of line marks in database as '\r\n' so it can be replaced
-			// by Environment.NewLine in runtime depending on the system
-			string lyrics = NewSongLyrics.Replace('\r','\n').Replace("\n\n","\n").Replace("\n", "\r\n");
-
 			// Upload song on serever
-			bool wasAdded = await AddNewSongToDatabase(NewSongName, NewSongAuthor, lyrics, songToBeAddedToDatabase);
+			bool wasAdded = await AddNewSongToDatabase(NewSongName, NewSongAuthor, NewSongLyrics, songToBeAddedToDatabase);
 
 			// Update UI
 			IsUploading = false;

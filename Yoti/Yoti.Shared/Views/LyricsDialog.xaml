@@ -34,7 +34,7 @@
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
-		
+
 		<TextBox
 			x:Name="lyricsTextBox"
 			Grid.Row="0"
@@ -45,13 +45,7 @@
 			TextAlignment="Left"
 			PlaceholderText="Lyrics"
 			Style="{StaticResource LyricsTextBox}"
-			Text="{x:Bind LyricsViewModel.Lyrics, Mode=TwoWay}"
-			/>
-		<Button
-			Grid.Row="1"
-			Content="Append New Line"
-			Style="{StaticResource DialogOKButtonStyle}"
-			Click="{x:Bind LyricsViewModel.AddNewLine}"
+			Text="{x:Bind MainPageViewModel.NewSongLyrics, Mode=TwoWay}"
 			/>
 	</Grid>
 </ContentDialog>
