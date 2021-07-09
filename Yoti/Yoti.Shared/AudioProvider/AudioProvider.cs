@@ -264,24 +264,45 @@ namespace Yoti.Shared.AudioProvider
 			#endregion
 			#region ANDROID
 #if __ANDROID__
+			// Setup AudioTrack
 			ChannelOut channels = Parameters.Channels == 1 ? ChannelOut.Mono : ChannelOut.Stereo;
+			AudioTrack audioTrack = new AudioTrack.Builder()
+				.SetAudioAttributes(new AudioAttributes.Builder()
+					.SetUsage(AudioUsageKind.Media)
+					.SetContentType(AudioContentType.Music)
+					.Build())
+				.SetAudioFormat(new AudioFormat.Builder()
+					.SetEncoding(Encoding.Pcm16bit)
+					.SetSampleRate((int)Parameters.SamplingRate)
+					.SetChannelMask(channels)
+					.Build())
+				.SetBufferSizeInBytes(buffer.Length)
+				.Build();
+
+
+			int totalBytesReplayed = 0;
+			// Replay audio in lock until whole buffer is replayed
 			lock (bufferLock)
 			{
-				AudioTrack audioTrack = new AudioTrack.Builder()
-					.SetAudioAttributes(new AudioAttributes.Builder()
-						.SetUsage(AudioUsageKind.Media)
-						.SetContentType(AudioContentType.Music)
-						.Build())
-					.SetAudioFormat(new AudioFormat.Builder()
-						.SetEncoding(Encoding.Pcm16bit)
-						.SetSampleRate((int)Parameters.SamplingRate)
-						.SetChannelMask(channels)
-						.Build())
-					.SetBufferSizeInBytes(buffer.Length)
-					.Build();
-
 				audioTrack.Play();
-				audioTrack.Write(buffer, 0, buffer.Length);
+
+				while (totalBytesReplayed < bufferLimit)
+				{
+					try
+					{
+						totalBytesReplayed = audioTrack.Write(buffer, 0, bufferLimit);
+						System.Diagnostics.Debug.WriteLine($"Read: {totalBytesReplayed}");
+						if (totalBytesReplayed < 0)
+							throw new Exception(String.Format("Exception code: {0}", totalBytesReplayed));
+						
+					}
+					catch (Exception e)
+					{
+						// Invalidate audio buffer
+						buffer = null;
+						break;
+					}
+				}
 			}
 #endif
 			#endregion
@@ -330,14 +351,31 @@ namespace Yoti.Shared.AudioProvider
 
 				// Start recording
 				isRecording = true;
-				
+				int totalBytesRead = 0;
+				buffer = new byte[bufferLimit];
+
 				// lock buffer so that no other thread can acces the buffer (ie. replay while recording)
 				// and create inconsistent audio data
 				lock (bufferLock)
 				{
-					buffer = new byte[bufferLimit];
 					recorder.StartRecording();
-					recorder.Read(buffer, 0, bufferLimit);
+					// Record audio until buffer is full
+					while (totalBytesRead < bufferLimit)
+					{
+						try
+						{
+							totalBytesRead = recorder.Read(buffer, 0, bufferLimit);
+							if (totalBytesRead < 0)
+								throw new Exception(String.Format("Exception code: {0}", totalBytesRead));
+						}
+						catch (Exception e)
+						{
+							// Invalidate audio buffer
+							buffer = null;
+							break;
+						}
+					}
+				
 				}
 #endif
 				#endregion

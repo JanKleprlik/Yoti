@@ -122,7 +122,7 @@ namespace Yoti.Shared.ViewModels
 					// so results can be shown to user throughout the process of uploading. 
 					sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value, AudioDataProvider.Parameters.MaxRecordingUploadSize_MB);
 				}
-				catch(FileLoadException e)
+				catch (FileLoadException e)
 				{
 					// Inform user about failure
 					sucessfullRecordingUpload = false;
@@ -168,13 +168,13 @@ namespace Yoti.Shared.ViewModels
 		public async void UploadNewSong()
 		{
 			// Open platform specific FilePicker
-			if(! await audioRecorder.UploadRecording(value => UploadedSongText = value, AudioDataProvider.Parameters.MaxUploadSize_MB))
+			if (!await audioRecorder.UploadRecording(value => UploadedSongText = value, AudioDataProvider.Parameters.MaxUploadSize_MB))
 				return;
 
 
 			byte[] uploadedSong = await audioRecorder.GetDataFromStream(); // await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_MB:AudioDataProvider.Parameters.MaxUploadSize_MB);
-			
-			//file not picked
+
+			// File not picked
 			if (uploadedSong == null)
 				return;
 
@@ -183,19 +183,19 @@ namespace Yoti.Shared.ViewModels
 				songToBeAddedToDatabase = new WavFormat(uploadedSong);
 				if (!IsSupported(songToBeAddedToDatabase))
 				{
-					//release resources
+					// Release resources
 					songToBeAddedToDatabase = null;
 					return;
 				}
 			}
-			catch(ArgumentException e)
+			catch (ArgumentException e)
 			{
 				this.Log().LogError(e.Message);
 				InformationText = "Problem with uploaded wav file occured." + Environment.NewLine + "Please try a different audio file.";
 				return;
 			}
 		}
-#endif 
+#endif
 
 		/// <summary>
 		/// Proces picked song and upload it into the server database.
@@ -204,7 +204,7 @@ namespace Yoti.Shared.ViewModels
 		{
 			// Reset UI
 			WasRecognized = false;
-			
+
 			// Check that all form controls are filled.
 			if (NewSongName.IsNullOrEmpty())
 			{
@@ -221,10 +221,13 @@ namespace Yoti.Shared.ViewModels
 				InformationText = "Please upload the song.";
 				return;
 			}
+
+
+			// Lyrics is not mandatory
+			// Set lyrics as "Unknown" if not provided by the user
 			if (NewSongLyrics.IsNullOrEmpty())
 			{
-				InformationText = "Please enter the lyrics.";
-				return;
+				NewSongLyrics = "Unknown";
 			}
 
 			// Update UI
@@ -237,18 +240,20 @@ namespace Yoti.Shared.ViewModels
 			// Update UI
 			IsUploading = false;
 			if (wasAdded)
-				InformationText = $"\"{NewSongName}\" by {NewSongAuthor} added";
+				InformationText = $"\"{NewSongName}\" by {NewSongAuthor} added.";
+			else
+				InformationText = $"\"{NewSongName}\" by {NewSongAuthor} could not added to the database.";
 			// Close 'Add song' form
 			CloseNewSongForm();
 
 
-			//release resources and reset 'Add song' form data
+			// Release resources and reset 'Add song' form data
 			songToBeAddedToDatabase = null;
 			UploadedSongText = "Please upload audio file";
 			NewSongAuthor = string.Empty;
 			NewSongName = string.Empty;
 
-			//Force GC to avoid memory struggles on older phones
+			// Force GC to avoid memory struggles on older phones
 			GC.Collect();
 		}
 
@@ -277,12 +282,12 @@ namespace Yoti.Shared.ViewModels
 			if (RecognizedSong == null)
 			{
 				var lyricsShowDialog = new LyricsShowDialog(new Song()
-					{
-						Lyrics = "No record.",
-						Author = "Unknown",
-						Name = "Lyrics",
-						BPM = 0
-					});
+				{
+					Lyrics = "No record.",
+					Author = "Unknown",
+					Name = "Lyrics",
+					BPM = 0
+				});
 				await lyricsShowDialog.ShowAsync();
 			}
 			else
@@ -309,7 +314,7 @@ namespace Yoti.Shared.ViewModels
 			var lyricsDialog = new LyricsDialog(this);
 			ContentDialogResult resutl = await lyricsDialog.ShowAsync();
 		}
-#endregion
+		#endregion
 
 		#region Properties
 

@@ -23,8 +23,7 @@ namespace Yoti.Shared.ViewModels
 		/// </summary>
 		public string Lyrics
 		{
-			get => _song.Lyrics.Replace("\r\n", Environment.NewLine); //unify NewLine according to app enviroment
-			private set	{ /*nothing should happen*/ }
+			get => _song.Lyrics;
 		}
 		/// <summary>
 		/// Name of the author of the song that is supposed to be displayed.
@@ -32,7 +31,6 @@ namespace Yoti.Shared.ViewModels
 		public string Name
 		{
 			get => _song.Name;
-			private set { /*nothing should happen*/ }
 		}
 	}
 }

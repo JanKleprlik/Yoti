@@ -166,7 +166,7 @@ namespace Yoti.Server.Controllers
 		/// </summary>
 		/// <param name="song">Song to delete.</param>
 		/// <returns>Deleted song.</returns>
-		#region Delete test
+		#region Delete song
 		[HttpDelete("[action]")]
 		public async Task<ActionResult<Song>> DeleteSong(Song song)
 		{

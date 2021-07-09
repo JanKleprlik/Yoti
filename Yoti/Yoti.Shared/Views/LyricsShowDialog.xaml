@@ -9,7 +9,6 @@
     mc:Ignorable="d android"
 	
 	Title="{x:Bind LyricsShowViewModel.Name}"
-	android:Foreground="Black"
     PrimaryButtonText="Done"
 
 	CornerRadius="25"
