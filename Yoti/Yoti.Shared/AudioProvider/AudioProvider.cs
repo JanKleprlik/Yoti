@@ -72,8 +72,9 @@ namespace Yoti.Shared.AudioProvider
 		private AudioRecord recorder { get; set; }
 		/// <summary>
 		/// Audio Buffer size limit.
+		/// Default value 441 000 is 5 seconds of recording.
 		/// </summary>
-		private int bufferLimit { get; set; } = 480000;
+		private int bufferLimit { get; set; } = 441000;
 #endif
 		#endregion
 
@@ -84,7 +85,7 @@ namespace Yoti.Shared.AudioProvider
 		/// </summary>
 		/// <param name="writeResult">Action accepting result of Upload process described in string.</param>
 		/// <returns>True if picked song was sucessfuly uploaded, false otherwise.</returns>
-		public async Task<bool> UploadRecording(Action<string> writeResult)
+		public async Task<bool> UploadRecording(Action<string> writeResult, ulong maxSize_MB)
 		{
 			#region UWP
 #if NETFX_CORE
@@ -96,35 +97,76 @@ namespace Yoti.Shared.AudioProvider
 
 			// Open FilePicker
 			StorageFile file = await picker.PickSingleFileAsync();
-			
+
 			if (file == null)
 			{
 				writeResult("No song uploaded.");
 				return false;
 			}
-			
+
 			// Check size of uploaded file
 			var fileProperties = await file.GetBasicPropertiesAsync();
-			if (fileProperties.Size > Parameters.MaxRecordingUploadSize_MB * 1024 * 1024)
+			if (fileProperties.Size > maxSize_MB * 1024 * 1024)
 			{
-				writeResult($"Selected file is too big." + Environment.NewLine + $"Maximum allowed size is {Parameters.MaxRecordingUploadSize_MB} MB.");
+				writeResult($"Selected file is too big." + Environment.NewLine + $"Maximum allowed size is {maxSize_MB} MB.");
 				return false;
 			}
-			else 
+			else
 			{
 				buffer = await file.OpenAsync(FileAccessMode.ReadWrite);
 				writeResult(file.Name);
 				return true;
 			}
-
 #endif
 			#endregion
 
 			#region ANDROID
 #if __ANDROID__
+			if (await Utils.Permissions.Droid.GetExternalStoragePermission())
+			{
+				// Setup FilePicker
+				PickOptions options = new PickOptions
+				{
+					PickerTitle = "Please select a wav song file",
+					FileTypes = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+					{
+						{DevicePlatform.Android, new[]{"audio/x-wav", "audio/wav"} }
+					})
+				};
 
-			buffer = await Utils.FileUpload.PickAndUploadFileAsync(writeResult, AudioDataProvider.Parameters.MaxRecordingUploadSize_MB);
-			return buffer != null;
+				// Open FilePicker
+				FileResult result = await FilePicker.PickAsync(options);
+
+				// Process picked file
+				if (result != null)
+				{
+					var audioFileData = await result.OpenReadAsync();
+					if ((ulong)audioFileData.Length > maxSize_MB * 1024 * 1024)
+					{
+						writeResult($"File is too large." + Environment.NewLine + $"Maximum allowed size is {maxSize_MB} MB.");
+						return false;
+					}
+
+					buffer = new byte[(int)audioFileData.Length];
+					audioFileData.Read(buffer, 0, (int)audioFileData.Length);
+					writeResult(result.FileName);
+
+					return true;
+				}
+				// No file picked
+				else
+				{
+					writeResult("No song uploaded");
+					return false;
+				}
+
+			}
+			// External Sotrage Permission not granted
+			else
+			{
+				writeResult("Acces to read storage denied.");
+				return false;
+			}
 #endif
 			#endregion
 			// Fallback value for unsupported platforms

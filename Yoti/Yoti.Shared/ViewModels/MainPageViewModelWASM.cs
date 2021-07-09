@@ -24,7 +24,7 @@ namespace Yoti.Shared.ViewModels
 		/// Also handles necessary UI updates. <br></br>
 		/// WASM only.
 		/// </summary>
-		public async void RecognizeSong_WASM()
+		public void RecognizeSong_WASM()
 		{
 			// Setup Delegates
 			DeleteDelegates();
@@ -43,7 +43,7 @@ namespace Yoti.Shared.ViewModels
 			else
 			{
 				stringBuilder = new StringBuilder();
-				await WebAssemblyRuntime.InvokeAsync($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_MB}, 0);"); //(size_limit, js metadata offset)
+				WebAssemblyRuntime.InvokeJS($"pickAndUploadAudioFile({AudioProvider.AudioDataProvider.Parameters.MaxRecordingUploadSize_MB}, 0);"); //(size_limit, js metadata offset)
 			}
 		}
 
@@ -73,11 +73,12 @@ namespace Yoti.Shared.ViewModels
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e">Instance with audio data and process status information.</param>
-		private async void OnSongToRecognizeEvent(object sender, WasmEventHandlerArgs e)
+		private async void OnSongToRecognizeEvent(object sender, string fileAsDataUrl, bool isDone)
 		{
+			//remove EventHandler in case this is the last iteration
 			WasmSongEvent -= OnSongToRecognizeEvent;
 			// Audio data is fully uploaded from javascript to C#, now recognize the song
-			if (e.isDone)
+			if (isDone)
 			{
 				// Update UI
 				IsRecording = false;
@@ -128,7 +129,7 @@ namespace Yoti.Shared.ViewModels
 			}
 			else
 			{
-				stringBuilder.Append(e.FileAsDataUrl);
+				stringBuilder.Append(fileAsDataUrl);
 
 				//repeat this event until e.isDone == true;
 				WasmSongEvent += OnSongToRecognizeEvent;
@@ -140,11 +141,12 @@ namespace Yoti.Shared.ViewModels
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e">Instance with audio data and process status information.</param>
-		private void OnNewSongUploadedEvent(object sender, WasmEventHandlerArgs e)
+		private void OnNewSongUploadedEvent(object sender, string fileAsDataUrl, bool isDone)
 		{
+			//remove EventHandler in case this is the last iteration
 			WasmSongEvent -= OnNewSongUploadedEvent;
 			// Song is fully uploaded from javascript to C#, now convert uploaded data to Wav Format
-			if (e.isDone)
+			if (isDone)
 			{
 				// Convert audio data from Base64 string to byte array
 				byte[] binData = Convert.FromBase64String(stringBuilder.ToString()); 
@@ -168,12 +170,12 @@ namespace Yoti.Shared.ViewModels
 				}
 
 				// Update UI
-				UploadedSongText = e.FileAsDataUrl;
+				UploadedSongText = fileAsDataUrl;
 				InformationText = "File picked";
 			}
 			else
 			{
-				stringBuilder.Append(e.FileAsDataUrl);
+				stringBuilder.Append(fileAsDataUrl);
 				// Repeat this event until e.isDone
 				WasmSongEvent += OnNewSongUploadedEvent;
 			}
@@ -186,7 +188,7 @@ namespace Yoti.Shared.ViewModels
 		/// </summary>
 		/// <param name="fileAsDataUrl">File data to be transfered.</param>
 		/// <param name="isDone">Flag indicating wether complete file was transfered.</param>
-		public static void ProcessEvent(string fileAsDataUrl, bool isDone) => WasmSongEvent?.Invoke(null, new WasmEventHandlerArgs(fileAsDataUrl, isDone));
+		public static void ProcessEvent(string fileAsDataUrl, bool isDone) => WasmSongEvent?.Invoke(null, fileAsDataUrl, isDone);
 
 		/// <summary>
 		/// Upload event handler
@@ -196,34 +198,7 @@ namespace Yoti.Shared.ViewModels
 		/// <summary>
 		/// Event handler delegate.
 		/// </summary>
-		private delegate void WasmEventHandler(object sender, WasmEventHandlerArgs args);
-
-		/// <summary>
-		/// Event handler argument class used to transfer data from javascript to C#
-		/// </summary>
-		private class WasmEventHandlerArgs
-		{
-			/// <summary>
-			/// Constructor
-			/// </summary>
-			/// <param name="fileAsDataUrl">Data to be transfered.</param>
-			/// <param name="isDone">Flag indicating wether complete file was transfered.</param>
-			public WasmEventHandlerArgs(string fileAsDataUrl, bool isDone)
-			{
-				FileAsDataUrl = fileAsDataUrl;
-				this.isDone = isDone;
-			}
-
-			/// <summary>
-			/// File data to be transfered.
-			/// </summary>
-			public string FileAsDataUrl { get; }
-
-			/// <summary>
-			/// Flag indicating wether complete file was transfered.
-			/// </summary>
-			public bool isDone { get; }
-		}
+		private delegate void WasmEventHandler(object sender, string fileAsDataUrl, bool isDone);
 
 		/// <summary>
 		/// Helper method deleting all buffered delegates.

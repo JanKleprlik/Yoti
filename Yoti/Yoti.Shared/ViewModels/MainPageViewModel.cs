@@ -130,7 +130,7 @@ namespace Yoti.Shared.ViewModels
 				{
 					// UploadRecording accepts Action that sets InformationText string
 					// so results can be shown to user throughout the process of uploading. 
-					sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value);
+					sucessfullRecordingUpload = await audioRecorder.UploadRecording(value => InformationText = value, AudioDataProvider.Parameters.MaxRecordingUploadSize_MB);
 				}
 				catch(FileLoadException e)
 				{
@@ -170,7 +170,6 @@ namespace Yoti.Shared.ViewModels
 		{
 			audioRecorder.ReplayRecording(UIDispatcher);
 		}
-#endif 
 
 		/// <summary>
 		/// Opens platform specific FilePicker and allows the user to pick audio file. <br></br>
@@ -179,7 +178,11 @@ namespace Yoti.Shared.ViewModels
 		public async void UploadNewSong()
 		{
 			// Open platform specific FilePicker
-			byte[] uploadedSong = await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_MB:AudioDataProvider.Parameters.MaxUploadSize_MB);
+			if(! await audioRecorder.UploadRecording(value => UploadedSongText = value, AudioDataProvider.Parameters.MaxUploadSize_MB))
+				return;
+
+
+			byte[] uploadedSong = await audioRecorder.GetDataFromStream(); // await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_MB:AudioDataProvider.Parameters.MaxUploadSize_MB);
 			
 			//file not picked
 			if (uploadedSong == null)
@@ -202,6 +205,7 @@ namespace Yoti.Shared.ViewModels
 				return;
 			}
 		}
+#endif 
 
 		/// <summary>
 		/// Proces picked song and upload it into the server database.
