@@ -26,7 +26,7 @@ namespace Yoti.Shared.Views
 			Settings appSettings = new Settings();
 
 			SettingsViewModel = new SettingsViewModel(appSettings);
-			MainPageViewModel = new MainPageViewModel(outputTextBox, appSettings, SettingsViewModel, Dispatcher);
+			MainPageViewModel = new MainPageViewModel(appSettings, SettingsViewModel, Dispatcher);
 			setupFlickerAnimation();
 		}
 

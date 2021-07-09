@@ -15,6 +15,7 @@ using AudioRecognitionLibrary.Recognizer;
 using System.Linq;
 using System.IO;
 using Yoti.Shared.Views;
+using System.Text;
 
 namespace Yoti.Shared.ViewModels
 {
@@ -26,9 +27,8 @@ namespace Yoti.Shared.ViewModels
 		/// <param name="outputTextBlock">TextBlock control to write Detailed info into.</param>
 		/// <param name="settings">Starting settings for the application.</param>
 		/// <param name="UIDispatcher">CoreDispatcher used for dispatching replay of captured audio.</param>
-		public MainPageViewModel(TextBlock outputTextBlock, Settings settings, SettingsViewModel settingsViewModel, CoreDispatcher UIDispatcher)
+		public MainPageViewModel(Settings settings, SettingsViewModel settingsViewModel, CoreDispatcher UIDispatcher)
 		{
-			textWriter = new TextBlockTextWriter(outputTextBlock);
 			Settings = settings;
 			this.UIDispatcher = UIDispatcher;
 			this.settingsViewModel = settingsViewModel;
@@ -50,11 +50,6 @@ namespace Yoti.Shared.ViewModels
 		private AudioRecognizer recognizer { get; set; }
 
 		/// <summary>
-		/// Text writer used for detailed info output from recognizer.
-		/// </summary>
-		private TextBlockTextWriter textWriter { get; set; }
-
-		/// <summary>
 		/// Audio Format used for song recognition.
 		/// </summary>
 		private IAudioFormat uploadedSong { get; set; }
@@ -63,11 +58,6 @@ namespace Yoti.Shared.ViewModels
 		/// Audio Format used for adding new song to database.
 		/// </summary>
 		private IAudioFormat songToBeAddedToDatabase { get; set; }
-
-		/// <summary>
-		/// Lock used for file upload.
-		/// </summary>
-		private object uploadedSongLock { get; set; } = new object();
 
 		/// <summary>
 		/// API provider for communication with server side.
@@ -353,6 +343,21 @@ namespace Yoti.Shared.ViewModels
 
 		}
 
+		private string _detailedInfoText = "";
+		/// <summary>
+		/// Detailed info text displaying informatioun about 
+		/// the process of recognition.
+		/// </summary>
+		public string DetailedInfoText
+		{
+			get => _detailedInfoText;
+			set
+			{
+				_detailedInfoText = value;
+				OnPropertyChanged();
+			}
+		}
+
 		private string _uploadedSongText = "Please upload audio file";
 		/// <summary>
 		/// Name of uploaded song in 'Add song' form.
@@ -534,7 +539,7 @@ namespace Yoti.Shared.ViewModels
 		/// <summary>
 		/// Recognized song.
 		/// </summary>
-		public Song RecognizedSong = null;
+		public Song RecognizedSong { get; set; } = null;
 		#endregion
 
 		#region private Methods
@@ -576,8 +581,11 @@ namespace Yoti.Shared.ViewModels
 		/// </summary>
 		private void UpdateRecognitionUI()
 		{
+			//Hide YouTube Music link and lyrics button
 			WasRecognized = false;
-			textWriter.Clear();
+			// Delete previous detailed info
+			DetailedInfoText = "";
+			//notify user about the process of recognition
 			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
 		}
 
@@ -588,25 +596,35 @@ namespace Yoti.Shared.ViewModels
 		private async Task WriteRecognitionResults(RecognitionResult result)
 		{
 
-			//Write result of top 10 song accuracies
+			// Write result of top 10 song accuracies (accuracies are already sorted from server).
+			StringBuilder detailedInfoSB = new StringBuilder();
 			for (int i = 0; i < Math.Min(10,result.SongAccuracies.Count); i++)
 			{
 				var songAccuracy = result.SongAccuracies[i];
 				Song song = await recognizerApi.GetSongById(songAccuracy.Item1);
 
-				await textWriter.WriteLineAsync($"Song \"{song?.Name ?? "Unknown"}\" is a {Math.Min(100d,songAccuracy.Item2):##.#}% match.");
+				detailedInfoSB.Append($"Song \"{song?.Name ?? "Unknown"}\" is a {Math.Min(100d, songAccuracy.Item2):##.#}% match. {Environment.NewLine}");
 			}
 
+			// If song was not recognized
 			if (result.Song == null)
 			{
+				// Display recognition failure
 				InformationText = $"Song was not recognized.";
+				// Hide YouTube Music link and button for lyrics
 				WasRecognized = false;
 				return;
 			}
 
+			// Display recognition result
 			InformationText = $"\"{result.Song.Name}\" by {result.Song.Author}";
+			// Display detailed info about recognition
+			DetailedInfoText = detailedInfoSB.ToString();
+			// Generate YouTube Music link
 			YouTubeLink = CreateYouTubeLink(result.Song.Name, result.Song.Author);
+			// Set recognized song so lyrics can be displayed
 			RecognizedSong = result.Song;
+			// Display YouTube Music link and button for lyrics
 			WasRecognized = true;
 		}
 

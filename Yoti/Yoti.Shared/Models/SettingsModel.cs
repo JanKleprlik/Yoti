@@ -16,13 +16,6 @@ namespace Yoti.Shared.Models
 		}
 
 		/// <summary>
-		/// <b>True</b>: Use Constant Q algorithm to get frequency domain.<br/>
-		/// <b>False</b>: Use FFT to get frequency domain.<br/>
-		/// Default: False
-		/// </summary>
-		public bool Lyrics { get; set; }
-
-		/// <summary>
 		/// <b>True</b>: Print detailed information about recognition. <br/>
 		/// <b>False</b>: Print only result.<br/>
 		/// Default: False
@@ -85,7 +78,6 @@ namespace Yoti.Shared.Models
 		/// </summary>
 		public void SetToDefault()
 		{
-			Lyrics = false;
 			DetailedInfo = false;
 			RecordingLength = 5;
 			UseMicrophone = true;
@@ -95,7 +87,6 @@ namespace Yoti.Shared.Models
 		public override string ToString()
 		{
 			string text = "SETTINGS: \n" +
-				$"ConstQAlgorithm: {Lyrics}\n" +
 				$"DetailedInfo: {DetailedInfo}\n" +
 				$"UseMicrophone: {UseMicrophone}\n" +
 				$"RecordingLength: {RecordingLength}";

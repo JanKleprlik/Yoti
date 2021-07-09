@@ -331,6 +331,7 @@
 				/>
 			<TextBlock
 				x:Name="outputTextBox"
+				Text="{x:Bind MainPageViewModel.DetailedInfoText, Mode=OneWay}"
 				Width="Auto"
 				Height="Auto"
 				android:FontSize="10"

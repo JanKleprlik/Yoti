@@ -57,25 +57,6 @@ namespace Yoti.Shared.RestApi
 				return null;
 			}
 		}
-		/// <summary>
-		/// DELETE request
-		/// </summary>
-		/// <param name="url">Request url</param>
-		/// <param name="headers">Dictionary of name and value of the header.</param>
-		/// <returns>Serialized JSON response as string. Null on failure.</returns>
-		protected async Task<string> DeleteAsync(string url, Dictionary<string, string> headers = null)
-		{
-			using (var request = CreateRequestMessage(HttpMethod.Delete, url, headers))
-			using (var response = await _client.SendAsync(request))
-			{
-				if (response.IsSuccessStatusCode)
-				{
-					return await response.Content.ReadAsStringAsync();
-				}
-
-				return null;
-			}
-		}
 
 		/// <summary>
 		/// DELETE request
@@ -100,6 +81,7 @@ namespace Yoti.Shared.RestApi
 				}
 			}
 		}
+
 		/// <summary>
 		/// POST request
 		/// </summary>
@@ -110,30 +92,6 @@ namespace Yoti.Shared.RestApi
 		protected async Task<string> PostAsync(string url, string payload, Dictionary<string, string> headers = null)
 		{
 			using (var request = CreateRequestMessage(HttpMethod.Post, url, headers))
-			{
-				request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
-				using (var response = await _client.SendAsync(request))
-				{
-					if (response.IsSuccessStatusCode)
-					{
-						return await response.Content.ReadAsStringAsync();
-					}
-
-					return null;
-				}
-			}
-		}
-
-		/// <summary>
-		/// PUT request
-		/// </summary>
-		/// <param name="url">Request url.</param>
-		/// <param name="payload">Payload serialized as JSON.</param>
-		/// <param name="headers">Dictionary of name and value of the header.</param>
-		/// <returns>Serialized JSON response as string. Null on failure.</returns>
-		protected async Task<string> PutAsync(string url, string payload, Dictionary<string, string> headers = null)
-		{
-			using (var request = CreateRequestMessage(HttpMethod.Put, url, headers))
 			{
 				request.Content = new StringContent(payload, Encoding.UTF8, "application/json");
 				using (var response = await _client.SendAsync(request))
