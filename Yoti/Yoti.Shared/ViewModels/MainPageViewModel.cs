@@ -32,7 +32,6 @@ namespace Yoti.Shared.ViewModels
 			Settings = settings;
 			this.UIDispatcher = UIDispatcher;
 			this.settingsViewModel = settingsViewModel;
-
 			recognizer = new AudioRecognizer();
 
 			// Audio Provider on WASM is handled in javascript

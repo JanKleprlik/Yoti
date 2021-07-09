@@ -30,10 +30,10 @@ namespace AudioRecognitionLibrary.Processor
 			BitReverse(data);
 
 			int max = 1;
-			while (n > max) // while loop represents logarithm for loop implementation of https://en.wikipedia.org/wiki/Cooley%E2%80%93Tukey_FFT_algorithm
+			while (n > max)
 			{
-				int step = 2 * max; // 2^s form wiki
-									//helper variables for Real and Img separate computations
+				int step = 2 * max;
+				//helper variables for Real and Img separate computations
 				double omegaReal = 1;
 				double omegaImg = 0;
 				double omegaCoefReal = Math.Cos(Math.PI / max);
@@ -43,12 +43,12 @@ namespace AudioRecognitionLibrary.Processor
 					//2*n because we have double the amount of data (Re+Img)
 					for (int k = m; k < 2 * n; k += 2 * step)
 					{
-						double tmpReal = omegaReal * data[k + step] - omegaImg * data[k + step + 1]; //t real part from wiki
-						double tmpImg = omegaImg * data[k + step] + omegaReal * data[k + step + 1]; //t img part from wiki
-																									//A[k+j+m/2] from wiki
+						double tmpReal = omegaReal * data[k + step] - omegaImg * data[k + step + 1]; 
+						double tmpImg = omegaImg * data[k + step] + omegaReal * data[k + step + 1];
+																									
 						data[k + step] = data[k] - tmpReal;
 						data[k + step + 1] = data[k + 1] - tmpImg;
-						//A[k+j] from wiki
+
 						data[k] = data[k] + tmpReal;
 						data[k + 1] = data[k + 1] + tmpImg;
 					}

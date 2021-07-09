@@ -60,7 +60,6 @@ namespace Yoti.Shared.Models
 		/// </summary>
 		public int[] SupportedSamplingRates { get; } = new int[] { 
 			(int)AudioProvider.AudioDataProvider.Parameters.SamplingRate, // 44100 Hz
-			(int)AudioProvider.AudioDataProvider.Parameters.SamplingRate/2 // 22050 Hz
 		};
 
 		/// <summary>

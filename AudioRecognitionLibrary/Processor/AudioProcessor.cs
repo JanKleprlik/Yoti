@@ -18,7 +18,7 @@ namespace AudioRecognitionLibrary.Processor
 		/// Resamples data from multiple channels to single one.
 		/// </summary>
 		/// <param name="audio">audio with</param>
-		public static void ConvertToMono(IAudioFormat audio)
+		public static short[] ConvertToMono(IAudioFormat audio)
 		{
 			if (audio == null)
 				throw new ArgumentNullException("Argument 'audio' is null.");
@@ -28,7 +28,7 @@ namespace AudioRecognitionLibrary.Processor
 			switch (audio.Channels)
 			{
 				case 1:
-					break;
+					return audio.Data;
 
 				case 2:
 					short[] mono = new short[audio.NumOfDataSamples / 2];
@@ -38,11 +38,7 @@ namespace AudioRecognitionLibrary.Processor
 						mono[i / 2] = Arithmetics.Average(audio.Data[i], audio.Data[i + 1]);
 					}
 
-					// number of bytes is halved (Left and Right bytes are merget into one)
-					audio.Data = mono; //set new SampleData
-					audio.Channels = 1; //lower number of channels
-					audio.NumOfDataSamples /= 2;  //lower number of data samples
-					break;
+					return mono;
 				default:
 					throw new NotImplementedException($"Convert from {audio.Channels} channels to mono is not supported.");
 			}

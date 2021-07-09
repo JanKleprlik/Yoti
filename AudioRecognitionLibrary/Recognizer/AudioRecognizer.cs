@@ -14,15 +14,14 @@ namespace AudioRecognitionLibrary.Recognizer
 
 		/// <summary>
 		/// Creates fingerprint of given audio and returns it together with number of valid notes. (needed to compute recognition accuracy). <br></br>
-		/// WARNING: Converts audio into single channel.
 		/// </summary>
 		/// <param name="audio">Audio whos fingerprint we want.</param>
 		/// <returns>Tuple where Item1 is fingerprint, Item2 is total number of notes. <br></br>fingerprint: [address; (absolute anchor times)]<br></br>Note: Address is the hash.</returns>
 		public Tuple<Dictionary<uint, List<uint>>, int> GetAudioFingerprint(IAudioFormat audio)
 		{
-			AudioProcessor.ConvertToMono(audio);
+			short[] monoData = AudioProcessor.ConvertToMono(audio);
 
-			double[] data = Array.ConvertAll(audio.Data, item => (double)item);
+			double[] data = Array.ConvertAll(monoData, item => (double)item);
 
 			//compute downsample coeficient for resampling to Parameters.TargetSamplingRate
 			int downsampleCoef = (int) audio.SampleRate / Parameters.TargetSamplingRate;
@@ -82,7 +81,6 @@ namespace AudioRecognitionLibrary.Recognizer
 
 		/// <summary>
 		/// Obtains BPM of given audio.
-		/// WARNING: Converts audio into single chanel.
 		/// </summary>
 		/// <param name="song">Audio to get BPM of.</param>
 		/// <param name="approximate">Flag wether to approximate BPM in intervals of size set at <see cref="AudioRecognizer.Parameters"/></param>
@@ -90,10 +88,10 @@ namespace AudioRecognitionLibrary.Recognizer
 		public int GetBPM(IAudioFormat song, bool approximate = false)
 		{
 			// Multiple audio channels do not improve BPM identification.
-			AudioProcessor.ConvertToMono(song);
+			short[] monoData = AudioProcessor.ConvertToMono(song);
 
 			// Using floats instead of doubles here because of filters from NAudio library
-			float[] data = Array.ConvertAll(song.Data, item => (float)item);
+			float[] data = Array.ConvertAll(monoData, item => (float)item);
 
 
 			FilterBPMFrequencies(data, (float)song.SampleRate);
