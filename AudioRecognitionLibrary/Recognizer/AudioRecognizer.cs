@@ -471,11 +471,11 @@ namespace AudioRecognitionLibrary.Recognizer
 		{
 			//[songID, delta]
 			Dictionary<uint, int> maxTimeCoherentNotes = new Dictionary<uint, int>();
-			foreach (var songID in filteredSongs.Keys)
+			foreach (var songID in filteredSongs.Keys) //foreach song
 			{
 				//[delta, occurrence]
 				Dictionary<long, int> songDeltasQty = new Dictionary<long, int>();
-				foreach (var address in recordAddresses.Keys)
+				foreach (var address in recordAddresses.Keys) //foreach address of the song
 				{
 					if (filteredSongs[songID].ContainsKey(address))
 					{
@@ -556,11 +556,11 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <returns>[songID, [address, (absSongAnchorTime)]]</returns>
 		private Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordAddresses, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
 		{
-			// [songID, [address, (absSongAnchorTime)]]
-			Dictionary<uint, Dictionary<uint, List<uint>>> res = new Dictionary<uint, Dictionary<uint, List<uint>>>();
-			// [songID, common couple amount]
+			// [songID, [address, (absSongAnchorTime)]] -> songs that have common hashes
+			Dictionary<uint, Dictionary<uint, List<uint>>> filteredDatabaseSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();
+			// [songID, common couple amount] -> number of common hashes of each song in the database with target song
 			Dictionary<uint, int> commonCoupleAmount = new Dictionary<uint, int>();
-			// [songID, common couples in TGZ amount]
+			// [songID, common couples in TGZ amount] -> number of hashes in target zones of each song in the databaze
 			Dictionary<uint, int> commonTGZAmount = new Dictionary<uint, int>();
 
 			// Create datastructure for fast search in time coherency check
@@ -586,13 +586,13 @@ namespace AudioRecognitionLibrary.Recognizer
 
 							uint AbsSongAnchTime = (uint)(songValue >> 32);
 
-							if (!res.ContainsKey(songID)) //add songID entry
-								res.Add(songID, new Dictionary<uint, List<uint>>());
-							if (!res[songID].ContainsKey(address)) //add address entry
-								res[songID].Add(address, new List<uint>());
+							if (!filteredDatabaseSongs.ContainsKey(songID)) //add songID entry
+								filteredDatabaseSongs.Add(songID, new Dictionary<uint, List<uint>>());
+							if (!filteredDatabaseSongs[songID].ContainsKey(address)) //add address entry
+								filteredDatabaseSongs[songID].Add(address, new List<uint>());
 
 							//add the actual Absolute Anchor Time of a song
-							res[songID][address].Add(AbsSongAnchTime);
+							filteredDatabaseSongs[songID][address].Add(AbsSongAnchTime);
 						}
 					}
 				}
@@ -602,21 +602,22 @@ namespace AudioRecognitionLibrary.Recognizer
 
 			// Remove songs that have low ratio of couples that make a TGZ
 			// also remove songs that have low amount of samples common with recording
-			foreach (var songID in res.Keys)
+			foreach (var songID in filteredDatabaseSongs.Keys)
 			{
+				// ratio of common target zones and common couples
 				double ratio = (double)commonTGZAmount[songID] / commonCoupleAmount[songID];
-				//remove song if less than half of samples is not in TGZ
-				//remove songs that don't have enough samples in TGZ
-				//		- min is 1720 * coef (for noise cancellation)
-				//			- avg 2. samples per bin common (2 out of 6) with about 860 bins per 10 (1000/11.7) seconds = 1720
-				if ((commonTGZAmount[songID] < 1400 || ratio < Parameters.SamplesInTgzCoef) && //normal songs have a lot of samples in TGZ with not that high ratio (thus wont get deleted)
-					ratio < 0.8d) //or test sounds (Hertz.wav or 400Hz.wav) dont have many samples in TGZ but have high ratio
+				
+				// limit of common hashes in targetzone that song must have to be considered
+				// 1024 /10,8 -> number of bins potentialy considered at each FFT iteration
+				// 3 -> average 3 out of 6 bins are considered at each FFT
+				// 5 for average 5 second long recording
+				int commonTGZLimit = (int) ( 1024 / 10.8 * 3 * 5);
+				
+
+				if (!(commonTGZAmount[songID] < commonTGZLimit //remove songs that have very little hashes in common with the recording
+					|| ratio < Parameters.SamplesInTgzCoef)) //remove song if less than SamplesInTgzCoef of samples are not in TGZ
 				{
-					//res.Remove(songID);
-				}
-				else
-				{
-					filteredSongs.Add(songID, res[songID]);
+					filteredSongs.Add(songID, filteredDatabaseSongs[songID]);
 				}
 			}
 			return filteredSongs;
