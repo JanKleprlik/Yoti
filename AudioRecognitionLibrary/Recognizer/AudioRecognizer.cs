@@ -465,9 +465,9 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// Computes maximum number of time coherent notes for each song.
 		/// </summary>
 		/// <param name="filteredSongs">Filtered songs from database with their fingerprints.<br></br>[songId, [address, (absolute anchor time)]]<br></br>Note: address is eqv. to the hash.</param>
-		/// <param name="recordAddresses">Recording addresses <br></br>[address, (absolute anchor time)]<br></br>Note: address is eqv. to the hash.</param>
+		/// <param name="recordFingerprint">Recording addresses <br></br>[address, (absolute anchor time)]<br></br>Note: address is eqv. to the hash.</param>
 		/// <returns>Dict of songs with their number of maxium coherent notes.<br></br>[songId, timeCoherentNotes]</returns>
-		private static Dictionary<uint, int> GetDeltas(Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs, Dictionary<uint, List<uint>> recordAddresses)
+		private static Dictionary<uint, int> GetDeltas(Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs, Dictionary<uint, List<uint>> recordFingerprint)
 		{
 			//[songID, delta]
 			Dictionary<uint, int> maxTimeCoherentNotes = new Dictionary<uint, int>();
@@ -475,13 +475,13 @@ namespace AudioRecognitionLibrary.Recognizer
 			{
 				//[delta, occurrence]
 				Dictionary<long, int> songDeltasQty = new Dictionary<long, int>();
-				foreach (var address in recordAddresses.Keys) //foreach address of the song
+				foreach (var address in recordFingerprint.Keys) //foreach address of the song
 				{
 					if (filteredSongs[songID].ContainsKey(address))
 					{
 						foreach (var absSongAnchTime in filteredSongs[songID][address]) //foreach AbsSongAnchorTime at specific address 
 						{
-							foreach (var absRecAnchTime in recordAddresses[address]) //foreach AbsRecordAnchorTime at specific address
+							foreach (var absRecAnchTime in recordFingerprint[address]) //foreach AbsRecordAnchorTime at specific address
 							{
 								//delta can be negative (RecTime = 8 with mapped SongTime = 2)
 								long delta = (long)absSongAnchTime - (long)absRecAnchTime;
@@ -520,13 +520,15 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <summary>
 		/// Gets quantities of song values connected with common addresses in recording.
 		/// </summary>
-		/// <param name="recordAddresses">addresses in recording</param>
+		/// <param name="recordFingerprint">Fingerprint of the recording</param>
 		/// <returns>[songValue, occurrence]</returns>
-		private static Dictionary<ulong, int> GetSongValQuantities(Dictionary<uint, List<uint>> recordAddresses, Dictionary<uint, List<ulong>> database)
+		private static Dictionary<ulong, int> GetSongValQuantities(Dictionary<uint, List<uint>> recordFingerprint, Dictionary<uint, List<ulong>> database)
 		{
+			//[songValue, number of occurence]
+			// song value == 32 bits of absolute anchor time and 32 bits of song id
 			var quantities = new Dictionary<ulong, int>();
 
-			foreach (var address in recordAddresses.Keys)
+			foreach (var address in recordFingerprint.Keys)
 			{
 				if (database.ContainsKey(address))
 				{
@@ -551,10 +553,10 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <summary>
 		/// Filter out songs that don't have enough common samples with recording
 		/// </summary>
-		/// <param name="recordAddresses">Addresses in recording</param>
+		/// <param name="recordFingerprint">Addresses in recording</param>
 		/// <param name="quantities">occurrences of songvalues common with recording</param>
-		/// <returns>[songID, [address, (absSongAnchorTime)]]</returns>
-		private Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordAddresses, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
+		/// <returns>[songID, [hash, (absSongAnchorTime)]]</returns>
+		private Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordFingerprint, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
 		{
 			// [songID, [address, (absSongAnchorTime)]] -> songs that have common hashes
 			Dictionary<uint, Dictionary<uint, List<uint>>> filteredDatabaseSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();
@@ -564,19 +566,21 @@ namespace AudioRecognitionLibrary.Recognizer
 			Dictionary<uint, int> commonTGZAmount = new Dictionary<uint, int>();
 
 			// Create datastructure for fast search in time coherency check
-			// SongID -> Address -> absSongAnchorTime
-			foreach (var address in recordAddresses.Keys)
+			// SongID -> hash -> absSongAnchorTime
+			foreach (var hash in recordFingerprint.Keys)
 			{
-				if (database.ContainsKey(address))
+				if (database.ContainsKey(hash))
 				{
-					foreach (var songValue in database[address])
+					foreach (var songValue in database[hash])
 					{
+						//Get song id from songValue (last 32 bits)
 						uint songID = (uint)songValue;
+
 						if (!commonCoupleAmount.ContainsKey(songID))
 							commonCoupleAmount.Add(songID, 0);
 						commonCoupleAmount[songID]++;
 
-						//filter out addresses that do not create TGZ
+						//filter out hashes that do not create TGZ
 						if (quantities[songValue] >= Parameters.TargetZoneSize)      
 						{
 							if (!commonTGZAmount.ContainsKey(songID))
@@ -588,11 +592,11 @@ namespace AudioRecognitionLibrary.Recognizer
 
 							if (!filteredDatabaseSongs.ContainsKey(songID)) //add songID entry
 								filteredDatabaseSongs.Add(songID, new Dictionary<uint, List<uint>>());
-							if (!filteredDatabaseSongs[songID].ContainsKey(address)) //add address entry
-								filteredDatabaseSongs[songID].Add(address, new List<uint>());
+							if (!filteredDatabaseSongs[songID].ContainsKey(hash)) //add address entry
+								filteredDatabaseSongs[songID].Add(hash, new List<uint>());
 
 							//add the actual Absolute Anchor Time of a song
-							filteredDatabaseSongs[songID][address].Add(AbsSongAnchTime);
+							filteredDatabaseSongs[songID][hash].Add(AbsSongAnchTime);
 						}
 					}
 				}
