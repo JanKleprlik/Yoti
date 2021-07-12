@@ -600,7 +600,8 @@ namespace Yoti.Shared.ViewModels
 		private async Task WriteRecognitionResults(RecognitionResult result)
 		{
 
-			// Write result of top 10 song accuracies (accuracies are already sorted from server).
+			// Write result of top 10 song accuracies.
+			result.SongAccuracies.Sort((a, b) => b.Item2.CompareTo(a.Item2));
 			StringBuilder detailedInfoSB = new StringBuilder();
 			for (int i = 0; i < Math.Min(10,result.SongAccuracies.Count); i++)
 			{

@@ -27,13 +27,12 @@ namespace Yoti.Server.Models
 		}
 
 		public DbSet<Song> Songs { get; set; }
-		public DbSet<SearchData> SearchDatas { get; set; }
-
+		public DbSet<DatabaseHash> DatabaseHashes { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Song>().ToTable("Songs");
-			modelBuilder.Entity<SearchData>().ToTable("SearchData");
+			modelBuilder.Entity<DatabaseHash>().ToTable("DatabaseHash");
 		}
 	}
 }

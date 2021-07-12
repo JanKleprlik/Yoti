@@ -32,13 +32,9 @@ namespace Yoti.Server
 
 			services.AddDbContext<SongContext>(opt =>
 				opt.UseSqlServer(Configuration.GetConnectionString("yotidatabaseconnection")));
-				//opt.UseSqlite("SongContext")); //SQLite version used at development stage
 
 			// Create configuration singleton so DbContext has access to connection string without exposing it
 			services.AddSingleton(provider => Configuration);
-
-			// SearchData singleton so they do not have to be loaded at every request
-			services.AddSingleton<SearchDataSingleton>();
 
 			services.AddControllers();
 
