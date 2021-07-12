@@ -2,7 +2,7 @@
   "dependencies": {
     "secrets1": {
       "type": "secrets",
-      "connectionId": "YotiValutUri"
+      "connectionId": "VaultUri"
     },
     "mssql1": {
       "type": "mssql",

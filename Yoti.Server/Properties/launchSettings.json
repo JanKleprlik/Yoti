@@ -9,19 +9,21 @@
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-		"BP.Server": {
-			"commandName": "Project",
-			"launchBrowser": true,
-			"launchUrl": "recognition/getsongs",
-			"environmentVariables": {
-				"YotiValutUri": "https://yotiservervault.vault.azure.net/",				
-				"ASPNETCORE_ENVIRONMENT": "Development"
-			},
+    "BP.Server": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "recognition/getsongs",
+      "environmentVariables": {
+        "YotiValutUri": "https://yotiservervault.vault.azure.net/",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "VaultUri": "https://yotiservervault.vault.azure.net/",
+        "AZURE_USERNAME": "44214998@cuni.cz"
+      },
 			"ConnectionStrings": {
-				"yotidatabaseconnection": "Data Source=tcp:yotisongdatabaseserver.database.windows.net,1433;Initial Catalog=YotiSongDatabase;User Id=YotiAdmin@yotisongdatabaseserver;Password=AdminPassword."
+				"yotidatabaseconnection": "Data Source=tcp:yotisongdatabaseserver.database.windows.net,1433;Initial Catalog=YotiDatabase;User Id=YotiAdmin@yotisongdatabaseserver;Password=AdminPassword."
 			},
-			"dotnetRunMessages": "true",
-			"applicationUrl": "https://localhost:5001;http://localhost:5000"
-		}
+      "dotnetRunMessages": "true",
+      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    }
   }
 }

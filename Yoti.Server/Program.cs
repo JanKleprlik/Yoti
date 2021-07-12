@@ -37,7 +37,7 @@ namespace Yoti.Server
 					var songContext = services.GetRequiredService<SongContext>();
 					
 					// Delete database if exists
-					//songContext.Database.EnsureDeleted();
+					// songContext.Database.EnsureDeleted();
 					
 					// Create database
 					songContext.Database.EnsureCreated();

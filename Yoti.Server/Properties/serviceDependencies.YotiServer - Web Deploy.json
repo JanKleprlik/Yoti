@@ -3,14 +3,14 @@
     "secrets1": {
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/YotiServervault",
       "type": "secrets.keyVault",
-      "connectionId": "YotiValutUri",
+      "connectionId": "VaultUri",
       "secretStore": "AzureAppSettings"
     },
     "mssql1": {
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/yotisongdatabaseserver/databases/YotiSongDatabase",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/yotisongdatabaseserver/databases/YotiDatabase",
       "type": "mssql.azure",
       "connectionId": "yotidatabaseconnection",
-      "secretStore": "AzureAppSettings"
+      "secretStore": "AzureKeyVault"
     }
   }
 }

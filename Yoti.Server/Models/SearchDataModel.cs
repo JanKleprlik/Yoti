@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Yoti.Server.Models
 {
@@ -10,11 +8,11 @@ namespace Yoti.Server.Models
 		/// Id of the hash
 		/// </summary>
 		public int Id { get; set; }
-	
+
 		/// <summary>
 		/// Hash value 
 		/// </summary>
-		private int _Hash { get; set; }
+		public int HashDB { get; set; }
 
 		/// <summary>
 		/// Hash value wrapper used to convert unsigned to signed
@@ -25,11 +23,11 @@ namespace Yoti.Server.Models
 		{
 			get
 			{
-				return (uint)_Hash;
+				return (uint)HashDB;
 			}
 			set
 			{
-				_Hash = (int)value;
+				HashDB = (int)value;
 			}
 		}
 
@@ -43,7 +41,7 @@ namespace Yoti.Server.Models
 		/// 32 bits - Absolute Anchor Time
 		/// 32 bits - Song Id
 		/// </summary>
-		private long _SongValue { get; set; }
+		public long SongValueDB { get; set; }
 
 		/// <summary>
 		/// SongValue wrapper converting unsigned to signed
@@ -54,12 +52,12 @@ namespace Yoti.Server.Models
 		{
 			get
 			{
-				return (ulong)_SongValue;
+				return (ulong)SongValueDB;
 			}
 
 			set
 			{
-				_SongValue = (long)value;
+				SongValueDB = (long)value;
 			}
 		}
 
