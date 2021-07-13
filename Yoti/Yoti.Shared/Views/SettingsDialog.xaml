@@ -16,8 +16,17 @@
 	CornerRadius="25"
 	BorderBrush="{StaticResource PrimaryLightColor}"
 	BorderThickness="5"
+	FontFamily="{StaticResource Sansation}"
 	
 	>
+	<ContentDialog.TitleTemplate>
+		<DataTemplate>
+			<TextBlock
+				Text="{Binding}"
+				FontFamily="{StaticResource Sansation}"/>
+		</DataTemplate>
+	</ContentDialog.TitleTemplate>
+	
 	<ContentDialog.Resources>
 		<Style x:Name="DialogOKButtonStyle" TargetType="Button">
 			<Setter Property="Template" Value="{StaticResource NonexpandingOKButton}"/>
@@ -45,18 +54,21 @@
 			OnContent="Detailed info"
 			OffContent="Detailed info"
 			IsOn="{x:Bind SettingsViewModel.DetailedInfo, Mode=TwoWay}"
+			FontFamily="{StaticResource Sansation}"
 			/>
 		<ToggleSwitch 
 			x:Name="UseMicrophone"
 			OnContent="Use microphone"
 			OffContent="Use microphone"
 			IsOn="{x:Bind SettingsViewModel.UseMicrophone, Mode=TwoWay}"
+			FontFamily="{StaticResource Sansation}"
 			/>
 
 		<Slider
 			x:Name="RecordingLength"
 			Minimum="3"
 			Maximum="8"
+			FontFamily="{StaticResource Sansation}"
 			Header="{x:Bind SettingsViewModel.RecordingLengthText, Mode=OneWay}"
 			Value="{x:Bind SettingsViewModel.RecordingLength, Mode=TwoWay}"
 			Visibility="{x:Bind SettingsViewModel.UseMicrophone, Converter={StaticResource BooleanToVisibilityConverter}, Mode=OneWay}"

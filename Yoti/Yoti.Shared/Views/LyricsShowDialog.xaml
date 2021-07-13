@@ -15,6 +15,14 @@
 	BorderBrush="{StaticResource PrimaryLightColor}"
 	BorderThickness="5"
 	>
+	<ContentDialog.TitleTemplate>
+		<DataTemplate>
+			<TextBlock
+				Text="{Binding}"
+				FontFamily="{StaticResource Sansation}"/>
+		</DataTemplate>
+	</ContentDialog.TitleTemplate>
+
 	<ContentDialog.Resources>
 		<Style x:Name="DialogOKButtonStyle" TargetType="Button">
 			<Setter Property="Template" Value="{StaticResource NonexpandingOKButton}"/>
