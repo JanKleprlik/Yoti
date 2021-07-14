@@ -3,26 +3,24 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:52342",
-      "sslPort": 44378
+      "applicationUrl": "http://localhost:54665/",
+      "sslPort": 44327
     }
   },
-  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "BP.Server": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Yoti.Server": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "recognition/getsongs",
       "environmentVariables": {
-        "YotiValutUri": "https://yotiservervault.vault.azure.net/",
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "VaultUri": "https://yotiservervault.vault.azure.net/",
-        "AZURE_USERNAME": "44214998@cuni.cz"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       },
-			"ConnectionStrings": {
-				"yotidatabaseconnection": "Data Source=tcp:yotisongdatabaseserver.database.windows.net,1433;Initial Catalog=YotiDatabase;User Id=YotiAdmin@yotisongdatabaseserver;Password=AdminPassword."
-			},
-      "dotnetRunMessages": "true",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
     }
   }

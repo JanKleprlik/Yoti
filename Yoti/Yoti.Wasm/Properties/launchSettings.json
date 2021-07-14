@@ -3,8 +3,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:51813/",
-      "sslPort": 44326
+      "applicationUrl": "http://localhost:65348/",
+      "sslPort": 0
     }
   },
   "profiles": {
@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "BP.Wasm": {
+    "Yoti.Wasm": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

@@ -18,9 +18,6 @@
     <Content Include="Assets\SplashScreen.png" />
   </ItemGroup>
   <ItemGroup>
-    <UpToDateCheckInput Include="..\BP.Shared\**\*.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <None Remove="Assets\AudioDatabase.db" />
     <None Remove="WasmScripts\Recorder.js" />
     <None Remove="WasmScripts\Recorder2.js" />
@@ -55,7 +52,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\AudioRecognitionLibrary\AudioRecognitionLibrary.csproj" />
   </ItemGroup>
-  <Import Project="..\BP.Shared\BP.Shared.projitems" Label="Shared" Condition="Exists('..\BP.Shared\BP.Shared.projitems')" />
   <Import Project="..\Yoti.Shared\BP.Shared.projitems" Label="Shared" />
   <Import Project="..\..\SharedTypes\SharedTypes.projitems" Label="Shared" />
 </Project>
