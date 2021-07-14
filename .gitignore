@@ -346,3 +346,4 @@ healthchecksdb
 Yoti.Server/Properties/ServiceDependencies/*
 Yoti.Server/Properties/*.json
 !Yoti.Server/Properties/launchSettings.json
+Yoti/Yoti.Wasm/Properties/ServiceDependencies/*
