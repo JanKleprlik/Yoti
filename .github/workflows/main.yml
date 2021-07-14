@@ -1,9 +1,9 @@
-name: Yoti
+name: WASM deploy
 on:
   pull_request:
-    branches: [ main ]
+    branches: [master]
   push:
-    branches: [ main ]   
+    branches: [master]
   workflow_dispatch:  # Allows workflow to be ran via a button
 jobs:
   build:
@@ -19,15 +19,15 @@ jobs:
       with:
         dotnet-version: 5.0.x
     - name: Restore Dependencies
-      run: dotnet restore ./BP/BP.Wasm/BP.Wasm.csproj
+      run: dotnet restore ./Yoti/Yoti.Wasm/Yoti.Wasm.csproj
     - name: Build 
-      run: dotnet build ./BP/BP.Wasm/BP.Wasm.csproj --no-restore -f $framework -c $config
+      run: dotnet build ./Yoti/Yoti.Wasm/Yoti.Wasm.csproj --no-restore -f $framework -c $config
     - name: Publish Artifacts
       uses: actions/upload-artifact@v1.0.0
       if: github.event_name == 'workflow_dispatch' # Only deploy if Workflow manually ran
       with:
         name: pages
-        path: ./BP/BP.Wasm/bin/${{env.config}}/${{env.framework}}/dist/        
+        path: ./Yoti/Yoti.Wasm/bin/${{env.config}}/${{env.framework}}/dist/        
   deploy:
     needs: build 
     runs-on: ubuntu-latest
