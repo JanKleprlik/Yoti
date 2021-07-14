@@ -54,7 +54,7 @@ namespace Yoti.Server
 			Host.CreateDefaultBuilder(args)
 				.ConfigureAppConfiguration((context, config) =>
 				{
-					var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("YotiValutUri"));
+					var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("YotiVaultUri"));
 					config.AddAzureKeyVault(
 					keyVaultEndpoint,
 					new DefaultAzureCredential());
