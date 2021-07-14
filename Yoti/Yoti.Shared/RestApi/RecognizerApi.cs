@@ -25,7 +25,7 @@ namespace Yoti.Shared.RestApi
 		/// <summary>
 		/// Base Recognizer URL
 		/// </summary>
-		private readonly string baseUrl = "https://yotiserver.azurewebsites.net/recognition";
+		private readonly string baseUrl = "https://yotiserver.azurewebsites.net";
 		#endregion
 
 		/// <summary>
@@ -36,7 +36,7 @@ namespace Yoti.Shared.RestApi
 		public async Task<Song> UploadSong(PreprocessedSongData songToUpload)
 		{
 			var result = await PostAsync(
-				baseUrl + "/addnewsong",
+				baseUrl + "/recognition/addnewsong",
 				JsonSerializer.Serialize(songToUpload, serializerOptions),
 				defaultHeaders);
 
@@ -57,7 +57,7 @@ namespace Yoti.Shared.RestApi
 		public async Task<RecognitionResult> RecognizeSong(PreprocessedSongData songToRecognize)
 		{
 			var result = await PostAsync(
-				baseUrl + "/recognizesong",
+				baseUrl + "/recognition/recognizesong",
 				JsonSerializer.Serialize(songToRecognize, serializerOptions),
 				defaultHeaders);
 
@@ -76,7 +76,7 @@ namespace Yoti.Shared.RestApi
 		public async Task<List<Song>> GetSongs()
 		{
 			var result = await GetAsync(
-			   baseUrl + "/getsongs",
+			   baseUrl + "/recognition/getsongs",
 			   defaultHeaders);
 
 			if (result != null)
@@ -95,7 +95,7 @@ namespace Yoti.Shared.RestApi
 		public async Task<Song> GetSongById(uint id)
 		{
 			var result = await GetAsync(
-				baseUrl + $"/getsong/{id}",
+				baseUrl + $"/recognition/getsong/{id}",
 				defaultHeaders);
 			if (result != null)
 			{
@@ -112,7 +112,7 @@ namespace Yoti.Shared.RestApi
 		public async Task<Song> DeleteSong(Song songToDelete)
 		{
 			var result = await this.DeleteAsync(
-				baseUrl + "/deletesong",
+				baseUrl + "/recognition/deletesong",
 				JsonSerializer.Serialize(songToDelete, serializerOptions),
 				defaultHeaders);
 
