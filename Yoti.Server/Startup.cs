@@ -52,6 +52,7 @@ namespace Yoti.Server
 
 			app.UseRouting();
 
+			// neccesary to allow queries from WASM
 			app.UseCors(builder => builder
 				.AllowAnyOrigin()
 				.AllowAnyMethod()
