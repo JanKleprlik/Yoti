@@ -35,10 +35,10 @@ namespace Yoti.Server
 				try
 				{
 					var songContext = services.GetRequiredService<SongContext>();
-					
+
 					// Delete database content if any exists
 					// songContext.Database.EnsureDeleted();
-					
+
 					// Create database
 					songContext.Database.EnsureCreated();
 				}
@@ -52,13 +52,6 @@ namespace Yoti.Server
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
 			Host.CreateDefaultBuilder(args)
-				.ConfigureAppConfiguration((context, config) =>
-				{
-					var keyVaultEndpoint = new Uri(Environment.GetEnvironmentVariable("YotiVaultUri"));
-					config.AddAzureKeyVault(
-						keyVaultEndpoint,
-						new DefaultAzureCredential());
-				})
 				.ConfigureLogging(logging =>
 				{
 					logging.ClearProviders();
