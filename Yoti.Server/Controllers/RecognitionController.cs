@@ -55,10 +55,7 @@ namespace Yoti.Server.Controllers
 		public ActionResult<Song> AddNewSong(PreprocessedSongData songToUpload)
 		{
 			Song newSong = new Song { Author = songToUpload.Author, Name = songToUpload.Name, Lyrics = songToUpload.Lyrics, BPM = songToUpload.BPM };
-
-			//_logger.LogInformation("Getting correct searchdata");
-			//Dictionary<uint, List<ulong>> searchData = GetSearchDataByBPM(songToUpload.BPM);
-			
+	
 			// Creaty empty SearchData data structure that will be saved into the database
 			Dictionary<uint, List<ulong>> searchData = new Dictionary<uint, List<ulong>>();
 
@@ -74,12 +71,10 @@ namespace Yoti.Server.Controllers
 			_recognizer.AddFingerprintToDatabase(songToUpload.Fingerprint, Convert.ToUInt32(maxId), searchData);
 
 			// Update data in database
-			//_searchDataInstance.SaveToDB(songToUpload.BPM);
-			//_context.SaveChanges();
 			AddSearchDataToDB(searchData, newSong.BPM);
 			_context.SaveChanges();
 
-			// Conversion of newSong.Id from int to uint is safe because SongId is always positive and smaller than max value of int
+			// Return added song
 			return CreatedAtAction(nameof(GetSong), new { id =newSong.Id }, newSong);
 		}
 		#endregion
@@ -137,33 +132,7 @@ namespace Yoti.Server.Controllers
 					}
 
 				}
-
-
-				//foreach(KeyValuePair<int, Dictionary<uint, List<ulong>>> entry in _searchDataInstance.SearchData)
-				//{
-				//	if (entry.Key == songToUpload.BPM)
-				//		continue; //skip searchdata that was already searched through
-
-
-				//	searchData = GetSearchDataByBPM(entry.Key);
-				//	var potentialRecognitionResult = _recognizer.RecognizeSong(songToUpload.Fingerprint, searchData, songToUpload.TFPCount);
-
-				//	uint? potentialSongId = potentialRecognitionResult.Item1;
-				//	double accuracy = GetSongAccuracy(potentialSongId, potentialRecognitionResult.Item2);
-
-				//	// If result is not null and accuracy is higher than current max
-				//	// remember the id and new max accuracy and accuracies of other songs
-				//	if (potentialSongId != null && accuracy > maxAccuracy)
-				//	{
-				//		_logger.LogDebug($"New potential song id found: {potentialSongId} with proba: {accuracy} in BPM: {entry.Key}");
-				//		songId = potentialSongId; //remember songId
-				//		maxAccuracy = accuracy; //remember max accuracy
-				//		songAccuracies = potentialRecognitionResult.Item2; //remember accuracies of other song in BPM batch
-				//	}
-				//}
 			}
-
-			//songAccuracies.Sort((a, b) => b.Item2.CompareTo(a.Item2)); //sort by descending accuracy so it is sent that way to the client
 
 			if (songId == null)
 			{
@@ -343,7 +312,7 @@ namespace Yoti.Server.Controllers
 						SongValue = songValue,
 					};
 					
-					//Add hash to the database
+					// Add hash to the database
 					_context.Add(databaseHash);
 				}
 			}
@@ -358,42 +327,6 @@ namespace Yoti.Server.Controllers
 			uint deleteSongId= song.Id;
 
 			_context.DatabaseHashes.RemoveRange(_context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValue == song.Id).ToArray());
-
-
-			//Dictionary<uint, List<ulong>> oldSearchData = GetSearchDataByBPM(song.BPM);
-			//Dictionary<uint, List<ulong>> newSearchData = new Dictionary<uint, List<ulong>>();
-
-			//// Iterate over all entries in old search data
-			//foreach (KeyValuePair<uint, List<ulong>> entry in oldSearchData)
-			//{
-			//	List<ulong> songDataList = new List<ulong>();
-
-			//	// Iterate over all songDatas (Abs data & songID).
-			//	foreach (ulong songData in entry.Value)
-			//	{
-			//		// If deleteSongId is different from the Id in current songData
-			//		// add it to new songDataList that will be in new search data.
-			//		// Cast songData int is because ulong songID consists of:
-			//		// 32 bits of Absolute time of Anchor
-			//		// 32 bits of songID
-			//		if (deleteSongId != (uint)songData)
-			//		{
-			//			// Add songData to new search Data
-			//			songDataList.Add(songData);
-			//		}
-			//	}
-
-			//	// If some songData survive on entry.Key 
-			//	// put them into newSearchData
-			//	if (songDataList.Count != 0)
-			//	{
-			//		newSearchData.Add(entry.Key, songDataList);
-			//	}
-			//}
-
-			//// Replace new search Data
-			//_searchDataInstance.SearchData[song.BPM] = newSearchData;
-			//_searchDataInstance.SaveToDB(song.BPM);
 
 		}
 
