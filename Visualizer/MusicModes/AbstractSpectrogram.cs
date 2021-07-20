@@ -15,7 +15,7 @@ namespace Visualizer.MusicModes
 		protected VertexArray VA { get; set; }
 
 		/// <summary>
-		/// Render one window of spectrogram.
+		/// Render one column of spectrogram.
 		/// </summary>
 		/// <param name="data"></param>
 		/// <param name="basePosition"></param>

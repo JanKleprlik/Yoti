@@ -18,26 +18,26 @@ namespace Visualizer
 				"havana_5.wav",
 				"havana_8.wav",
 			};
-			AudioRecognitionLibrary.Recognizer.AudioRecognizer recognizer = new AudioRecognitionLibrary.Recognizer.AudioRecognizer();
-			Console.WriteLine($"BPMLowFreq: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMLowFreq}\n" +
-								$"BPMHighFreq: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMHighFreq}\n" +
-								$"PartsPerSecond: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.PartsPerSecond}\n" +
-								$"BPMLowLimit: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMLowLimit}\n" +
-								$"BPMHighLimit: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMHighLimit}\n" +
-								$"PeakNeighbourRange: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.PeakNeighbourRange}");
-			foreach (var file in files)
-			{
+			//AudioRecognitionLibrary.Recognizer.AudioRecognizer recognizer = new AudioRecognitionLibrary.Recognizer.AudioRecognizer();
+			//Console.WriteLine($"BPMLowFreq: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMLowFreq}\n" +
+			//					$"BPMHighFreq: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMHighFreq}\n" +
+			//					$"PartsPerSecond: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.PartsPerSecond}\n" +
+			//					$"BPMLowLimit: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMLowLimit}\n" +
+			//					$"BPMHighLimit: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.BPMHighLimit}\n" +
+			//					$"PeakNeighbourRange: {AudioRecognitionLibrary.Recognizer.AudioRecognizer.Parameters.PeakNeighbourRange}");
+			//foreach (var file in files)
+			//{
 
-				var audio = Recorder.GetAudio($"Resources/Songs/{file}");
-				Console.WriteLine($"FILE: {file}");
-				Console.WriteLine(recognizer.GetBPM(audio, true));
-			}
+			//	var audio = Recorder.GetAudio($"Resources/Songs/{file}");
+			//	Console.WriteLine($"FILE: {file}");
+			//	Console.WriteLine(recognizer.GetBPM(audio, true));
+			//}
 
-			//string file = "Home.wav";
-			//var audio = Recorder.GetAudio($"Resources/Songs/{file}");
-			//AudioProcessor.ConvertToMono(audio);
-			//var window = new global::Visualizer.Visualizer(audio.Data, audio.Channels, audio.SampleRate, VisualisationModes.Spectrogram);
-			//window.Run();
+			string file = "Avicii.wav";
+			var audio = Recorder.GetAudio($"Resources/Songs/{file}");
+			AudioProcessor.ConvertToMono(audio);
+			var window = new global::Visualizer.Visualizer(audio.Data, audio.Channels, audio.SampleRate, VisualisationModes.Frequencies);
+			window.Run();
 		}
 	}
 }

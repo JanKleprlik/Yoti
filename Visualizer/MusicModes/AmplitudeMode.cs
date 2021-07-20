@@ -6,26 +6,6 @@ namespace Visualizer.MusicModes
 {
 	class AmplitudeMode : AbstractMode
 	{
-		#region Constructors
-		public AmplitudeMode(string path) : base(new SoundBuffer(path))
-		{
-			VA = new VertexArray(PrimitiveType.LineStrip, BufferSize);
-			Song.Loop = true;
-			Song.Play();
-		}
-		public AmplitudeMode(byte[] data) : base(new SoundBuffer(data))
-		{
-			VA = new VertexArray(PrimitiveType.LineStrip, BufferSize);
-			Song.Loop = true;
-			Song.Play();
-		}
-		public AmplitudeMode(short[] data, uint channelCount, uint sampleRate) : base(new SoundBuffer(data, channelCount, sampleRate))
-		{
-			VA = new VertexArray(PrimitiveType.LineStrip, BufferSize);
-			Song.Loop = true;
-			Song.Play();
-		}
-
 		public AmplitudeMode(SoundBuffer sb) : base(sb)
 		{
 			VA = new VertexArray(PrimitiveType.LineStrip, BufferSize);
@@ -38,8 +18,6 @@ namespace Visualizer.MusicModes
 			Song.Loop = true;
 			Song.Play();
 		}
-
-		#endregion
 
 
 		private VertexArray VA;
