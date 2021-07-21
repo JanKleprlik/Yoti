@@ -25,7 +25,7 @@ namespace Yoti.Shared.RestApi
 		/// <summary>
 		/// Base Recognizer URL
 		/// </summary>
-		private readonly string baseUrl = "https://yotiserver.azurewebsites.net";
+		private readonly string baseUrl = "https://yotiserverdev.azurewebsites.net";
 		#endregion
 
 		/// <summary>
