@@ -53,7 +53,7 @@ namespace Yoti.Shared.RestApi
 		/// Recognize song in the database.
 		/// </summary>
 		/// <param name="songToRecognize">Preprocessed data of the song to be recognized.</param>
-		/// <returns>Recognition result containting info about recognized song and process of recognizing. Null on failure.</returns>
+		/// <returns>Recognition result containting info about recognized song and process of recognizing. Song null and empty SongAccuracies on failure.</returns>
 		public async Task<RecognitionResult> RecognizeSong(PreprocessedSongData songToRecognize)
 		{
 			var result = await PostAsync(
@@ -66,7 +66,7 @@ namespace Yoti.Shared.RestApi
 				return JsonSerializer.Deserialize<RecognitionResult>(result, serializerOptions);
 			}
 
-			return null;
+			return new RecognitionResult { Song = null, SongAccuracies = new List<System.Tuple<uint, double>>() };
 		}
 
 		/// <summary>

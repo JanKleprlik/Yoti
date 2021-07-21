@@ -102,7 +102,14 @@ namespace Yoti.Shared.ViewModels
 			if (Settings.UseMicrophone)
 			{
 				IsRecording = true;
-				sucessfullRecordingUpload = await Task.Run(() => audioRecorder.RecordAudio(Settings.RecordingLength));
+				try
+				{
+					sucessfullRecordingUpload = await Task.Run(() => audioRecorder.RecordAudio(Settings.RecordingLength));
+				}
+				catch (UnauthorizedAccessException e)
+				{
+					sucessfullRecordingUpload = false;
+				}
 				IsRecording = false;
 
 				// Inform user about failure
@@ -146,6 +153,8 @@ namespace Yoti.Shared.ViewModels
 				// Update UI
 				if (recognitionResult != null)
 					await WriteRecognitionResults(recognitionResult);
+
+
 
 				IsRecognizing = false;
 			}

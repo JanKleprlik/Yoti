@@ -42,13 +42,17 @@ namespace Visualizer.MusicModes
 					//Takes every second sample (only the Left ones)
 					for (uint i = 0; i < BufferSize; i++)
 					{
-						VA[i] = new Vertex(new Vector2f(i / 4 + 100, (float)(200 + Samples[(i + offset) * 2] * 0.008)));
+						// * 0.008 is there to bound its maximum value
+						// without it values would go to extreme heights
+						VA[i] = new Vertex(new Vector2f(i / 4 + 100, (float)(200 + Samples[(i + offset) * 2] * 0.008))); 
 					}
 				}
 				else
 				{
 					for (uint i = 0; i < BufferSize; i++)
 					{
+						// * 0.008 is there to bound its maximum value
+						// without it values would go to extreme heights
 						VA[i] = new Vertex(new Vector2f(i / 4 + 100, (float)(200 + Samples[(i + offset)] * 0.008)));
 					}
 				}
