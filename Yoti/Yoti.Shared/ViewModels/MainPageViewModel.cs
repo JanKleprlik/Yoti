@@ -216,12 +216,12 @@ namespace Yoti.Shared.ViewModels
 			// Check that all form controls are filled.
 			if (NewSongName.IsNullOrEmpty())
 			{
-				InformationText = "Please enter song name.";
+				InformationText = "Please enter the song name.";
 				return;
 			}
 			if (NewSongAuthor.IsNullOrEmpty())
 			{
-				InformationText = "Please enter song author.";
+				InformationText = "Please enter the song author.";
 				return;
 			}
 			if (songToBeAddedToDatabase == null)
@@ -241,6 +241,8 @@ namespace Yoti.Shared.ViewModels
 			// Update UI
 			IsUploading = true;
 			InformationText = "Processing song";
+			CloseNewSongForm();
+
 
 			// Upload song on serever
 			bool wasAdded = await AddNewSongToDatabase(NewSongName, NewSongAuthor, NewSongLyrics, songToBeAddedToDatabase);
@@ -251,8 +253,6 @@ namespace Yoti.Shared.ViewModels
 				InformationText = $"\"{NewSongName}\" by {NewSongAuthor} added.";
 			else
 				InformationText = $"\"{NewSongName}\" by {NewSongAuthor} could not added to the database.";
-			// Close 'Add song' form
-			CloseNewSongForm();
 
 
 			// Release resources and reset 'Add song' form data
