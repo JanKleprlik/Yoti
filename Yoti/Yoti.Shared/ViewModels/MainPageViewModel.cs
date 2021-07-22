@@ -180,8 +180,7 @@ namespace Yoti.Shared.ViewModels
 				return;
 
 
-			byte[] uploadedSong = await audioRecorder.GetDataFromStream(); // await FileUpload.PickAndUploadFileAsync(value => UploadedSongText = value, maxSize_MB:AudioDataProvider.Parameters.MaxUploadSize_MB);
-
+			byte[] uploadedSong = await audioRecorder.GetDataFromStream(); 
 			// File not picked
 			if (uploadedSong == null)
 				return;
