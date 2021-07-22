@@ -311,9 +311,10 @@ namespace Yoti.Server.Controllers
 		{
 			uint deleteSongId= song.Id;
 
-			foreach (var hash in _context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValueDB == song.Id))
+			foreach (var hash in _context.DatabaseHashes.Where(v => v.BPM == song.BPM))
 			{
-				_context.DatabaseHashes.Remove(hash);
+				if ((uint)hash.SongValue == song.Id)
+					_context.DatabaseHashes.Remove(hash);
 			}
 		}
 

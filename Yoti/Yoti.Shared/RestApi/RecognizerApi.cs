@@ -35,10 +35,22 @@ namespace Yoti.Shared.RestApi
 		/// <returns>Uploaded song. Null on failure.</returns>
 		public async Task<Song> UploadSong(PreprocessedSongData songToUpload)
 		{
-			var result = await PostAsync(
-				baseUrl + "/recognition/addnewsong",
-				JsonSerializer.Serialize(songToUpload, serializerOptions),
-				defaultHeaders);
+			string result;
+
+			try
+			{
+
+				result = await PostAsync(
+					baseUrl + "/recognition/addnewsong",
+					JsonSerializer.Serialize(songToUpload, serializerOptions),
+					defaultHeaders);
+			}
+			catch (System.Net.Http.HttpRequestException e)
+			{
+				//result is null when there is no connection
+				result = null;
+			}
+
 
 
 			if (result != null)
@@ -56,10 +68,19 @@ namespace Yoti.Shared.RestApi
 		/// <returns>Recognition result containting info about recognized song and process of recognizing. Song null and empty SongAccuracies on failure.</returns>
 		public async Task<RecognitionResult> RecognizeSong(PreprocessedSongData songToRecognize)
 		{
-			var result = await PostAsync(
-				baseUrl + "/recognition/recognizesong",
-				JsonSerializer.Serialize(songToRecognize, serializerOptions),
-				defaultHeaders);
+			string result;
+			try
+			{
+				result = await PostAsync(
+					baseUrl + "/recognition/recognizesong",
+					JsonSerializer.Serialize(songToRecognize, serializerOptions),
+					defaultHeaders);
+			}
+			catch (System.Net.Http.HttpRequestException e)
+			{
+				//result is null when there is no connection
+				result = null;
+			}
 
 			if (result != null)
 			{
@@ -75,9 +96,19 @@ namespace Yoti.Shared.RestApi
 		/// <returns>List of songs in the database.</returns>
 		public async Task<List<Song>> GetSongs()
 		{
-			var result = await GetAsync(
-			   baseUrl + "/recognition/getsongs",
-			   defaultHeaders);
+			string result;
+			try
+			{
+
+				result = await GetAsync(
+				   baseUrl + "/recognition/getsongs",
+				   defaultHeaders);
+			}
+			catch(System.Net.Http.HttpRequestException e)
+			{
+				//result is null when there is no connection
+				result = null;
+			}
 
 			if (result != null)
 			{
@@ -94,9 +125,19 @@ namespace Yoti.Shared.RestApi
 		/// <returns>Song if it is in database. Null otherwise</returns>
 		public async Task<Song> GetSongById(uint id)
 		{
-			var result = await GetAsync(
-				baseUrl + $"/recognition/getsong/{id}",
-				defaultHeaders);
+			string result;
+			try
+			{		
+				result = await GetAsync(
+					baseUrl + $"/recognition/getsong/{id}",
+					defaultHeaders);
+			}
+			catch (System.Net.Http.HttpRequestException e)
+			{
+				//result is null when there is no connection
+				result = null;
+			}
+
 			if (result != null)
 			{
 				return JsonSerializer.Deserialize<Song>(result, serializerOptions);
@@ -111,10 +152,20 @@ namespace Yoti.Shared.RestApi
 		/// <returns>Deleted song on sucess, null on failure.</returns>
 		public async Task<Song> DeleteSong(Song songToDelete)
 		{
-			var result = await this.DeleteAsync(
-				baseUrl + "/recognition/deletesong",
-				JsonSerializer.Serialize(songToDelete, serializerOptions),
-				defaultHeaders);
+			string result;
+			try
+			{
+				result = await this.DeleteAsync(
+					baseUrl + "/recognition/deletesong",
+					JsonSerializer.Serialize(songToDelete, serializerOptions),
+					defaultHeaders);
+			}
+			catch (System.Net.Http.HttpRequestException e)
+			{
+				//result is null when there is no connection
+				result = null;
+			}
+
 
 			if (result != null)
 			{
