@@ -357,44 +357,7 @@ namespace Yoti.Server.Controllers
 		{
 			uint deleteSongId= song.Id;
 
-			_context.DatabaseHashes.RemoveRange(_context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValue == song.Id).ToArray());
-
-
-			//Dictionary<uint, List<ulong>> oldSearchData = GetSearchDataByBPM(song.BPM);
-			//Dictionary<uint, List<ulong>> newSearchData = new Dictionary<uint, List<ulong>>();
-
-			//// Iterate over all entries in old search data
-			//foreach (KeyValuePair<uint, List<ulong>> entry in oldSearchData)
-			//{
-			//	List<ulong> songDataList = new List<ulong>();
-
-			//	// Iterate over all songDatas (Abs data & songID).
-			//	foreach (ulong songData in entry.Value)
-			//	{
-			//		// If deleteSongId is different from the Id in current songData
-			//		// add it to new songDataList that will be in new search data.
-			//		// Cast songData int is because ulong songID consists of:
-			//		// 32 bits of Absolute time of Anchor
-			//		// 32 bits of songID
-			//		if (deleteSongId != (uint)songData)
-			//		{
-			//			// Add songData to new search Data
-			//			songDataList.Add(songData);
-			//		}
-			//	}
-
-			//	// If some songData survive on entry.Key 
-			//	// put them into newSearchData
-			//	if (songDataList.Count != 0)
-			//	{
-			//		newSearchData.Add(entry.Key, songDataList);
-			//	}
-			//}
-
-			//// Replace new search Data
-			//_searchDataInstance.SearchData[song.BPM] = newSearchData;
-			//_searchDataInstance.SaveToDB(song.BPM);
-
+			_context.DatabaseHashes.RemoveRange(_context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValueDB == song.Id).ToArray());
 		}
 
 		/// <summary>
