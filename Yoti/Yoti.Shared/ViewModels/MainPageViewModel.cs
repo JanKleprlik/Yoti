@@ -287,6 +287,7 @@ namespace Yoti.Shared.ViewModels
 		public async void ShowLyrics()
 		{
 			// Backup info to show when no song was recognized.
+
 			if (RecognizedSong == null)
 			{
 				var lyricsShowDialog = new LyricsShowDialog(new Song()
@@ -296,13 +297,14 @@ namespace Yoti.Shared.ViewModels
 					Name = "Lyrics",
 					BPM = 0
 				});
-				await lyricsShowDialog.ShowAsync();
+				await ShowDialog(lyricsShowDialog);
 			}
 			else
 			{
 				var lyricsShowDialog = new LyricsShowDialog(RecognizedSong);
-				await lyricsShowDialog.ShowAsync();
+				await ShowDialog(lyricsShowDialog);
 			}
+
 		}
 
 		/// <summary>
@@ -311,7 +313,7 @@ namespace Yoti.Shared.ViewModels
 		public async void ShowSettings()
 		{
 			var settingsDialog = new SettingsDialog(settingsViewModel);
-			ContentDialogResult result = await settingsDialog.ShowAsync();
+			await ShowDialog(settingsDialog);
 		}
 
 		/// <summary>
@@ -320,7 +322,8 @@ namespace Yoti.Shared.ViewModels
 		public async void ShowLyricsEditDialog()
 		{
 			var lyricsDialog = new LyricsDialog(this);
-			ContentDialogResult resutl = await lyricsDialog.ShowAsync();
+			await ShowDialog(lyricsDialog);
+			
 		}
 		#endregion
 
@@ -600,6 +603,25 @@ namespace Yoti.Shared.ViewModels
 			DetailedInfoText = "";
 			//notify user about the process of recognition
 			InformationText = Settings.UseMicrophone ? "Recording ..." : "Uploading file ... ";
+		}
+
+		/// <summary>
+		/// Opens dialog window.
+		/// </summary>
+		/// <param name="dialog">Dialog to open</param>
+		private async Task ShowDialog(ContentDialog dialog)
+		{
+			try
+			{
+				ContentDialogResult resutl = await dialog.ShowAsync();
+			}
+			catch (Exception e)
+			{
+				// Do not open dialog if it's already opened.
+				// Only one Content dialog can be openned at the time
+				// else System.Exception is thrown
+				return;
+			}
 		}
 
 		/// <summary>
