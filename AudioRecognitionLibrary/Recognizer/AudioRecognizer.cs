@@ -16,7 +16,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// Creates fingerprint of given audio and returns it together with number of valid notes. (needed to compute recognition accuracy). <br></br>
 		/// </summary>
 		/// <param name="audio">Audio whos fingerprint we want.</param>
-		/// <returns>Tuple where Item1 is fingerprint, Item2 is total number of notes. <br></br>fingerprint: [address; (absolute anchor times)]<br></br>Note: Address is the hash.</returns>
+		/// <returns>Tuple where Item1 is fingerprint, Item2 is total number of notes. <br></br>fingerprint: [hash; (absolute anchor times)]<br></br>Note: Address is the hash.</returns>
 		public Tuple<Dictionary<uint, List<uint>>, int> GetAudioFingerprint(IAudioFormat audio)
 		{
 			short[] monoData = AudioProcessor.ConvertToMono(audio);
@@ -31,7 +31,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			int bufferSize = Parameters.WindowSize / downsampleCoef; //default: 4096/4 = 1024
 			var timeFrequencyPoints = CreateTimeFrequencyPoints(bufferSize, downsampledData);
 
-			//[address;(AbsAnchorTimes)]
+			//[hash;(AbsAnchorTimes)]
 			Dictionary<uint, List<uint>> fingerprint = CreateRecordAddresses(timeFrequencyPoints);
 
 			return new Tuple<Dictionary<uint, List<uint>>, int> (fingerprint, timeFrequencyPoints.Count);
@@ -280,7 +280,7 @@ namespace AudioRecognitionLibrary.Recognizer
 			// Get quantities of each SongValue to determine wether they make a complete TGZ (5+ points correspond to the same SongValue)
 			var quantities = GetSongValQuantities(fingerprint, database);
 
-			// Filter songs and addresses that only 
+			// Filter songs that satisfy common hashes quantity constraint
 			var filteredSongs = FilterSongs(fingerprint, quantities, database);
 
 			// Get longest delta for each song that says how many notes from recording are time coherent to the song
@@ -464,8 +464,8 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <summary>
 		/// Computes maximum number of time coherent notes for each song.
 		/// </summary>
-		/// <param name="filteredSongs">Filtered songs from database with their fingerprints.<br></br>[songId, [address, (absolute anchor time)]]<br></br>Note: address is eqv. to the hash.</param>
-		/// <param name="recordFingerprint">Recording addresses <br></br>[address, (absolute anchor time)]<br></br>Note: address is eqv. to the hash.</param>
+		/// <param name="filteredSongs">Filtered songs from database with their fingerprints.<br></br>[songId, [hash, (absolute anchor time)]]<br></br></param>
+		/// <param name="recordFingerprint">Recording fingerprint <br></br>[hash, (absolute anchor time)]<br></br></param>
 		/// <returns>Dict of songs with their number of maxium coherent notes.<br></br>[songId, timeCoherentNotes]</returns>
 		private static Dictionary<uint, int> GetDeltas(Dictionary<uint, Dictionary<uint, List<uint>>> filteredSongs, Dictionary<uint, List<uint>> recordFingerprint)
 		{
@@ -475,13 +475,13 @@ namespace AudioRecognitionLibrary.Recognizer
 			{
 				//[delta, occurrence]
 				Dictionary<long, int> songDeltasQty = new Dictionary<long, int>();
-				foreach (var address in recordFingerprint.Keys) //foreach address of the song
+				foreach (var hash in recordFingerprint.Keys) //foreach hash of the song
 				{
-					if (filteredSongs[songID].ContainsKey(address))
+					if (filteredSongs[songID].ContainsKey(hash))
 					{
-						foreach (var absSongAnchTime in filteredSongs[songID][address]) //foreach AbsSongAnchorTime at specific address 
+						foreach (var absSongAnchTime in filteredSongs[songID][hash]) //foreach AbsSongAnchorTime at specific hash
 						{
-							foreach (var absRecAnchTime in recordFingerprint[address]) //foreach AbsRecordAnchorTime at specific address
+							foreach (var absRecAnchTime in recordFingerprint[hash]) //foreach AbsRecordAnchorTime at specific hash
 							{
 								//delta can be negative (RecTime = 8 with mapped SongTime = 2)
 								long delta = (long)absSongAnchTime - (long)absRecAnchTime;
@@ -518,7 +518,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		}
 
 		/// <summary>
-		/// Gets quantities of song values connected with common addresses in recording.
+		/// Gets quantities of song values connected with common hashes in recording.
 		/// </summary>
 		/// <param name="recordFingerprint">Fingerprint of the recording</param>
 		/// <returns>[songValue, occurrence]</returns>
@@ -528,11 +528,11 @@ namespace AudioRecognitionLibrary.Recognizer
 			// song value == 32 bits of absolute anchor time and 32 bits of song id
 			var quantities = new Dictionary<ulong, int>();
 
-			foreach (var address in recordFingerprint.Keys)
+			foreach (var hash in recordFingerprint.Keys)
 			{
-				if (database.ContainsKey(address))
+				if (database.ContainsKey(hash))
 				{
-					foreach (var songValue in database[address])
+					foreach (var songValue in database[hash])
 					{
 						if (!quantities.ContainsKey(songValue))
 						{
@@ -558,7 +558,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// <returns>[songID, [hash, (absSongAnchorTime)]]</returns>
 		private Dictionary<uint, Dictionary<uint, List<uint>>> FilterSongs(Dictionary<uint, List<uint>> recordFingerprint, Dictionary<ulong, int> quantities, Dictionary<uint, List<ulong>> database)
 		{
-			// [songID, [address, (absSongAnchorTime)]] -> songs that have common hashes
+			// [songID, [hash, (absSongAnchorTime)]] -> songs that have common hashes
 			Dictionary<uint, Dictionary<uint, List<uint>>> filteredDatabaseSongs = new Dictionary<uint, Dictionary<uint, List<uint>>>();
 			// [songID, common couple amount] -> number of common hashes of each song in the database with target song
 			Dictionary<uint, int> commonCoupleAmount = new Dictionary<uint, int>();
@@ -592,7 +592,7 @@ namespace AudioRecognitionLibrary.Recognizer
 
 							if (!filteredDatabaseSongs.ContainsKey(songID)) //add songID entry
 								filteredDatabaseSongs.Add(songID, new Dictionary<uint, List<uint>>());
-							if (!filteredDatabaseSongs[songID].ContainsKey(hash)) //add address entry
+							if (!filteredDatabaseSongs[songID].ContainsKey(hash)) //add hash entry
 								filteredDatabaseSongs[songID].Add(hash, new List<uint>());
 
 							//add the actual Absolute Anchor Time of a song
@@ -631,7 +631,7 @@ namespace AudioRecognitionLibrary.Recognizer
 		/// Creates Address to Absolute time anchor dictionary out of TFPs
 		/// </summary>
 		/// <param name="timeFrequencyPoints">Time Frequency points of the aduio.</param>
-		/// <returns>[address (absolute anchor times)]</returns>
+		/// <returns>[hash (absolute anchor times)]</returns>
 		private static Dictionary<uint, List<uint>> CreateRecordAddresses(List<TimeFrequencyPoint> timeFrequencyPoints)
 		{
 			Dictionary<uint, List<uint>> res = new Dictionary<uint, List<uint>>();
@@ -662,11 +662,11 @@ namespace AudioRecognitionLibrary.Recognizer
 					uint pointFreq = timeFrequencyPoints[i + pointNum].Frequency;
 					uint pointTime = timeFrequencyPoints[i + pointNum].Time;
 
-					uint address = Tools.Builders.BuildAddress(anchorFreq, pointFreq, pointTime - anchorTime);
+					uint hash = Tools.Builders.BuildAddress(anchorFreq, pointFreq, pointTime - anchorTime);
 
-					if (!res.ContainsKey(address)) //create new instance if it doesnt exist
-						res.Add(address, new List<uint>());
-					res[address].Add(anchorTime); //add Anchor time to the list
+					if (!res.ContainsKey(hash)) //create new instance if it doesnt exist
+						res.Add(hash, new List<uint>());
+					res[hash].Add(anchorTime); //add Anchor time to the list
 				}
 			}
 			return res;
