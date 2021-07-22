@@ -10,20 +10,17 @@ namespace Yoti.Server.Models
 {
 	public class SongContext : DbContext
 	{
-		private readonly IConfiguration configuration;
-		private IDbConnection dbConnection { get; }
 
 		public SongContext(DbContextOptions<SongContext> options, IConfiguration configuration) : base(options)
 		{
 			// Initialize database connection
-			this.configuration = configuration;
-			dbConnection = new SqlConnection(this.configuration.GetConnectionString("yotidatabaseconnection"));
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder options)
 		{
 			if (!options.IsConfigured)
-				options.UseSqlServer(dbConnection.ToString());
+				options.UseSqlite(@"Data Source=FingerPrintDatabase.db");
+				//options.UseSqlServer(dbConnection.ToString());
 		}
 
 		public DbSet<Song> Songs { get; set; }

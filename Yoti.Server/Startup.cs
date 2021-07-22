@@ -31,7 +31,8 @@ namespace Yoti.Server
 		{
 
 			services.AddDbContext<SongContext>(opt =>
-				opt.UseSqlServer(Configuration.GetConnectionString("yotidatabaseconnection")));
+				opt.UseSqlite(@"Data Source = FingerPrintDatabase.db"));
+				//opt.UseSqlServer(Configuration.GetConnectionString("yotidatabaseconnection")));
 
 			// Create configuration singleton so DbContext has access to connection string without exposing it
 			services.AddSingleton(provider => Configuration);
