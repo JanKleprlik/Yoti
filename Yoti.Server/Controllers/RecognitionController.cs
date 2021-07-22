@@ -326,7 +326,7 @@ namespace Yoti.Server.Controllers
 		{
 			uint deleteSongId= song.Id;
 
-			_context.DatabaseHashes.RemoveRange(_context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValue == song.Id).ToArray());
+			_context.DatabaseHashes.RemoveRange(_context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValueDB == song.Id).ToArray());
 
 		}
 
