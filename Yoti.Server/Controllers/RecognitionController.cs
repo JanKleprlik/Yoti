@@ -274,21 +274,6 @@ namespace Yoti.Server.Controllers
 			}
 
 			return SearchData;
-
-
-			//var searchDataCorrectBPM =  _context.SearchDatas.Where(v => v.BPM == BPM).FirstOrDefault();
-
-			//JsonSerializerOptions serializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-			//return JsonSerializer.Deserialize<Dictionary<uint, List<ulong>>>(searchDataCorrectBPM.SongDataSerialized, serializerOptions);
-
-
-			//if (!_searchDataInstance.SearchData.ContainsKey(BPM)) //doesnt contains the BPM yet -> add it
-			//{
-			//	_searchDataInstance.SearchData.TryAdd(
-			//		BPM, //BPM
-			//		new Dictionary<uint, List<ulong>>()); //empty SongData
-			//}
-			//return _searchDataInstance.SearchData[BPM];
 		}
 
 		/// <summary>
@@ -326,8 +311,10 @@ namespace Yoti.Server.Controllers
 		{
 			uint deleteSongId= song.Id;
 
-			_context.DatabaseHashes.RemoveRange(_context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValueDB == song.Id).ToArray());
-
+			foreach (var hash in _context.DatabaseHashes.Where(v => v.BPM == song.BPM && (uint)v.SongValueDB == song.Id))
+			{
+				_context.DatabaseHashes.Remove(hash);
+			}
 		}
 
 		/// <summary>
