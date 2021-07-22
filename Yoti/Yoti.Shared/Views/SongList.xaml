@@ -83,11 +83,23 @@
 							HorizontalAlignment="Left"
 							Style="{StaticResource DefaultTextBlock}"
 							/>
+						
+						<!-- Lyrics button at user version of the app -->
+						<!--
 						<Button
 							Template="{StaticResource NonexpandingOKButton}"
 							Content="Lyrics"
 							Tag="{Binding}"
 							Click="ShowLyrics"
+							Grid.Column="3"
+							/>
+						-->
+						<!-- Delete button at admin version of the app -->
+						<Button
+							Template="{StaticResource NonexpandingOKButton}"
+							Content="Delete"
+							Tag="{Binding}"
+							Click="DeleteSong"
 							Grid.Column="3"
 							/>
 					</Grid>
