@@ -1,0 +1,3 @@
+Assets/SplashScreen.png
+Assets/youtube_logo_dark.png
+Assets/youtube_music_logo_dark.png
